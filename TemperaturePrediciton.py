@@ -11,7 +11,7 @@ df = pd.read_csv("https://raw.githubusercontent.com/jbrownlee/Datasets/master/da
 df["Date"] = pd.to_datetime(df["Date"])
 df = df.set_index("Date")
 
-# Extract the year, month and day of the date.
+# Extract the year, month and day of the date of each observation (1 temp. per day).
 df["Year"] = df.index.year
 df["Month"] = df.index.month
 df["Day"] = df.index.day
@@ -25,7 +25,9 @@ index = int(0.8*nmb_rows_df)
 train_df = df[0:index].copy()
 test_df = df[index:].copy()
 
-# Define the NN input features: Year, Month, Day and Temperature. So drop the Date columns.
+# Define the NN input features: Year, Month, Day and Temperature: Drop the Date columns.
+# As the temperature of the nex day will be predicted with the temperature from the previous day, the NN should also
+# be trained with the previous day temperatures.
 train_shifted_df = train_df.copy()
 train_shifted_df['Temp'] = train_shifted_df['Temp'].shift(periods = 1, fill_value = 0)
 NN_Input = train_shifted_df.drop(columns = ["Date"])
@@ -49,40 +51,42 @@ my_model.add(keras.layers.Dense(50, kernel_initializer = 'uniform', activation =
 # For example what happens if I put all the weights and biases to 1? What is the output etc. ?
 # todo hold back some data and do the exercise Steve gave you in Slack. Make sure to pose the problem right:
 # If you do not give the NN a chance to learn smth about the year then it cannot do that.
-my_model.add(keras.layers.Dense(85, kernel_initializer = 'uniform', activation = 'relu')) # The 165 is the output so the weights and biases are the [155x165] matrix between the previous output (this input) and this output.
+my_model.add(keras.layers.Dense(85, kernel_initializer = 'uniform', activation = 'relu'))
 my_model.add(keras.layers.Dense(85, kernel_initializer = 'uniform', activation = 'relu'))
 my_model.add(keras.layers.Dense(1, kernel_initializer = 'uniform', activation = 'relu'))
 # todo get the accuracy of the training set and the testing set.
 opt = keras.optimizers.Adam(learning_rate)
 my_model.compile(loss = 'mean_squared_error', optimizer = opt)
 
-print(my_model.summary())
-
 # Extract the loss per epoch to plot the learning progress.
 epochs, loss = train_model(my_model, NN_Input, NN_Output_Labels, epochs, batch_size)
 plot_the_loss_curve(epochs, loss)
 
-## Predict Temperature with NN
-# Use the temperature form the previous day.
+# Just as before, the test_df is also used to shift the temperature input by 1 day.
+# Created a dataframe compare_temp_df containing the original temperature (not shifted) and the modified
+# temperature shifted by one day which is used as an input to the NN to test the prediciton.
 compare_temp_df = test_df.copy()
 compare_temp_df = compare_temp_df.drop(columns = ["Date", "Year", "Month", "Day"])
 compare_temp_df = compare_temp_df.rename(columns = {"Temp": "Temp_before"})
-test_df['Temp'] = test_df['Temp'].shift(periods = 1, fill_value = 0)
+# Shift the temperature of the test_df dataframe by 1 day.
+test_df['Temp'] = test_df['Temp'].shift(periods = 1, fill_value = test_df['Temp'].mean())
+# Add the shifted column to the dataframe compare_temp_df.
 compare_temp_df['Temp_after'] = test_df['Temp']
 print(compare_temp_df)
 
+# Predict Temperature with the NN using the test data.
+# Use the temperature form the previous day.
 test_values = test_df.drop(columns = ["Date"]).copy()
 predicted_NN_temperatures = my_model.predict(test_values)
 dates_of_predicted_NN_temperatures = test_df['Date']
 
-## Plot the actual recorded temperature against the date.
+# Plot the actual recorded temperature against the date.
 fig, ax=plt.subplots(3)
 ax[0].plot(df['Date'], df['Temp'], linewidth = 0.5)
 ax[0].set_xlabel("Years")
 ax[0].set_ylabel("Actual Temperature")
 
 # Create the Previous Day Dataframe (which is the original dataframe but shifted by a day)
-
 predicted_df = previousday(df.copy())
 error = abs(predicted_df['Temp'] - df['Temp'])
 print("The mean absolute error from the previous day prediciton is %.2f" %nested_sum(error))
@@ -100,7 +104,7 @@ ax[2].set_ylabel("Previous Day Error")
 
 plt.show()
 
-## Plot the actual recorded temperature against the date.
+# Plot the actual recorded temperature against the date.
 fig2, ax2=plt.subplots(3)
 
 ax2[0].plot(test_df['Date'], df['Temp'][index:], linewidth = 0.5)
@@ -128,8 +132,4 @@ ax2[2].plot(dates_of_predicted_NN_temperatures, error, linewidth=0.5)
 ax2[2].set_xlabel("Years")
 ax2[2].set_ylabel("NN Error")
 
-
 plt.show()
-
-# # todo Plot the predicitons: done
-# # todo Plot the loss over the iterations or epochs so that <ou can see that it is converging: done
