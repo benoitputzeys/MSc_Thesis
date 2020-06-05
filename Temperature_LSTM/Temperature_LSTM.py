@@ -49,18 +49,21 @@ Raw_Output = train_df[["Temp"]].values
 # Creating a data structure with 60 timesteps and 1 output
 X_train = []
 y_train = []
-for i in range(30, len(Raw_Input)):
-    X_train.append(Raw_Input[i-30:i, 0])
-    y_train.append(Raw_Input[i, 0])
-# Remember that in order to be accepted into the network, you need to transform it into a numpy array.
-X_train, y_train = np.array(X_train), np.array(y_train)
+
+X_train = np.zeros((4,len(Raw_Input)-30,30))
+y_train = np.zeros((len(Raw_Input)-30,1))
+for j in range(4):
+    for i in range(30, len(Raw_Input)):
+        for k in range(30):
+            X_train[j, i - 30, k] = Raw_Input[i-k, j]
+            y_train[i - 30] = Raw_Input[i,0]
 
 # Reshaping
 # Keras requires an input of 3 dimensions
 # The first is the number of observations
 # The second is the number of timesteps
 # The third is the number of indicators.
-X_train = np.reshape(X_train, (X_train.shape[0], X_train.shape[1], 1))
+X_train = np.reshape(X_train, (X_train.shape[1], X_train.shape[2], X_train.shape[0]))
 
 # Part 2 - Building the RNN
 
@@ -90,7 +93,7 @@ regressor = Sequential()
 # Because predicting the stock market price is pretty complex, you need to have a high dimensionality too thus 50
 # for the number of neurons. If the number of neurons is too small in each of the LSTM layers, the model would not
 # capture very well the upward and downward trend.
-regressor.add(LSTM(units = 50, return_sequences = True, input_shape = (X_train.shape[1], 1)))
+regressor.add(LSTM(units = 50, return_sequences = True, input_shape = (X_train.shape[1], X_train.shape[2])))
 regressor.add(Dropout(0.2))
 
 # Adding a second LSTM layer and some Dropout regularisation
@@ -128,8 +131,6 @@ regressor.compile(optimizer = 'adam', loss = 'mean_squared_error')
 # 32 stock prize observation.
 regressor.fit(X_train, y_train, epochs = 45, batch_size = 32)
 
-
-
 # Part 3 - Making the predictions and visualising the results
 
 # Getting the real stock price of 2017
@@ -156,7 +157,7 @@ dataset_total = pd.concat((train_df['Temp'], test_df['Temp']), axis = 0)
 inputs = dataset_total[len(dataset_total) - len(test_df) - 30:].values
 # The shape of inputs is (80,) but sklearn requires this to be in a shape (80,1)
 # Thus just put a reshape and all good.
-inputs = inputs.reshape(-1,1)
+# inputs = inputs.reshape(-1,1)
 # # As you have trained on reshaped values, you have to reshape the inputs for the prediciton as well.
 # # Careful here to not use fit_transform as above because you do not want to compute the minimum and maximum
 # # again, you want to preserve those from before and subject your data to the same tranformation as before.
@@ -165,23 +166,32 @@ inputs = inputs.reshape(-1,1)
 # Remember that in this step, you create a numpy array with 60 entries per rowand 20 columns
 # In each iteration, you add this row to the variable X_test via append.
 # After this, make sure to also make it an np.array.
-X_test = []
-for i in range(30, len(inputs)):
-    X_test.append(inputs[i-30:i, 0])
-X_test = np.array(X_test)
 
-# Just as above, reshape your input before it goes into the NN.
-X_test = np.reshape(X_test, (X_test.shape[0], X_test.shape[1], 1))
-# Predict the stock prices.
+
+X_test= np.zeros((4,len(inputs)-30,30))
+for j in range(4):
+    for i in range(30, len(inputs)):
+        for k in range(30):
+            X_test[j, i - 30, k] = inputs[i-k, j]
+
+# # Just as above, reshape your input before it goes into the NN.
+X_test = np.reshape(X_test, (X_test.shape[1], X_test.shape[2], X_test.shape[0]))
+# # Predict the stock prices.
 predicted_temperature = regressor.predict(X_test)
 # # Rescale the output.
 # predicted_stock_price = sc.inverse_transform(predicted_stock_price)
 
 # Visualising the results
+
+error = predicted_temperature - test_temperatures
+
 plt.plot(test_temperatures, color = 'red', label = 'Real Temperature')
 plt.plot(predicted_temperature, color = 'blue', label = 'Predicted Temperature')
+plt.plot(abs(error), color = 'black', label = 'Error')
 plt.title('Temperature Prediction')
 plt.xlabel('Time')
 plt.ylabel('Temperature')
 plt.legend()
 plt.show()
+
+print("The asolute men error is ", abs(error)/len(predicted_temperature))
