@@ -46,7 +46,7 @@ NN_Output_Labels = train_df[["Temp"]]
 
 # Define the hyperparameters.
 learning_rate = 0.0005
-epochs = 155
+epochs = 100
 batch_size = 32
 
 # Create the model.
@@ -56,7 +56,7 @@ my_model = create_model(learning_rate, (1,))
 epochs, loss = train_model(my_model, NN_Input, NN_Output_Labels, epochs, batch_size)
 
 # Plot the loss per epoch.
-plot_the_loss_curve(epochs[10:], loss[10:])
+plot_the_loss_curve(epochs[5:], loss[5:])
 
 ########################################################################################################################
 
@@ -147,5 +147,5 @@ plot_predicted_temp(axes2, dates_of_predicted_NN_temperatures, arr[1:], "NN pred
 plot_error(axes2, dates_of_predicted_NN_temperatures, error_NN, "NN error")
 
 # Plot the predicted temperature on the last 60 days.
-plot_prediction_zoomed_in(dates_of_predicted_NN_temperatures[-60:], arr[-60:],df['Temp'][-60:], "Predicted", "Actual")
+plot_prediction_zoomed_in(dates_of_predicted_NN_temperatures[-60:], arr[-60:],df['Temp'][-60:], predicted_df["Temp"].values[-60:], "Predicted", "Actual", "Previous day")
 

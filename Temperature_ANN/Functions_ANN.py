@@ -89,11 +89,12 @@ def plot_error(ax, xvalues, error,string):
     ax[2].set_ylabel(string)
     plt.show()
 
-def plot_prediction_zoomed_in(xvalues,yvalues1, yvalues2, string1, string2):
+def plot_prediction_zoomed_in(xvalues,yvalues1, yvalues2, yvalues3, string1, string2, string3):
     plt.figure(4)
     plt.xlabel("Time")
     plt.ylabel("Temperature")
     plt.plot(xvalues, yvalues1 , label=string1)
     plt.plot(xvalues, yvalues2 , label=string2)
+    plt.plot(xvalues, yvalues3 , label=string3)
     plt.legend()
     plt.show()
