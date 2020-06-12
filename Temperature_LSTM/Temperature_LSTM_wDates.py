@@ -4,6 +4,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
+from datetime import datetime
+
 from keras.optimizers import RMSprop
 
 # Importing the training set
@@ -12,10 +14,10 @@ df = pd.read_csv('https://raw.githubusercontent.com/jbrownlee/Datasets/master/da
 df["Date"] = pd.to_datetime(df["Date"])
 df = df.set_index("Date")
 
-# Extract the year, month and day of the date of each observation (1 temp. per day).
-df["Year"] = df.index.year
+# Extract the month and day of the date of each observation (1 temp. per day).
 df["Month"] = df.index.month
 df["Day"] = df.index.day
+
 
 # Reset the index and drop the date column.
 df.reset_index(inplace = True)
@@ -29,21 +31,36 @@ test_df = df[index:].copy()
 
 # Define the NN input features: Year, Month, Day and Temperature.
 # The temperature of the nex day will be predicted with the temperature from the 30 previous days.
-Raw_Input = train_df.iloc[:, 0:4].values
+Raw_Input = train_df.iloc[:, :].values
 Raw_Output = train_df[["Temp"]].values
 
 # Creating a data structure with 30 previous observations and 1 output
 X_train = []
 y_train = []
+date_string = list()
 days_past = 1
 
-X_train = np.zeros((len(Raw_Input)-days_past,days_past,4))
+# test = Raw_Input[:,0]
+# type(test[1])
+# test2 = datetime.fromtimestamp(test[1])
+#
+# # Read your string into a datetime object
+# for i in range(len(Raw_Input)):
+#     test = Raw_Input[i, 0]
+#     date_string.append( dt.datetime.strftime(test, '%Y-%m-%d'))
+
+
+#Raw_Input[:,0] = float(np.array(date_string))
+#X_train[50, 0, 1] = Raw_Input[5, 0]
+
+X_train = np.zeros((len(Raw_Input)-days_past,days_past, days_past))
 y_train = np.zeros((len(Raw_Input)-days_past,1))
-for j in range(4):
-    for i in range(days_past, len(Raw_Input)):
+for i in range(days_past, len(Raw_Input)):
+    for j in range(2):
         for k in range(days_past):
             X_train[i - days_past, k, j] = Raw_Input[i-k-1, j]
             y_train[i - days_past] = Raw_Input[i,0]
+
 
 # Part 2 - Building the RNN
 from Functions_LSTM import train_model, plot_loss, create_model

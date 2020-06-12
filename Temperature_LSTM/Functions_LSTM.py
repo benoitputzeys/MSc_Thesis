@@ -10,7 +10,7 @@ from keras.layers import Dropout
 from keras.initializers import RandomNormal
 from keras.optimizers import RMSprop
 
-def create_model(input_variable):
+def create_model(input_variable, learning_rate):
     # Initialising the NN
     # Initialise the NN as a sequence of layers as opposed to a computational graph.
     my_model = Sequential()
@@ -48,15 +48,15 @@ def create_model(input_variable):
     # But experimenting with other optimizers, one can also use the adam optimizer.
     # The adam optimizer is actually always a good choice and very powerfull too!
     # In general, the most commonly used optimizers are adam and RMSprop
-    optimizer = RMSprop(lr=1e-3)
+    optimizer = RMSprop(lr=learning_rate)
     my_model.compile(optimizer = optimizer, loss = 'mean_squared_error')
 
     return my_model
 
-def train_model(model, X_train, y_train):
+def train_model(model, X_train, y_train, epochs, batch):
 
     # Fitting the model to the Training set
-    history = model.fit(X_train, y_train, epochs=100, batch_size=64)
+    history = model.fit(X_train, y_train, epochs=epochs, batch_size=batch)
 
     # The list of epochs is stored separately from the rest of history.
     epochs = history.epoch
@@ -76,8 +76,25 @@ def plot_loss(epochs, difference, counter):
     plt.xlabel("Epoch")
     plt.ylabel("Mean Squared Error")
     string = "Loss with " + str(counter) + " days in the past."
-    plt.plot(epochs[10:], difference[10:], label = string)
+    plt.plot(epochs, difference, label = string)
     plt.legend()
     plt.show()
 
     return None
+
+
+def plot_error_LSTM(xvalues, error, label):
+    plt.figure(3)
+    plt.plot(xvalues, error, linewidth=0.5, label=label)
+    plt.xlabel("Years")
+    plt.ylabel("Error")
+    plt.show()
+
+def plot_prediction_zoomed_in( xvalues, yvalues1, yvalues2, string1, string2 ):
+    plt.figure(2)
+    plt.xlabel("Time")
+    plt.ylabel("Temperature")
+    plt.plot(xvalues, yvalues1 , label=string1)
+    plt.plot(xvalues, yvalues2 , label=string2)
+    plt.legend()
+    plt.show()
