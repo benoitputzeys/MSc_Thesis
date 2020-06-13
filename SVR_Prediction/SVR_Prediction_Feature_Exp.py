@@ -16,6 +16,9 @@ print(df.head())
 df_label = df["Total_Generation"]
 df_features = pd.DataFrame()
 df_features["Total_Generation"] = df["Total_Generation"].shift(-2)
+df_features["System_Buy_Price"] = df["System_Buy_Price"].shift(-2)
+df_features["System_Total_Accepted_Bid_Volume"] = df["System_Total_Accepted_Bid_Volume"].shift(-2)
+#df_features["Total_System_Accepted_Offer_Volume"] = df["Total_System_Accepted_Offer_Volume"].shift(-2)
 df_features["Settlement_Period"] = df["Settlement_Period"]
 
 # Create your input variable
@@ -25,8 +28,8 @@ y = np.reshape(y,(len(y),1))
 
 # After having shifted the data, the nan values have to be replaces in order to have good predictions.
 replace_nan = SimpleImputer(missing_values = np.nan, strategy='mean')
-replace_nan.fit(x[:,0:1])
-x[:, 0:1] = replace_nan.transform(x[:,0:1])
+replace_nan.fit(x)
+x = replace_nan.transform(x)
 
 X_train, X_test, y_train, y_test = train_test_split(x, y, test_size = 0.2, random_state = 0, shuffle = False)
 X_test_unscaled = X_test
