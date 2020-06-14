@@ -45,7 +45,7 @@ y_train = y_scaler.fit_transform(y_train)
 y_test = y_scaler.transform(y_test)
 
 # Fit the Decision Tree to our data
-regressor = RandomForestRegressor(n_estimators = 100, random_state = 0)
+regressor = RandomForestRegressor(n_estimators = 2, random_state = 0)
 regressor.fit(X_train, y_train)
 
 # Compute the prediction and rescale

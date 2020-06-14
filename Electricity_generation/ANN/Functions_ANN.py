@@ -26,14 +26,15 @@ def create_model(my_learning_rate, shapeinput):
     # Input shape corresponds to the number of columns (the features day, month and year) of the dataframe,
     # excpet for the output label, the temperature.
 
-    my_model.add(keras.layers.Dense(50, kernel_initializer='uniform', activation='relu', input_shape = shapeinput))
-    # todo hold back some data and do the exercise Steve gave you in Slack. Make sure to pose the problem right:
-    # If you do not give the NN a chance to learn smth about the year then it cannot do that.
-    my_model.add(keras.layers.Dense(85, kernel_initializer='uniform', activation='relu'))
-    my_model.add(keras.layers.Dense(85, kernel_initializer='uniform', activation='relu'))
+    my_model.add(keras.layers.Dense(5, kernel_initializer='uniform', activation='relu', input_shape = shapeinput))
+    #my_model.add(keras.layers.Dense(85, kernel_initializer='uniform', activation='relu'))
+    #my_model.add(keras.layers.Dense(85, kernel_initializer='uniform', activation='relu'))
+    my_model.add(keras.layers.Dense(10, kernel_initializer='uniform', activation='relu'))
+    my_model.add(keras.layers.Dense(10, kernel_initializer='uniform', activation='relu'))
+    my_model.add(keras.layers.Dense(10, kernel_initializer='uniform', activation='relu'))
+    my_model.add(keras.layers.Dense(10, kernel_initializer='uniform', activation='relu'))
     my_model.add(keras.layers.Dense(1, kernel_initializer='uniform', activation='relu'))
 
-    # todo get the accuracy of the training set and the testing set.
     opt = keras.optimizers.Adam(my_learning_rate)
     my_model.compile(loss='mean_squared_error', optimizer=opt)
 
@@ -70,31 +71,31 @@ def nested_sum(lst):
     return total
 
 
-def plot_actual_temp(ax, dataframe):
-    ax[0].plot(dataframe['Date'], dataframe['Temp'], linewidth=0.5)
-    ax[0].set_xlabel("Years")
-    ax[0].set_ylabel("Actual Temperature")
+def plot_actual_generation(ax, y_values, string):
+    ax[0].plot(y_values, linewidth=0.5)
+    ax[0].set_xlabel("Time")
+    ax[0].set_ylabel(string)
     plt.show()
 
-def plot_predicted_temp(ax, xvalues, yvalues, string):
+def plot_predicted_generation(ax,  yvalues, string):
 
-    ax[1].plot(xvalues, yvalues, linewidth=0.5)
-    ax[1].set_xlabel("Years")
+    ax[1].plot( yvalues, linewidth=0.5)
+    ax[1].set_xlabel("Time")
     ax[1].set_ylabel(string)
     plt.show()
 
-def plot_error(ax, xvalues, error,string):
-    ax[2].plot(xvalues, error, linewidth=0.5)
-    ax[2].set_xlabel("Years")
+def plot_error(ax, error, string):
+    ax[2].plot( error, linewidth=0.5)
+    ax[2].set_xlabel("Time")
     ax[2].set_ylabel(string)
     plt.show()
 
-def plot_prediction_zoomed_in(xvalues,yvalues1, yvalues2, yvalues3, string1, string2, string3):
+def plot_prediction_zoomed_in(yvalues1, yvalues2, yvalues3, string1, string2, string3):
     plt.figure(4)
     plt.xlabel("Time")
-    plt.ylabel("Temperature")
-    plt.plot(xvalues, yvalues1 , label=string1)
-    plt.plot(xvalues, yvalues2 , label=string2)
-    plt.plot(xvalues, yvalues3 , label=string3)
+    plt.ylabel("Genration")
+    plt.plot( yvalues1 , label=string1)
+    plt.plot( yvalues2 , label=string2)
+    plt.plot( yvalues3 , label=string3)
     plt.legend()
     plt.show()
