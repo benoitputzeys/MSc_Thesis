@@ -11,12 +11,12 @@ frames = ([ Decision_Tree, LSTM, Random_Forest, SVR])
 df = pd.concat(frames, axis = 0)
 
 # Create bars and choose color
-plt.bar(df.iloc[:,0], df.iloc[:,1], color='blue')
+plt.bar(df.iloc[:,0], df.iloc[:,2], color='blue')
 
 # Add title and axis names
 plt.title('Comparing Models with one another for electricity generation prediction.')
 plt.xlabel('Methods Used')
-plt.ylabel('Mean Squared Error (Test Set)')
+plt.ylabel('Mean Absolute Error (Test Set)')
 
 # Show graphic
 plt.show()

@@ -15,8 +15,8 @@ def return_features_and_labels():
     # frames = ([df1, df2, df3, df4, df5])
     # df = pd.concat(frames)
     #
-    # # Determine the label
-    # df_label = df["Total_Generation"]
+    # Determine the label
+    df_label = df["Total_Generation"]
 
     # Determine the Features
     df_features = pd.DataFrame()

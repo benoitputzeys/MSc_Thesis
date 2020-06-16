@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split, TimeSeriesSplit
 from Electricity_generation.LSTM.Functions_LSTM import plot_loss, train_model, create_model, plot_generation, plot_prediction_zoomed_in
 from sklearn.preprocessing import StandardScaler
+import pandas as pd
 
 ########################################################################################################################
 
@@ -38,8 +39,8 @@ X_test = np.reshape(X_test, (X_test.shape[0],X_test.shape[1],1))
 
 # Define the hyperparameters.
 learning_rate = 0.001
-number_of_epochs = 50
-batch_size = 32
+number_of_epochs = 75
+batch_size = 16
 
 # Create the model.
 my_model = create_model(X_train, learning_rate)
@@ -120,10 +121,10 @@ plot_generation(axes[2], error_previousday_test, "Error previous day on test set
 fig2, axes2 = plt.subplots(3)
 
 # Plot the actual generation in a new subplot of 3x1.
-plot_generation(axes2[0], y[-len(predicted_NN_generation_test):], "Actual Genration")
+plot_generation(axes2[0], y[-len(predicted_NN_generation_test):], "Actual Generation")
 
 # Plot the the predicted (NN) generation.
-plot_generation(axes2[1], predicted_NN_generation_test, "NN prediciton test set")
+plot_generation(axes2[1], predicted_NN_generation_test, "NN prediction test set")
 
 # Plot the error between the predicted and the actual temperature.
 plot_generation(axes2[2], error_NN_test, "NN error test")
@@ -140,5 +141,16 @@ plot_prediction_zoomed_in(predicted_NN_generation_test[-60:], y[-60:], X_test_un
 import csv
 with open('/Users/benoitputzeys/PycharmProjects/NN-Predicitons/Compare_Models/LSTM_result.csv', 'w', newline='',) as file:
     writer = csv.writer(file)
-    writer.writerow(["LSTM",str(np.mean(error_NN_test*error_NN_test))])
+    writer.writerow(["Method","MSE","MAE"])
+    writer.writerow(["LSTM",str(np.mean(error_NN_test*error_NN_test)),str(np.mean(error_NN_test))])
 
+df_best = pd.read_csv("/Users/benoitputzeys/PycharmProjects/NN-Predicitons/Compare_Models/Best_Results/LSTM_result.csv")
+
+import shutil
+if np.mean(error_NN_test*error_NN_test) <= df_best.iloc[0,1]:
+    import csv
+    with open('/Users/benoitputzeys/PycharmProjects/NN-Predicitons/Compare_Models/Best_Results/LSTM_result.csv', 'w',newline='', ) as file:
+        writer = csv.writer(file)
+        writer.writerow(["Method", "MSE", "MAE"])
+        writer.writerow(["LSTM", str(np.mean(error_NN_test * error_NN_test)), str(np.mean(error_NN_test))])
+    shutil.copyfile('Generation_LSTM.py', 'Best_LSTM.py')

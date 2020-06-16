@@ -21,22 +21,22 @@ def create_model(input_variable, learning_rate):
     # capture very well the upward and downward trend.
     my_model.add(LSTM(units=50, return_sequences=True, input_shape=(input_variable.shape[1],1),
                        kernel_initializer = initializer))
-    my_model.add(Dropout(0.2))
+    my_model.add(Dropout(0.1))
 
     # Adding a second LSTM layer and Dropout regularisation
     # No need to specify any input shape here because we have already defined that we have 50 neurons in the
     # previous layer.
     my_model.add(LSTM(units=50,return_sequences=True,  kernel_initializer = initializer))
-    my_model.add(Dropout(0.2))
+    my_model.add(Dropout(0.1))
 
     # Adding a third LSTM layer and Dropout regularisation
-    my_model.add(LSTM(units=50, kernel_initializer = initializer))
-    my_model.add(Dropout(0.2))
+    my_model.add(LSTM(units=50,return_sequences=True,  kernel_initializer = initializer))
+    my_model.add(Dropout(0.1))
 
-    # # Adding a fourth LSTM layer and Dropout regularisation
-    # # This is the last LSTM layer that is  added! Thus the return sequences is set to  false.
-    # regressor.add(LSTM(units = 25))
-    # regressor.add(Dropout(0.1))
+    # Adding a fourth LSTM layer and Dropout regularisation
+    # This is the last LSTM layer that is  added! Thus the return sequences is set to  false.
+    my_model.add(LSTM(units = 25, kernel_initializer = initializer))
+    my_model.add(Dropout(0.1))
 
     # Adding the output layer
     # We are not adding an LSTM layer. We are fully connecting the outward layer to the previous LSTM layer.

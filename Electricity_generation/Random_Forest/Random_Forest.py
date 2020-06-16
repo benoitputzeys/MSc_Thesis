@@ -113,4 +113,5 @@ plt.show()
 import csv
 with open('/Users/benoitputzeys/PycharmProjects/NN-Predicitons/Compare_Models/Random_Forest_result.csv', 'w', newline='',) as file:
     writer = csv.writer(file)
-    writer.writerow(["Random_Forest" , str(np.mean(error_test*error_test))])
+    writer.writerow(["Method","MSE","MAE"])
+    writer.writerow(["Random_Forest" , str(np.mean(error_test*error_test)),str(np.mean(abs(error_test)))])

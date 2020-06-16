@@ -119,4 +119,5 @@ plt.show()
 import csv
 with open('/Users/benoitputzeys/PycharmProjects/NN-Predicitons/Compare_Models/SVR_result.csv', 'w', newline='',) as file:
     writer = csv.writer(file)
-    writer.writerow(["SVR_result",str(np.mean(error_test*error_test))])
+    writer.writerow(["Method","MSE","MAE"])
+    writer.writerow(["SVR",str(np.mean(error_test*error_test)),str(np.mean(abs(error_test)))])
