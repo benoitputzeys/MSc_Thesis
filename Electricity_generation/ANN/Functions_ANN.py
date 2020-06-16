@@ -19,23 +19,21 @@ def plot_the_loss_curve(epochs, mse):
 print("Defined the plot_the_loss_curve function.")
 
 
-def create_model(my_learning_rate, shapeinput):
+def create_model(shapeinput, learning_rate):
     # Create the model.
     my_model = keras.Sequential()
 
     # Input shape corresponds to the number of columns (the features day, month and year) of the dataframe,
     # excpet for the output label, the temperature.
 
-    my_model.add(keras.layers.Dense(5, kernel_initializer='uniform', activation='relu', input_shape = shapeinput))
+    my_model.add(keras.layers.Dense(50, kernel_initializer='uniform', activation='relu', input_shape=shapeinput))
     #my_model.add(keras.layers.Dense(85, kernel_initializer='uniform', activation='relu'))
     #my_model.add(keras.layers.Dense(85, kernel_initializer='uniform', activation='relu'))
-    my_model.add(keras.layers.Dense(10, kernel_initializer='uniform', activation='relu'))
-    my_model.add(keras.layers.Dense(10, kernel_initializer='uniform', activation='relu'))
-    my_model.add(keras.layers.Dense(10, kernel_initializer='uniform', activation='relu'))
-    my_model.add(keras.layers.Dense(10, kernel_initializer='uniform', activation='relu'))
+    my_model.add(keras.layers.Dense(50, kernel_initializer='uniform', activation='relu'))
+    my_model.add(keras.layers.Dense(50, kernel_initializer='uniform', activation='relu'))
     my_model.add(keras.layers.Dense(1, kernel_initializer='uniform', activation='relu'))
 
-    opt = keras.optimizers.Adam(my_learning_rate)
+    opt = keras.optimizers.Adam(learning_rate)
     my_model.compile(loss='mean_squared_error', optimizer=opt)
 
     return my_model

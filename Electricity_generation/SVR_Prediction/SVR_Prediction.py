@@ -8,30 +8,20 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.svm import SVR
 from sklearn.model_selection import train_test_split
 
+########################################################################################################################
 
-# Import the timeseries data
-df = pd.read_csv("/Users/benoitputzeys/Desktop/Master Thesis/Data/SPI_2020/SPI_202005.csv")
-#df = df.iloc[:500,:]
-print(df.head())
-df_label = df["Total_Generation"]
-df_features = pd.DataFrame()
-df_features["Total_Generation"] = df["Total_Generation"].shift(-2)
-df_features["Settlement_Period"] = df["Settlement_Period"]
+# Get data and data preprocessing.
 
-# Create your input variable
-x = df_features.values
-y = df_label.values
-y = np.reshape(y,(len(y),1))
+########################################################################################################################
 
-# After having shifted the data, the nan values have to be replaces in order to have good predictions.
-replace_nan = SimpleImputer(missing_values = np.nan, strategy='mean')
-replace_nan.fit(x[:,0:1])
-x[:, 0:1] = replace_nan.transform(x[:,0:1])
+from Data_Preprocessing.get_features_and_label import return_features_and_labels
 
-X_train, X_test, y_train, y_test = train_test_split(x, y, test_size = 0.2, random_state = 0, shuffle = False)
+# Get the X (containing the features) and y (containing the labels) values
+X, y = return_features_and_labels()
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state = 0, shuffle = False)
 X_test_unscaled = X_test
 X_train_unscaled = X_train
-
 
 # Feature Scaling
 x_scaler = StandardScaler()
@@ -40,6 +30,12 @@ X_train = x_scaler.fit_transform(X_train)
 X_test = x_scaler.transform(X_test)
 y_train = y_scaler.fit_transform(y_train)
 y_test = y_scaler.transform(y_test)
+
+########################################################################################################################
+
+# Create the model.
+
+########################################################################################################################
 
 # Fit the SVR to our data
 regressor = SVR(kernel = 'rbf')
@@ -57,9 +53,15 @@ result_train = y_scaler.inverse_transform(intermediate_result_train_prediction)
 result_test = result_test.reshape((len(result_test), 1))
 result_train = result_train.reshape((len(result_train), 1))
 
+########################################################################################################################
+
+# Visualising the results
+
+########################################################################################################################
+
 # Visualising the results
 X_vals = []
-for i in range(len(df)):
+for i in range(len(X)):
     X_vals = np.append(X_vals, i)
 X_vals = np.reshape(X_vals,(len(X_vals),1))
 
@@ -106,3 +108,15 @@ ax2[2].plot(abs(error_test), color = 'blue')
 ax2[2].set_xlabel('Settlement Period')
 ax2[2].set_ylabel('Test Error')
 plt.show()
+
+
+########################################################################################################################
+
+# Save the results in a csv file.
+
+########################################################################################################################
+
+import csv
+with open('/Users/benoitputzeys/PycharmProjects/NN-Predicitons/Compare_Models/SVR_result.csv', 'w', newline='',) as file:
+    writer = csv.writer(file)
+    writer.writerow(["SVR_result",str(np.mean(error_test*error_test))])
