@@ -11,7 +11,7 @@ import pandas as pd
 
 ########################################################################################################################
 
-from Data_Preprocessing.get_features_and_label import return_features_and_labels
+from Data_Entsoe.Data_Preprocessing.Get_Features_And_Label import return_features_and_labels
 
 # Get the X (containing the features) and y (containing the labels) values
 X, y = return_features_and_labels()
@@ -42,10 +42,10 @@ y_test = y_scaler.transform(y_test)
 # Define the hyperparameters.
 learning_rate = 0.001
 number_of_epochs = 50
-batch_size = 32
+batch_size = 64
 
 # Create the model.
-my_model = create_model((10,), learning_rate)
+my_model = create_model(len(X_train[1]), learning_rate)
 
 # Extract the loss per epoch to plot the learning progress.
 
@@ -56,7 +56,8 @@ tscv = TimeSeriesSplit()
 for train_index, test_index in tscv.split(X_train):
       X_train_split, X_test_split = X_train[train_index], X_train[test_index]
       y_train_split, y_test_split = y_train[train_index], y_train[test_index]
-      #X_train_split = np.reshape(X_train_split, (X_train_split.shape[0],X_train_split.shape[1]))
+      # X_train_split = np.reshape(X_train_split, (X_train_split.shape[0],X_train_split.shape[1],1))
+      # y_train_split = np.reshape(y_train_split, (y_train_split.shape[0],y_train_split.shape[1],1))
       epochs_split, loss = train_model(my_model, X_train_split, y_train_split, number_of_epochs, batch_size)
       epochs_list = np.append(epochs_list , epochs_split)
       loss_list = np.append(loss_list, loss)
@@ -75,8 +76,6 @@ plot_the_loss_curve(np.linspace(1,len(epochs_list), len(epochs_list) ), loss_lis
 
 predicted_NN_generation_train = y_scaler.inverse_transform(my_model.predict(X_train))
 predicted_NN_generation_test = y_scaler.inverse_transform(my_model.predict(X_test))
-predicted_NN_generation_train = my_model.predict(X_train)
-predicted_NN_generation_test = my_model.predict(X_test)
 
 ########################################################################################################################
 
@@ -111,12 +110,12 @@ print("The mean squarred error from the NN prediction on the test set is %.2f"  
 ########################################################################################################################
 
 # Plot the actual recorded generation against the date.
-from Functions_ANN import plot_actual_generation, plot_predicted_generation, plot_error, plot_prediction_zoomed_in
+from Electricity_generation.ANN.Functions_ANN import plot_actual_generation, plot_predicted_generation, plot_error, plot_prediction_zoomed_in
 
 fig, axes = plt.subplots(3)
 
 # Plot the actual generation in a subplot of 3x1.
-plot_actual_generation(axes, y, "Actual Temperature")
+plot_actual_generation(axes, y, "Actual Generation")
 
 # Plot the predicted generation (from the day before) against the recording date.
 plot_predicted_generation(axes, X[:, 0], "Previous day prediction")
@@ -128,10 +127,10 @@ plot_error(axes,  error_previousday_test, "Error previous day on test set.")
 fig2, axes2 = plt.subplots(3)
 
 # Plot the actual generation in a new subplot of 3x1.
-plot_actual_generation(axes2, y, "Actual Genration")
+plot_actual_generation(axes2, y[-len(predicted_NN_generation_test):], "Actual Generation")
 
 # Plot the the predicted (NN) generation.
-plot_predicted_generation(axes2, predicted_NN_generation_test, "NN prediciton test set")
+plot_predicted_generation(axes2, predicted_NN_generation_test, "NN prediciton test-set")
 
 # Plot the error between the predicted and the actual temperature.
 plot_error(axes2, error_NN_test, "NN error test")

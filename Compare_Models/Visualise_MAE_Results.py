@@ -7,7 +7,7 @@ LSTM = pd.read_csv("/Users/benoitputzeys/PycharmProjects/NN-Predicitons/Compare_
 Random_Forest = pd.read_csv("/Users/benoitputzeys/PycharmProjects/NN-Predicitons/Compare_Models/Random_Forest_result.csv")
 SVR = pd.read_csv("/Users/benoitputzeys/PycharmProjects/NN-Predicitons/Compare_Models/SVR_result.csv")
 
-frames = ([ Decision_Tree, LSTM, Random_Forest, SVR])
+frames = ([ANN, Decision_Tree, LSTM, Random_Forest, SVR])
 df = pd.concat(frames, axis = 0)
 
 # Create bars and choose color

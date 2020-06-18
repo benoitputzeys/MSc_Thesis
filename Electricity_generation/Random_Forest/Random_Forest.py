@@ -10,7 +10,7 @@ from sklearn.model_selection import train_test_split
 
 ########################################################################################################################
 
-from Data_Preprocessing.get_features_and_label import return_features_and_labels
+from Data_Entsoe.Data_Preprocessing.Get_Features_And_Label import return_features_and_labels
 
 # Get the X (containing the features) and y (containing the labels) values
 X, y = return_features_and_labels()
@@ -61,18 +61,18 @@ for i in range(len(X)):
 X_vals = np.reshape(X_vals,(len(X_vals),1))
 
 figure1 = plt.figure(1)
-plt.plot(X_vals, y, color = 'red')
+plt.plot(X_vals, y, color = 'blue',linewidth=0.5)
 plt.title('Decision Tree')
 plt.xlabel('Settlement Period')
 plt.ylabel('Actual Value')
 
 fig, ax = plt.subplots(3)
 
-ax[0].plot(X_vals[:len(X_train)], X_train_unscaled[:,0], color = 'blue')
+ax[0].plot(X_vals[:len(X_train)], X_train_unscaled[:,0], color = 'blue',linewidth=0.5)
 ax[0].set_xlabel('Settlement Period')
 ax[0].set_ylabel('Actual Train')
 
-ax[1].plot(X_vals[:len(result_train)], result_train, color = 'blue')
+ax[1].plot(X_vals[:len(result_train)], result_train, color = 'blue',linewidth=0.5)
 ax[1].set_xlabel('Settlement Period')
 ax[1].set_ylabel('Train Prediction')
 
@@ -80,18 +80,18 @@ error_train = result_train - y_scaler.inverse_transform(y_train)
 print("The mean absolute error of the training set is %0.2f" %np.mean(abs(error_train)))
 print("The mean squarred error of the training set is %0.2f" %np.mean(error_train*error_train))
 
-ax[2].plot(abs(error_train), color = 'blue')
+ax[2].plot(abs(error_train), color = 'blue',linewidth=0.5)
 ax[2].set_xlabel('Settlement Period')
 ax[2].set_ylabel('Train Error')
 plt.show()
 
 fig2, ax2 = plt.subplots(3)
 
-ax2[0].plot(X_vals[-len(X_test):], X_test_unscaled[:,0], color = 'blue')
+ax2[0].plot(X_vals[-len(X_test):], X_test_unscaled[:,0], color = 'blue',linewidth=0.5)
 ax2[0].set_xlabel('Settlement Period')
 ax2[0].set_ylabel('Actual Test')
 
-ax2[1].plot(X_vals[len(result_train):], result_test, color = 'blue')
+ax2[1].plot(X_vals[len(result_train):], result_test, color = 'blue',linewidth=0.5)
 ax2[1].set_xlabel('Settlement Period')
 ax2[1].set_ylabel('Test Prediction')
 
@@ -99,7 +99,7 @@ error_test = result_test - y_scaler.inverse_transform(y_test)
 print("The mean absolute error of the test set is %0.2f" %np.mean(abs(error_test)))
 print("The mean squarred error of the test set is %0.2f" %np.mean(error_test*error_test))
 
-ax2[2].plot(abs(error_test), color = 'blue')
+ax2[2].plot(abs(error_test), color = 'blue',linewidth=0.5)
 ax2[2].set_xlabel('Settlement Period')
 ax2[2].set_ylabel('Test Error')
 plt.show()

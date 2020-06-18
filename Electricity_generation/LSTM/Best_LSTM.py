@@ -40,7 +40,7 @@ X_test = np.reshape(X_test, (X_test.shape[0],X_test.shape[1],1))
 # Define the hyperparameters.
 learning_rate = 0.001
 number_of_epochs = 50
-batch_size = 32
+batch_size = 64
 
 # Create the model.
 my_model = create_model(X_train, learning_rate)
@@ -121,10 +121,10 @@ plot_generation(axes[2], error_previousday_test, "Error previous day on test set
 fig2, axes2 = plt.subplots(3)
 
 # Plot the actual generation in a new subplot of 3x1.
-plot_generation(axes2[0], y[-len(predicted_NN_generation_test):], "Actual Genration")
+plot_generation(axes2[0], y[-len(predicted_NN_generation_test):], "Actual Generation")
 
 # Plot the the predicted (NN) generation.
-plot_generation(axes2[1], predicted_NN_generation_test, "NN prediciton test set")
+plot_generation(axes2[1], predicted_NN_generation_test, "NN prediction test set")
 
 # Plot the error between the predicted and the actual temperature.
 plot_generation(axes2[2], error_NN_test, "NN error test")
@@ -144,7 +144,7 @@ with open('/Users/benoitputzeys/PycharmProjects/NN-Predicitons/Compare_Models/LS
     writer.writerow(["Method","MSE","MAE"])
     writer.writerow(["LSTM",str(np.mean(error_NN_test*error_NN_test)),str(np.mean(error_NN_test))])
 
-df_best = pd.read_csv("/Users/benoitputzeys/PycharmProjects/NN-Predicitons/Compare_Models/Best_Results/ANN_result.csv")
+df_best = pd.read_csv("/Users/benoitputzeys/PycharmProjects/NN-Predicitons/Compare_Models/Best_Results/LSTM_result.csv")
 
 import shutil
 if np.mean(error_NN_test*error_NN_test) <= df_best.iloc[0,1]:
@@ -153,4 +153,4 @@ if np.mean(error_NN_test*error_NN_test) <= df_best.iloc[0,1]:
         writer = csv.writer(file)
         writer.writerow(["Method", "MSE", "MAE"])
         writer.writerow(["LSTM", str(np.mean(error_NN_test * error_NN_test)), str(np.mean(error_NN_test))])
-    shutil.copyfile('Generation_ANN.py', 'Best_ANN.py')
+    shutil.copyfile('Generation_LSTM.py', 'Best_LSTM.py')

@@ -11,7 +11,7 @@ import pandas as pd
 
 ########################################################################################################################
 
-from Data_Preprocessing.get_features_and_label import return_features_and_labels
+from Data_Entsoe.Data_Preprocessing.Get_Features_And_Label import return_features_and_labels
 
 # Get the X (containing the features) and y (containing the labels) values
 X, y = return_features_and_labels()
@@ -39,8 +39,8 @@ X_test = np.reshape(X_test, (X_test.shape[0],X_test.shape[1],1))
 
 # Define the hyperparameters.
 learning_rate = 0.001
-number_of_epochs = 75
-batch_size = 16
+number_of_epochs = 50
+batch_size = 64
 
 # Create the model.
 my_model = create_model(X_train, learning_rate)

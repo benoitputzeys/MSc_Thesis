@@ -41,11 +41,11 @@ y_test = y_scaler.transform(y_test)
 
 # Define the hyperparameters.
 learning_rate = 0.001
-number_of_epochs = 50
-batch_size = 32
+number_of_epochs = 150
+batch_size = 64
 
 # Create the model.
-my_model = create_model((10,), learning_rate)
+my_model = create_model(len(X_train[1]), learning_rate)
 
 # Extract the loss per epoch to plot the learning progress.
 
@@ -56,7 +56,8 @@ tscv = TimeSeriesSplit()
 for train_index, test_index in tscv.split(X_train):
       X_train_split, X_test_split = X_train[train_index], X_train[test_index]
       y_train_split, y_test_split = y_train[train_index], y_train[test_index]
-      #X_train_split = np.reshape(X_train_split, (X_train_split.shape[0],X_train_split.shape[1]))
+      # X_train_split = np.reshape(X_train_split, (X_train_split.shape[0],X_train_split.shape[1],1))
+      # y_train_split = np.reshape(y_train_split, (y_train_split.shape[0],y_train_split.shape[1],1))
       epochs_split, loss = train_model(my_model, X_train_split, y_train_split, number_of_epochs, batch_size)
       epochs_list = np.append(epochs_list , epochs_split)
       loss_list = np.append(loss_list, loss)
@@ -75,8 +76,6 @@ plot_the_loss_curve(np.linspace(1,len(epochs_list), len(epochs_list) ), loss_lis
 
 predicted_NN_generation_train = y_scaler.inverse_transform(my_model.predict(X_train))
 predicted_NN_generation_test = y_scaler.inverse_transform(my_model.predict(X_test))
-predicted_NN_generation_train = my_model.predict(X_train)
-predicted_NN_generation_test = my_model.predict(X_test)
 
 ########################################################################################################################
 
@@ -128,7 +127,7 @@ plot_error(axes,  error_previousday_test, "Error previous day on test set.")
 fig2, axes2 = plt.subplots(3)
 
 # Plot the actual generation in a new subplot of 3x1.
-plot_actual_generation(axes2, y, "Actual Genration")
+plot_actual_generation(axes2, y[-len(predicted_NN_generation_test):], "Actual Genration")
 
 # Plot the the predicted (NN) generation.
 plot_predicted_generation(axes2, predicted_NN_generation_test, "NN prediciton test set")
