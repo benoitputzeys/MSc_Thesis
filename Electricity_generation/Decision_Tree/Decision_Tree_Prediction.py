@@ -3,6 +3,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
+from sklearn.metrics import mean_absolute_error, mean_squared_error
 
 ########################################################################################################################
 
@@ -10,10 +11,12 @@ from sklearn.model_selection import train_test_split
 
 ########################################################################################################################
 
-from Data_Entsoe.Data_Preprocessing.Get_Features_And_Label import return_features_and_labels
+from numpy import genfromtxt
 
 # Get the X (containing the features) and y (containing the labels) values
-X, y = return_features_and_labels()
+X = genfromtxt('/Users/benoitputzeys/PycharmProjects/NN-Predicitons/Data_Entsoe/Data_Preprocessing/X.csv', delimiter=',')
+y = genfromtxt('/Users/benoitputzeys/PycharmProjects/NN-Predicitons/Data_Entsoe/Data_Preprocessing/y.csv', delimiter=',')
+y = np.reshape(y, (len(y), 1))
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state = 0, shuffle = False)
 X_test_unscaled = X_test
@@ -37,13 +40,25 @@ y_test = y_scaler.transform(y_test)
 regressor = DecisionTreeRegressor(random_state = 0)
 regressor.fit(X_train, y_train)
 
-#print(intermediate_result)
 result_test = y_scaler.inverse_transform(regressor.predict(X_test))
 result_train = y_scaler.inverse_transform(regressor.predict(X_train))
 
-#print(result)
 result_test = result_test.reshape((len(result_test), 1))
 result_train = result_train.reshape((len(result_train), 1))
+
+print("-"*200)
+
+error_train = result_train - y_scaler.inverse_transform(y_train)
+print("The mean absolute error of the training set is %0.2f" % mean_absolute_error(y_scaler.inverse_transform(y_train),result_train))
+print("The mean squared error of the training set is %0.2f" % mean_squared_error(y_scaler.inverse_transform(y_train),result_train))
+print("The root mean squared error of the training set is %0.2f" % np.sqrt(mean_squared_error(y_scaler.inverse_transform(y_train),result_train)))
+
+print("-"*200)
+
+error_test = result_test - y_scaler.inverse_transform(y_test)
+print("The mean absolute error of the training set is %0.2f" % mean_absolute_error(y_scaler.inverse_transform(y_test),result_test))
+print("The mean squared error of the training set is %0.2f" % mean_squared_error(y_scaler.inverse_transform(y_test),result_test))
+print("The root mean squared error of the training set is %0.2f" % np.sqrt(mean_squared_error(y_scaler.inverse_transform(y_test),result_test)))
 
 ########################################################################################################################
 
@@ -51,53 +66,41 @@ result_train = result_train.reshape((len(result_train), 1))
 
 ########################################################################################################################
 
-X_vals = []
-for i in range(len(X)):
-    X_vals = np.append(X_vals, i)
-X_vals = np.reshape(X_vals,(len(X_vals),1))
 
 figure1 = plt.figure(1)
-plt.plot(X_vals, y, color = 'blue',linewidth=0.5)
-plt.title('Decision Tree')
+plt.plot(y, linewidth=0.5)
+plt.title('Training + Test Set (Decision Tree)')
 plt.xlabel('Settlement Period')
-plt.ylabel('Actual Value')
+plt.ylabel('Actual Value (Training + Test Set)')
 
 fig, ax = plt.subplots(3)
-
-ax[0].plot(X_vals[:len(X_train)], X_train_unscaled[:,0], color = 'blue',linewidth=0.5)
+fig.suptitle('Decision Tree: Training Set', fontsize=16)
+ax[0].plot(X_train_unscaled[:,0],linewidth=0.5)
 ax[0].set_xlabel('Settlement Period')
-ax[0].set_ylabel('Actual Train')
+ax[0].set_ylabel('Actual Value: Training Set')
 
-ax[1].plot(X_vals[:len(result_train)], result_train, color = 'blue',linewidth=0.5)
+ax[1].plot( result_train, linewidth=0.5)
 ax[1].set_xlabel('Settlement Period')
-ax[1].set_ylabel('Train Prediction')
+ax[1].set_ylabel('Prediction on training set')
 
-error_train = result_train - y_scaler.inverse_transform(y_train)
-print("The mean absolute error of the training set is %0.2f" %np.mean(abs(error_train)))
-print("The mean squarred error of the training set is %0.2f" %np.mean(error_train*error_train))
-
-ax[2].plot(abs(error_train), color = 'blue',linewidth=0.5)
+ax[2].plot(abs(error_train), linewidth=0.5)
 ax[2].set_xlabel('Settlement Period')
-ax[2].set_ylabel('Train Error')
+ax[2].set_ylabel('Absolute error: Training set')
 plt.show()
 
 fig2, ax2 = plt.subplots(3)
-
-ax2[0].plot(X_vals[-len(X_test):], X_test_unscaled[:,0], color = 'blue',linewidth=0.5)
+fig2.suptitle('Decision Tree: Testing Set', fontsize=16)
+ax2[0].plot(X_test_unscaled[:,0], linewidth=0.5)
 ax2[0].set_xlabel('Settlement Period')
-ax2[0].set_ylabel('Actual Test')
+ax2[0].set_ylabel('Actual Value: Test Set')
 
-ax2[1].plot(X_vals[len(result_train):], result_test, color = 'blue',linewidth=0.5)
+ax2[1].plot(result_test,linewidth=0.5)
 ax2[1].set_xlabel('Settlement Period')
-ax2[1].set_ylabel('Test Prediction')
+ax2[1].set_ylabel('Prediction on test set')
 
-error_test = result_test - y_scaler.inverse_transform(y_test)
-print("The mean absolute error of the test set is %0.2f" %np.mean(abs(error_test)))
-print("The mean squarred error of the test set is %0.2f" %np.mean(error_test*error_test))
-
-ax2[2].plot(abs(error_test), color = 'blue',linewidth=0.5)
+ax2[2].plot(abs(error_test), linewidth=0.5)
 ax2[2].set_xlabel('Settlement Period')
-ax2[2].set_ylabel('Test Error')
+ax2[2].set_ylabel('Absolute error: Test set.')
 plt.show()
 
 
@@ -110,5 +113,9 @@ plt.show()
 import csv
 with open('/Users/benoitputzeys/PycharmProjects/NN-Predicitons/Compare_Models/Decision_Tree_result.csv', 'w', newline='',) as file:
     writer = csv.writer(file)
-    writer.writerow(["Method","MSE","MAE"])
-    writer.writerow(["Decision_Tree",str(np.mean(error_test*error_test)),str(np.mean(abs(error_test)))])
+    writer.writerow(["Method","MSE","MAE","RMSE"])
+    writer.writerow(["Decision_Tree",
+                     str(mean_squared_error(y_scaler.inverse_transform(y_test),result_test)),
+                     str(mean_absolute_error(y_scaler.inverse_transform(y_test),result_test)),
+                     str(np.sqrt(mean_squared_error(y_scaler.inverse_transform(y_test),result_test)))
+                     ])
