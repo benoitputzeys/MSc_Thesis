@@ -17,11 +17,12 @@ def plot_the_loss_curve(x_value,mse):
 
 
 def create_model(dim, learning_rate):
+
     # Create the model.
     my_model = keras.Sequential()
+
     # Input shape corresponds to the number of columns (the features day, month and year) of the dataframe,
     # excpet for the output label, the temperature.
-
     my_model.add(Dense(units=25, kernel_initializer='uniform', input_dim = dim, activation='relu'))
     my_model.add(Dropout(0.1))
     my_model.add(Dense(units=75, kernel_initializer='uniform', activation='relu'))
@@ -37,7 +38,6 @@ def create_model(dim, learning_rate):
 
 
 def train_model(model, xvalues, yvalues, epochs, batch):
-    """Train the model by feeding it data."""
 
     #history = model.fit(xvalues, yvalues, batch_size=batch_size, epochs=epochs, shuffle=False)
     history = model.fit(xvalues, yvalues, batch_size=batch, epochs=epochs)
@@ -73,8 +73,8 @@ def plot_prediction_zoomed_in(yvalues1, yvalues2, yvalues3, string1, string2, st
     plt.suptitle('Prediction Zoomed In', fontsize=16)
     plt.xlabel("Settlement Periods")
     plt.ylabel("Predicted Generation")
-    plt.plot(yvalues1 , label=string1)
-    plt.plot(yvalues2 , label=string2)
-    plt.plot(yvalues3 , label=string3)
+    plt.plot(yvalues1, label=string1)
+    plt.plot(yvalues2, label=string2)
+    plt.plot(yvalues3, label=string3)
     plt.legend()
     plt.show()

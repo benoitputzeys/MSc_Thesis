@@ -56,28 +56,40 @@ df_features["Simple_Moving_Average_50_D"] = rolling_mean_50
 df_features["Exp_Moving_Average_20_D"] = exp_20
 df_features["Exp_Moving_Average_50_D"] = exp_50
 
-df_features["Day_of_Week"] = df["Time (CET)"]
-
 # Create the settlement period feature and the day of week feature.
 counter = 0
 SP = 0
 DoW = 0
 for i in range(len(df_features)):
     counter = counter + 1
-    DoW = np.append(DoW, pd.to_datetime([df_features.iloc[i, 5][0:10]], format='%d.%m.%Y').weekday.values[0])
+    DoW = np.append(DoW, pd.to_datetime([df.iloc[i, 0][0:10]], format='%d.%m.%Y').weekday.values[0])
     if counter == 49:
         counter = 1
     SP = np.append(SP, counter)
 
-SP = np.delete(SP,0)
-DoW = np.delete(DoW,0)
+DoW_SP = DoW*SP
+DoW_SP = DoW_SP.reshape(len(DoW_SP),1)
 
-df_features["Settlement_Period"] = SP
-df_features["Day_of_Week"] = DoW
+# from sklearn.preprocessing import OneHotEncoder
+#
+# SP_encoder = OneHotEncoder()
+# SP = SP.reshape(len(SP),1)
+# SP_1hot = SP_encoder.fit_transform(SP)
+# SP_1hot = SP_1hot.toarray()
+#
+# DoW_encoder = OneHotEncoder()
+# DoW = DoW.reshape(len(DoW),1)
+# DoW_1hot = DoW_encoder.fit_transform(DoW)
+# DoW_1hot = DoW_1hot.toarray()
 
+df_features = np.concatenate([df_features, DoW_SP], axis=1)
+#df_features = np.concatenate([df_features, DoW_1hot], axis=1)
+
+# df_features["Settlement_Period"] = SP
+# df_features["Day_of_Week"] = DoW
 
 # Create your input variable
-X = df_features.values
+X = df_features
 y = df_label.values
 
 y = np.reshape(y, (len(y), 1))

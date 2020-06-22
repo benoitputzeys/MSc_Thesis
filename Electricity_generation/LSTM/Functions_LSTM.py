@@ -7,7 +7,6 @@ from keras.models import Sequential
 from keras.layers import Dense
 from keras.layers import LSTM
 from keras.layers import Dropout
-from keras.initializers import RandomNormal
 from keras.optimizers import RMSprop
 
 def create_model(input_variable, learning_rate):

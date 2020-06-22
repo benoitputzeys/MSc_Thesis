@@ -6,9 +6,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_absolute_error, mean_squared_error
 
 ########################################################################################################################
-
 # Get data and data preprocessing.
-
 ########################################################################################################################
 
 from numpy import genfromtxt
@@ -19,6 +17,7 @@ y = genfromtxt('/Users/benoitputzeys/PycharmProjects/NN-Predicitons/Data_Entsoe/
 y = np.reshape(y, (len(y), 1))
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state = 0, shuffle = False)
+# Save the unscaled data for later for data representation.
 X_test_unscaled = X_test
 X_train_unscaled = X_train
 
@@ -31,9 +30,7 @@ y_train = y_scaler.fit_transform(y_train)
 y_test = y_scaler.transform(y_test)
 
 ########################################################################################################################
-
 # Create the model.
-
 ########################################################################################################################
 
 # Fit the Decision Tree to our data
@@ -47,25 +44,20 @@ result_test = result_test.reshape((len(result_test), 1))
 result_train = result_train.reshape((len(result_train), 1))
 
 print("-"*200)
-
 error_train = result_train - y_scaler.inverse_transform(y_train)
 print("The mean absolute error of the training set is %0.2f" % mean_absolute_error(y_scaler.inverse_transform(y_train),result_train))
 print("The mean squared error of the training set is %0.2f" % mean_squared_error(y_scaler.inverse_transform(y_train),result_train))
 print("The root mean squared error of the training set is %0.2f" % np.sqrt(mean_squared_error(y_scaler.inverse_transform(y_train),result_train)))
 
 print("-"*200)
-
 error_test = result_test - y_scaler.inverse_transform(y_test)
 print("The mean absolute error of the training set is %0.2f" % mean_absolute_error(y_scaler.inverse_transform(y_test),result_test))
 print("The mean squared error of the training set is %0.2f" % mean_squared_error(y_scaler.inverse_transform(y_test),result_test))
 print("The root mean squared error of the training set is %0.2f" % np.sqrt(mean_squared_error(y_scaler.inverse_transform(y_test),result_test)))
 
 ########################################################################################################################
-
 # Visualising the results
-
 ########################################################################################################################
-
 
 figure1 = plt.figure(1)
 plt.plot(y, linewidth=0.5)
@@ -103,11 +95,8 @@ ax2[2].set_xlabel('Settlement Period')
 ax2[2].set_ylabel('Absolute error: Test set.')
 plt.show()
 
-
 ########################################################################################################################
-
 # Save the results in a csv file.
-
 ########################################################################################################################
 
 import csv

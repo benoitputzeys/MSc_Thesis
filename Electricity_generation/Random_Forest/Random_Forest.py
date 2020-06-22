@@ -6,9 +6,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_absolute_error, mean_squared_error
 
 ########################################################################################################################
-
 # Get data and data preprocessing.
-
 ########################################################################################################################
 
 from numpy import genfromtxt
@@ -32,9 +30,7 @@ y_train = y_scaler.fit_transform(y_train)
 y_test = y_scaler.transform(y_test)
 
 ########################################################################################################################
-
 # Create the model.
-
 ########################################################################################################################
 
 # Fit the Decision Tree to our data
@@ -65,9 +61,7 @@ print("The mean squared error of the training set is %0.2f" % mean_squared_error
 print("The root mean squared error of the training set is %0.2f" % np.sqrt(mean_squared_error(y_scaler.inverse_transform(y_test),result_test)))
 
 ########################################################################################################################
-
 # Visualising the results
-
 ########################################################################################################################
 
 
@@ -108,9 +102,7 @@ ax2[2].set_ylabel('Absolute error: Test set.')
 plt.show()
 
 ########################################################################################################################
-
 # Save the results in a csv file.
-
 ########################################################################################################################
 
 import csv

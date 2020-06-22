@@ -25,14 +25,12 @@ X_test_unscaled = X_test
 X_train_unscaled = X_train
 
 # Feature Scaling
-X_scaler = StandardScaler()
+x_scaler = StandardScaler()
 y_scaler = StandardScaler()
-X_train = X_scaler.fit_transform(X_train)
-X_test = X_scaler.transform(X_test)
+X_train = x_scaler.fit_transform(X_train)
+X_test = x_scaler.transform(X_test)
 y_train = y_scaler.fit_transform(y_train)
 y_test = y_scaler.transform(y_test)
-# X_train = np.reshape(X_train, (X_train.shape[0],X_train.shape[1],1))
-# X_test = np.reshape(X_test, (X_test.shape[0],X_test.shape[1],1))
 
 ########################################################################################################################
 # Create the model.
@@ -41,7 +39,7 @@ y_test = y_scaler.transform(y_test)
 # Define the hyperparameters.
 learning_rate = 0.001
 number_of_epochs = 50
-batch_size = 64
+batch_size = 32
 
 # Create the model.
 my_model = create_model(len(X_train[1]), learning_rate)
@@ -72,7 +70,6 @@ result_test = y_scaler.inverse_transform(my_model.predict(X_test))
 ########################################################################################################################
 
 # Compute the error between the Actual Generation and the prediction from the NN
-
 print("-"*200)
 error_train = abs(result_train[:,0] - y[:len(X_train),0])
 print("The mean absolute error of the training set is %0.2f" % mean_absolute_error(y_scaler.inverse_transform(y_train),result_train))
@@ -124,6 +121,9 @@ with open('/Users/benoitputzeys/PycharmProjects/NN-Predicitons/Compare_Models/AN
                      ])
 
 df_best = pd.read_csv("/Users/benoitputzeys/PycharmProjects/NN-Predicitons/Compare_Models/Best_Results/ANN_result.csv")
+
+my_model.save("my_model_test.h5")
+
 
 import shutil
 if mean_squared_error(y_scaler.inverse_transform(y_test), result_test) <= df_best.iloc[0,1]:
