@@ -4,6 +4,8 @@ from matplotlib import pyplot as plt
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_absolute_error, mean_squared_error
+from pandas import DataFrame
+import pandas as  pd
 
 ########################################################################################################################
 # Get data and data preprocessing.
@@ -12,8 +14,8 @@ from sklearn.metrics import mean_absolute_error, mean_squared_error
 from numpy import genfromtxt
 
 # Get the X (containing the features) and y (containing the labels) values
-X = genfromtxt('/Users/benoitputzeys/PycharmProjects/NN-Predicitons/Data_Entsoe/Data_Preprocessing/X.csv', delimiter=',')
-y = genfromtxt('/Users/benoitputzeys/PycharmProjects/NN-Predicitons/Data_Entsoe/Data_Preprocessing/y.csv', delimiter=',')
+X = genfromtxt('/Users/benoitputzeys/PycharmProjects/MSc_Thesis/Data_Entsoe/Data_Preprocessing/X.csv', delimiter=',')
+y = genfromtxt('/Users/benoitputzeys/PycharmProjects/MSc_Thesis/Data_Entsoe/Data_Preprocessing/y.csv', delimiter=',')
 y = np.reshape(y, (len(y), 1))
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state = 0, shuffle = False)
@@ -45,6 +47,38 @@ result_train = y_scaler.inverse_transform(intermediate_result_train_prediction)
 
 result_test = result_test.reshape((len(result_test), 1))
 result_train = result_train.reshape((len(result_train), 1))
+
+
+# Multi-Step prediction
+
+X_future_features = pd.DataFrame(data=X_test_unscaled,  columns=["0","1","2","3","4","5"])
+DoW_SP = genfromtxt(
+    '/Users/benoitputzeys/PycharmProjects/MSc_Thesis/Data_Entsoe/Data_Preprocessing/For_Multi_Step_Prediction/DoW_SP_2.csv',
+    delimiter=',')
+
+result_future = y_scaler.inverse_transform(y_test)
+
+for i in range(0,48*7):
+
+    prev_value = result_future[-1]
+
+    new_row = [[prev_value[0], 0, 0, 0, 0, 0]]
+    new_row = DataFrame(new_row, columns=["0", "1", "2", "3", "4", "5"])
+    X_future_features = pd.concat([X_future_features,new_row], axis=0)
+
+    rolling_mean_10 = X_future_features["0"].rolling(window=10).mean().values[-1]
+    rolling_mean_50 = X_future_features["0"].rolling(window=50).mean().values[-1]
+    exp_20 = X_future_features["0"].ewm(span=20, adjust=False).mean().values[-1]
+    exp_50 = X_future_features["0"].ewm(span=50, adjust=False).mean().values[-1]
+
+    update_row = [[prev_value, rolling_mean_10, rolling_mean_50, exp_20, exp_50, DoW_SP[i]]]
+
+    update_row = DataFrame(update_row, columns=["0", "1", "2", "3", "4", "5"])
+    X_future_features.iloc[-1,:] = update_row.iloc[0,:]
+
+    result_future = np.append(result_future, y_scaler.inverse_transform(regressor.predict(x_scaler.transform(update_row))))
+    result_future = np.reshape(result_future,(-1,1))
+
 
 print("-"*200)
 
@@ -101,12 +135,19 @@ ax2[2].set_xlabel('Settlement Period')
 ax2[2].set_ylabel('Absolute error: Test set.')
 plt.show()
 
+figure1 = plt.figure(4)
+plt.plot(result_future[-48*7:], linewidth=0.5)
+plt.title('Prediction 7 days in the future')
+plt.xlabel('Settlement Period')
+plt.ylabel('Prediction')
+
+
 ########################################################################################################################
 # Save the results in a csv file.
 ########################################################################################################################
 
 import csv
-with open('/Users/benoitputzeys/PycharmProjects/NN-Predicitons/Compare_Models/Random_Forest_result.csv', 'w', newline='',) as file:
+with open('/Users/benoitputzeys/PycharmProjects/MSc_Thesis/Compare_Models/Random_Forest_result.csv', 'w', newline='',) as file:
     writer = csv.writer(file)
     writer.writerow(["Method","MSE","MAE","RMSE"])
     writer.writerow(["Random_Forest" ,

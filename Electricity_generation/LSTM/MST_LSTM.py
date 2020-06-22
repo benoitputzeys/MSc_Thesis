@@ -14,8 +14,8 @@ from pandas import DataFrame
 from numpy import genfromtxt
 
 # Get the X (containing the features) and y (containing the labels) values
-X = genfromtxt('/Users/benoitputzeys/PycharmProjects/NN-Predicitons/Data_Entsoe/Data_Preprocessing/X.csv', delimiter=',')
-y = genfromtxt('/Users/benoitputzeys/PycharmProjects/NN-Predicitons/Data_Entsoe/Data_Preprocessing/y.csv', delimiter=',')
+X = genfromtxt('/Users/benoitputzeys/PycharmProjects/MSc_Thesis/Data_Entsoe/Data_Preprocessing/X.csv', delimiter=',')
+y = genfromtxt('/Users/benoitputzeys/PycharmProjects/MSc_Thesis/Data_Entsoe/Data_Preprocessing/y.csv', delimiter=',')
 y = np.reshape(y, (len(y), 1))
 
 # Split data into train set and test set.
@@ -70,28 +70,30 @@ result_test = y_scaler.inverse_transform(my_model.predict(X_test))
 # Multi-Step
 X_future_features = pd.DataFrame(data=X_test_unscaled,  columns=["0","1","2","3","4","5"])
 DoW_SP = genfromtxt(
-    '/Users/benoitputzeys/PycharmProjects/NN-Predicitons/Data_Entsoe/Data_Preprocessing/For_Multi_Step_Prediction/DoW_SP_2.csv',
+    '/Users/benoitputzeys/PycharmProjects/MSc_Thesis/Data_Entsoe/Data_Preprocessing/For_Multi_Step_Prediction/DoW_SP_2.csv',
     delimiter=',')
+result_future = y_scaler.inverse_transform(y_test)
 
-result_future = np.zeros((48*7,1))
 for i in range(0,48*7):
-    if i == 0:
-        prev_value = y[-2,0]
-    elif i == 1:
-        prev_value = y[-1, 0]
-    else:
-        prev_value = result_future[i-2][0]
+
+    prev_value = result_future[-2]
+
+    new_row = [[prev_value[0], 0, 0, 0, 0, 0]]
+    new_row = DataFrame(new_row, columns=["0", "1", "2", "3", "4", "5"])
+    X_future_features = pd.concat([X_future_features,new_row], axis=0)
 
     rolling_mean_10 = X_future_features["0"].rolling(window=10).mean().values[-1]
     rolling_mean_50 = X_future_features["0"].rolling(window=50).mean().values[-1]
     exp_20 = X_future_features["0"].ewm(span=20, adjust=False).mean().values[-1]
     exp_50 = X_future_features["0"].ewm(span=50, adjust=False).mean().values[-1]
 
-    newrow = [[prev_value, rolling_mean_10, rolling_mean_50, exp_20, exp_50, DoW_SP[i]]]
+    update_row = [[prev_value, rolling_mean_10, rolling_mean_50, exp_20, exp_50, DoW_SP[i]]]
 
-    df_row = DataFrame(newrow, columns=["0", "1", "2", "3", "4", "5"])
-    X_future_features = pd.concat([X_future_features,df_row], axis=0)
-    result_future[i,0] = np.round(y_scaler.inverse_transform(my_model.predict(X_scaler.transform(newrow).reshape(1,6,1))))
+    update_row = DataFrame(update_row, columns=["0", "1", "2", "3", "4", "5"])
+    X_future_features.iloc[-1,:] = update_row.iloc[0,:]
+
+    result_future = np.append(result_future, y_scaler.inverse_transform(my_model.predict(X_scaler.transform(update_row).reshape(1,6,1))))
+    result_future = np.reshape(result_future,(-1,1))
 
 ########################################################################################################################
 # Data processing for plotting curves and printing the errors.
@@ -133,7 +135,7 @@ plot_prediction_zoomed_in(result_test[-60:], y[-60:], X_test_unscaled[-60:,0], "
 
 fig3, ax3 = plt.subplots(2)
 fig3.suptitle('LSTM: Future Evaluation', fontsize=16)
-ax3[0].plot(result_future, linewidth=0.5)
+ax3[0].plot(result_future[-48*7:], linewidth=0.5)
 ax3[0].set_xlabel('Settlement Period')
 ax3[0].set_ylabel('Prediction')
 
@@ -146,7 +148,7 @@ ax3[1].set_ylabel('Prediction on test set')
 ########################################################################################################################
 
 import csv
-with open('/Users/benoitputzeys/PycharmProjects/NN-Predicitons/Compare_Models/LSTM_result.csv', 'w', newline='',) as file:
+with open('/Users/benoitputzeys/PycharmProjects/MSc_Thesis/Compare_Models/LSTM_result.csv', 'w', newline='',) as file:
     writer = csv.writer(file)
     writer.writerow(["Method","MSE","MAE","RMSE"])
     writer.writerow(["LSTM",
@@ -155,12 +157,12 @@ with open('/Users/benoitputzeys/PycharmProjects/NN-Predicitons/Compare_Models/LS
                      str(np.sqrt(mean_squared_error(y_scaler.inverse_transform(y_test),result_test)))
                      ])
 
-df_best = pd.read_csv("/Users/benoitputzeys/PycharmProjects/NN-Predicitons/Compare_Models/Best_Results/LSTM_result.csv")
+df_best = pd.read_csv("/Users/benoitputzeys/PycharmProjects/MSc_Thesis/Compare_Models/Best_Results/LSTM_result.csv")
 
 import shutil
 if mean_squared_error(y_scaler.inverse_transform(y_test), result_test) <= df_best.iloc[0,1]:
     import csv
-    with open('/Users/benoitputzeys/PycharmProjects/NN-Predicitons/Compare_Models/Best_Results/LSTM_result.csv', 'w',newline='', ) as file:
+    with open('/Users/benoitputzeys/PycharmProjects/MSc_Thesis/Compare_Models/Best_Results/LSTM_result.csv', 'w',newline='', ) as file:
         writer = csv.writer(file)
         writer.writerow(["Method", "MSE", "MAE","RMSE"])
         writer.writerow(["LSTM",

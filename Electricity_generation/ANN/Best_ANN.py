@@ -146,17 +146,17 @@ plot_prediction_zoomed_in(predicted_NN_generation_test[-60:], y[-60:], X_test_un
 ########################################################################################################################
 
 import csv
-with open('/Users/benoitputzeys/PycharmProjects/NN-Predicitons/Compare_Models/ANN_result.csv', 'w', newline='',) as file:
+with open('/Users/benoitputzeys/PycharmProjects/MSc_Thesis/Compare_Models/ANN_result.csv', 'w', newline='',) as file:
     writer = csv.writer(file)
     writer.writerow(["Method","MSE","MAE"])
     writer.writerow(["ANN", str(np.mean(error_NN_test*error_NN_test)), str(np.mean(error_NN_test))])
 
-df_best = pd.read_csv("/Users/benoitputzeys/PycharmProjects/NN-Predicitons/Compare_Models/Best_Results/ANN_result.csv")
+df_best = pd.read_csv("/Users/benoitputzeys/PycharmProjects/MSc_Thesis/Compare_Models/Best_Results/ANN_result.csv")
 
 import shutil
 if np.mean(error_NN_test*error_NN_test) <= df_best.iloc[0,1]:
     import csv
-    with open('/Users/benoitputzeys/PycharmProjects/NN-Predicitons/Compare_Models/Best_Results/ANN_result.csv', 'w',newline='', ) as file:
+    with open('/Users/benoitputzeys/PycharmProjects/MSc_Thesis/Compare_Models/Best_Results/ANN_result.csv', 'w',newline='', ) as file:
         writer = csv.writer(file)
         writer.writerow(["Method", "MSE", "MAE"])
         writer.writerow(["ANN", str(np.mean(error_NN_test * error_NN_test)), str(np.mean(error_NN_test))])

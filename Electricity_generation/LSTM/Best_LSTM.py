@@ -6,9 +6,7 @@ from sklearn.preprocessing import StandardScaler
 import pandas as pd
 
 ########################################################################################################################
-
 # Get data and data preprocessing.
-
 ########################################################################################################################
 
 from Data_Preprocessing.get_features_and_label import return_features_and_labels
@@ -32,9 +30,7 @@ X_train = np.reshape(X_train, (X_train.shape[0],X_train.shape[1],1))
 X_test = np.reshape(X_test, (X_test.shape[0],X_test.shape[1],1))
 
 ########################################################################################################################
-
 # Create the model.
-
 ########################################################################################################################
 
 # Define the hyperparameters.
@@ -66,18 +62,14 @@ loss_list = np.delete(loss_list, [0])
 plot_loss(np.linspace(1,len(epochs_list), len(epochs_list) ), loss_list)
 
 ########################################################################################################################
-
 # Predicting the generation.
-
 ########################################################################################################################
 
 predicted_NN_generation_train = y_scaler.inverse_transform(my_model.predict(X_train))
 predicted_NN_generation_test = y_scaler.inverse_transform(my_model.predict(X_test))
 
 ########################################################################################################################
-
 # Data processing for plotting curves and printing the errors.
-
 ########################################################################################################################
 
 # Create the Previous Day
@@ -101,9 +93,7 @@ print("The mean absolute error from the NN prediction on the test set is %.2f"  
 print("The mean squarred error from the NN prediction on the test set is %.2f"  %np.mean(error_NN_test*error_NN_test))
 
 ########################################################################################################################
-
 # Plotting curves.
-
 ########################################################################################################################
 
 fig, axes = plt.subplots(3)
@@ -133,23 +123,21 @@ plot_generation(axes2[2], error_NN_test, "NN error test")
 plot_prediction_zoomed_in(predicted_NN_generation_test[-60:], y[-60:], X_test_unscaled[-60:,0], "Predicted", "Actual", "Previous day")
 
 ########################################################################################################################
-
 # Save the results in a csv file.
-
 ########################################################################################################################
 
 import csv
-with open('/Users/benoitputzeys/PycharmProjects/NN-Predicitons/Compare_Models/LSTM_result.csv', 'w', newline='',) as file:
+with open('/Users/benoitputzeys/PycharmProjects/MSc_Thesis/Compare_Models/LSTM_result.csv', 'w', newline='',) as file:
     writer = csv.writer(file)
     writer.writerow(["Method","MSE","MAE"])
     writer.writerow(["LSTM",str(np.mean(error_NN_test*error_NN_test)),str(np.mean(error_NN_test))])
 
-df_best = pd.read_csv("/Users/benoitputzeys/PycharmProjects/NN-Predicitons/Compare_Models/Best_Results/LSTM_result.csv")
+df_best = pd.read_csv("/Users/benoitputzeys/PycharmProjects/MSc_Thesis/Compare_Models/Best_Results/LSTM_result.csv")
 
 import shutil
 if np.mean(error_NN_test*error_NN_test) <= df_best.iloc[0,1]:
     import csv
-    with open('/Users/benoitputzeys/PycharmProjects/NN-Predicitons/Compare_Models/Best_Results/LSTM_result.csv', 'w',newline='', ) as file:
+    with open('/Users/benoitputzeys/PycharmProjects/MSc_Thesis/Compare_Models/Best_Results/LSTM_result.csv', 'w',newline='', ) as file:
         writer = csv.writer(file)
         writer.writerow(["Method", "MSE", "MAE"])
         writer.writerow(["LSTM", str(np.mean(error_NN_test * error_NN_test)), str(np.mean(error_NN_test))])

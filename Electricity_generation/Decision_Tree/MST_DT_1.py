@@ -14,8 +14,8 @@ from pandas import DataFrame
 from numpy import genfromtxt
 
 # Get the X (containing the features) and y (containing the labels) values
-X = genfromtxt('/Users/benoitputzeys/PycharmProjects/NN-Predicitons/Data_Entsoe/Data_Preprocessing/X.csv', delimiter=',')
-y = genfromtxt('/Users/benoitputzeys/PycharmProjects/NN-Predicitons/Data_Entsoe/Data_Preprocessing/y.csv', delimiter=',')
+X = genfromtxt('/Users/benoitputzeys/PycharmProjects/MSc_Thesis/Data_Entsoe/Data_Preprocessing/X.csv', delimiter=',')
+y = genfromtxt('/Users/benoitputzeys/PycharmProjects/MSc_Thesis/Data_Entsoe/Data_Preprocessing/y.csv', delimiter=',')
 y = np.reshape(y, (len(y), 1))
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state = 0, shuffle = False)
@@ -50,28 +50,31 @@ result_train = result_train.reshape((len(result_train), 1))
 
 X_future_features = pd.DataFrame(data=X_test_unscaled,  columns=["0","1","2","3","4","5"])
 DoW_SP = genfromtxt(
-    '/Users/benoitputzeys/PycharmProjects/NN-Predicitons/Data_Entsoe/Data_Preprocessing/For_Multi_Step_Prediction/DoW_SP_2.csv',
+    '/Users/benoitputzeys/PycharmProjects/MSc_Thesis/Data_Entsoe/Data_Preprocessing/For_Multi_Step_Prediction/DoW_SP_2.csv',
     delimiter=',')
 
-result_future = np.zeros((48*7,1))
-for i in range(1,48*7):
-    if i == 1:
-        prev_value = y[-2,0]
-    elif i == 2:
-        prev_value = y[-1, 0]
-    else:
-        prev_value = result_future[i-3]
+result_future = y_scaler.inverse_transform(y_test)
+
+for i in range(0,48*7):
+
+    prev_value = result_future[-2]
+
+    new_row = [[prev_value[0], 0, 0, 0, 0, 0]]
+    new_row = DataFrame(new_row, columns=["0", "1", "2", "3", "4", "5"])
+    X_future_features = pd.concat([X_future_features,new_row], axis=0)
 
     rolling_mean_10 = X_future_features["0"].rolling(window=10).mean().values[-1]
     rolling_mean_50 = X_future_features["0"].rolling(window=50).mean().values[-1]
     exp_20 = X_future_features["0"].ewm(span=20, adjust=False).mean().values[-1]
     exp_50 = X_future_features["0"].ewm(span=50, adjust=False).mean().values[-1]
 
-    newrow = [[prev_value, rolling_mean_10, rolling_mean_50, exp_20, exp_50, DoW_SP[i-1]]]
+    update_row = [[prev_value, rolling_mean_10, rolling_mean_50, exp_20, exp_50, DoW_SP[i]]]
 
-    df_row = DataFrame(newrow, columns=["0", "1", "2", "3", "4", "5"])
-    X_future_features = pd.concat([X_future_features,df_row], axis=0)
-    result_future[i-1,0] = y_scaler.inverse_transform(regressor.predict(x_scaler.transform(newrow)))
+    update_row = DataFrame(update_row, columns=["0", "1", "2", "3", "4", "5"])
+    X_future_features.iloc[-1,:] = update_row.iloc[0,:]
+
+    result_future = np.append(result_future, y_scaler.inverse_transform(regressor.predict(x_scaler.transform(update_row))))
+    result_future = np.reshape(result_future,(-1,1))
 
 
 print("-"*200)
@@ -127,17 +130,25 @@ ax2[2].set_ylabel('Absolute error: Test set.')
 plt.show()
 
 figure1 = plt.figure(4)
-plt.plot(y_scaler.inverse_transform(result_future), linewidth=0.5)
+plt.plot(result_future[-48*7:], linewidth=0.5)
 plt.title('Prediction 7 days in the future')
 plt.xlabel('Settlement Period')
 plt.ylabel('Prediction')
+
+figure5 = plt.figure(5)
+values = X_future_features-X_future_features.shift(-1)
+plt.plot(values.iloc[-48*7-10:,0], linewidth=0.5)
+plt.title('Prediction 7 days in the future')
+plt.xlabel('Settlement Period')
+plt.ylabel('Prediction')
+
 
 ########################################################################################################################
 # Save the results in a csv file.
 ########################################################################################################################
 
 import csv
-with open('/Users/benoitputzeys/PycharmProjects/NN-Predicitons/Compare_Models/Decision_Tree_result.csv', 'w', newline='',) as file:
+with open('/Users/benoitputzeys/PycharmProjects/MSc_Thesis/Compare_Models/Decision_Tree_result.csv', 'w', newline='',) as file:
     writer = csv.writer(file)
     writer.writerow(["Method","MSE","MAE","RMSE"])
     writer.writerow(["Decision_Tree",

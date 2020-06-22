@@ -7,30 +7,30 @@ import math
 
 # Import the timeseries data and convert the strings to floats
 df15 = pd.read_csv(
-    "/Users/benoitputzeys/PycharmProjects/NN-Predicitons/Data_Entsoe/Total_Load_Country/Total Load - Day Ahead _ Actual_201501010000-201601010000.csv")
+    "/Users/benoitputzeys/PycharmProjects/MSc_Thesis/Data_Entsoe/Total_Load_Country/Total Load - Day Ahead _ Actual_201501010000-201601010000.csv")
 df15['Actual Total Load [MW] - United Kingdom (UK)'] = df15['Actual Total Load [MW] - United Kingdom (UK)'].astype(        float)
 
 df16 = pd.read_csv(
-    "/Users/benoitputzeys/PycharmProjects/NN-Predicitons/Data_Entsoe/Total_Load_Country/Total Load - Day Ahead _ Actual_201601010000-201701010000.csv")
+    "/Users/benoitputzeys/PycharmProjects/MSc_Thesis/Data_Entsoe/Total_Load_Country/Total Load - Day Ahead _ Actual_201601010000-201701010000.csv")
 df16['Actual Total Load [MW] - United Kingdom (UK)'] = df16['Actual Total Load [MW] - United Kingdom (UK)'].astype(        float)
 
 df17 = pd.read_csv(
-    "/Users/benoitputzeys/PycharmProjects/NN-Predicitons/Data_Entsoe/Total_Load_Country/Total Load - Day Ahead _ Actual_201701010000-201801010000.csv")
+    "/Users/benoitputzeys/PycharmProjects/MSc_Thesis/Data_Entsoe/Total_Load_Country/Total Load - Day Ahead _ Actual_201701010000-201801010000.csv")
 df17['Actual Total Load [MW] - United Kingdom (UK)'] = df17['Actual Total Load [MW] - United Kingdom (UK)'].astype(        float)
 
 # This csv data has missing values for the first 151 days of the year. (Get rid of them)
 df18 = pd.read_csv(
-    "/Users/benoitputzeys/PycharmProjects/NN-Predicitons/Data_Entsoe/Total_Load_Country/Total Load - Day Ahead _ Actual_201801010000-201901010000.csv")
+    "/Users/benoitputzeys/PycharmProjects/MSc_Thesis/Data_Entsoe/Total_Load_Country/Total Load - Day Ahead _ Actual_201801010000-201901010000.csv")
 df18['Actual Total Load [MW] - United Kingdom (UK)'] = df18['Actual Total Load [MW] - United Kingdom (UK)'].astype(        float)
 df18 = df18.truncate(before=151 * 48)
 
 df19 = pd.read_csv(
-    "/Users/benoitputzeys/PycharmProjects/NN-Predicitons/Data_Entsoe/Total_Load_Country/Total Load - Day Ahead _ Actual_201901010000-202001010000.csv")
+    "/Users/benoitputzeys/PycharmProjects/MSc_Thesis/Data_Entsoe/Total_Load_Country/Total Load - Day Ahead _ Actual_201901010000-202001010000.csv")
 df19['Actual Total Load [MW] - United Kingdom (UK)'] = df19['Actual Total Load [MW] - United Kingdom (UK)'].astype(        float)
 
 # This csv data has missing values for the last 152 days of the year as they lie in the future. (Get rid of them)
 df20 = pd.read_csv(
-    "/Users/benoitputzeys/PycharmProjects/NN-Predicitons/Data_Entsoe/Total_Load_Country/Total Load - Day Ahead _ Actual_202001010000-202101010000.csv")
+    "/Users/benoitputzeys/PycharmProjects/MSc_Thesis/Data_Entsoe/Total_Load_Country/Total Load - Day Ahead _ Actual_202001010000-202101010000.csv")
 df20.loc[df20['Actual Total Load [MW] - United Kingdom (UK)'] == '-', 'Actual Total Load [MW] - United Kingdom (UK)'] = 0
 df20['Actual Total Load [MW] - United Kingdom (UK)'] = df20['Actual Total Load [MW] - United Kingdom (UK)'].astype(float)
 df20 = df20.truncate(after=152*48-1)
@@ -46,10 +46,10 @@ df_features = pd.DataFrame()
 df_features["Total_Load_Past"] = df["Actual Total Load [MW] - United Kingdom (UK)"].shift(+2)
 
 # Create artificial features.
-rolling_mean_10 = df["Actual Total Load [MW] - United Kingdom (UK)"].rolling(window=10).mean()
-rolling_mean_50 = df["Actual Total Load [MW] - United Kingdom (UK)"].rolling(window=50).mean()
-exp_20 = df["Actual Total Load [MW] - United Kingdom (UK)"].ewm(span=20, adjust=False).mean()
-exp_50 = df["Actual Total Load [MW] - United Kingdom (UK)"].ewm(span=50, adjust=False).mean()
+rolling_mean_10 = df_features["Total_Load_Past"].rolling(window=10).mean()
+rolling_mean_50 = df_features["Total_Load_Past"].rolling(window=50).mean()
+exp_20 = df_features["Total_Load_Past"].ewm(span=20, adjust=False).mean()
+exp_50 = df_features["Total_Load_Past"].ewm(span=50, adjust=False).mean()
 
 df_features["Simple_Moving_Average_10_D"] = rolling_mean_10
 df_features["Simple_Moving_Average_50_D"] = rolling_mean_50
@@ -67,6 +67,8 @@ for i in range(len(df_features)):
         counter = 1
     SP = np.append(SP, counter)
 
+DoW = np.delete(DoW,0)
+SP = np.delete(SP,0)
 DoW_SP = DoW*SP
 DoW_SP = DoW_SP.reshape(len(DoW_SP),1)
 
@@ -103,8 +105,8 @@ replace_nan = SimpleImputer(missing_values=np.nan, strategy='mean')
 replace_nan.fit(y)
 y = replace_nan.transform(y)
 
-np.savetxt("/Users/benoitputzeys/PycharmProjects/NN-Predicitons/Data_Entsoe/Data_Preprocessing/X.csv", X, delimiter=",")
-np.savetxt("/Users/benoitputzeys/PycharmProjects/NN-Predicitons/Data_Entsoe/Data_Preprocessing/y.csv", y, delimiter=",")
+np.savetxt("/Users/benoitputzeys/PycharmProjects/MSc_Thesis/Data_Entsoe/Data_Preprocessing/X.csv", X, delimiter=",")
+np.savetxt("/Users/benoitputzeys/PycharmProjects/MSc_Thesis/Data_Entsoe/Data_Preprocessing/y.csv", y, delimiter=",")
 
 # plt.plot(X[-120:,0], label='Total Generation Past', linewidth=0.5 )
 # #plt.plot(y[:,0], label='Total Generation Actual', linewidth=0.5 )

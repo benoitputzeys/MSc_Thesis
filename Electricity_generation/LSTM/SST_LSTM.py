@@ -13,8 +13,8 @@ from sklearn.metrics import mean_absolute_error, mean_squared_error
 from numpy import genfromtxt
 
 # Get the X (containing the features) and y (containing the labels) values
-X = genfromtxt('/Users/benoitputzeys/PycharmProjects/NN-Predicitons/Data_Entsoe/Data_Preprocessing/X.csv', delimiter=',')
-y = genfromtxt('/Users/benoitputzeys/PycharmProjects/NN-Predicitons/Data_Entsoe/Data_Preprocessing/y.csv', delimiter=',')
+X = genfromtxt('/Users/benoitputzeys/PycharmProjects/MSc_Thesis/Data_Entsoe/Data_Preprocessing/X.csv', delimiter=',')
+y = genfromtxt('/Users/benoitputzeys/PycharmProjects/MSc_Thesis/Data_Entsoe/Data_Preprocessing/y.csv', delimiter=',')
 y = np.reshape(y, (len(y), 1))
 
 # Split data into train set and test set.
@@ -109,7 +109,7 @@ plot_prediction_zoomed_in(result_test[-60:], y[-60:], X_test_unscaled[-60:,0], "
 ########################################################################################################################
 
 import csv
-with open('/Users/benoitputzeys/PycharmProjects/NN-Predicitons/Compare_Models/LSTM_result.csv', 'w', newline='',) as file:
+with open('/Users/benoitputzeys/PycharmProjects/MSc_Thesis/Compare_Models/LSTM_result.csv', 'w', newline='',) as file:
     writer = csv.writer(file)
     writer.writerow(["Method","MSE","MAE","RMSE"])
     writer.writerow(["LSTM",
@@ -118,12 +118,12 @@ with open('/Users/benoitputzeys/PycharmProjects/NN-Predicitons/Compare_Models/LS
                      str(np.sqrt(mean_squared_error(y_scaler.inverse_transform(y_test),result_test)))
                      ])
 
-df_best = pd.read_csv("/Users/benoitputzeys/PycharmProjects/NN-Predicitons/Compare_Models/Best_Results/LSTM_result.csv")
+df_best = pd.read_csv("/Users/benoitputzeys/PycharmProjects/MSc_Thesis/Compare_Models/Best_Results/LSTM_result.csv")
 
 import shutil
 if mean_squared_error(y_scaler.inverse_transform(y_test), result_test) <= df_best.iloc[0,1]:
     import csv
-    with open('/Users/benoitputzeys/PycharmProjects/NN-Predicitons/Compare_Models/Best_Results/LSTM_result.csv', 'w',newline='', ) as file:
+    with open('/Users/benoitputzeys/PycharmProjects/MSc_Thesis/Compare_Models/Best_Results/LSTM_result.csv', 'w',newline='', ) as file:
         writer = csv.writer(file)
         writer.writerow(["Method", "MSE", "MAE","RMSE"])
         writer.writerow(["LSTM",
