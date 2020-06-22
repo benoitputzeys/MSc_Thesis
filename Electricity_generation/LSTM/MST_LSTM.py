@@ -91,7 +91,7 @@ for i in range(0,48*7):
 
     df_row = DataFrame(newrow, columns=["0", "1", "2", "3", "4", "5"])
     X_future_features = pd.concat([X_future_features,df_row], axis=0)
-    result_future[i,0] = np.round(y_scaler.inverse_transform(my_model.predict(x_scaler.transform(newrow))))
+    result_future[i,0] = np.round(y_scaler.inverse_transform(my_model.predict(X_scaler.transform(newrow).reshape(1,6,1))))
 
 ########################################################################################################################
 # Data processing for plotting curves and printing the errors.
