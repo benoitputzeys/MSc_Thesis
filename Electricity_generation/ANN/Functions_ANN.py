@@ -4,17 +4,18 @@ from matplotlib import pyplot as plt
 import keras
 from keras.layers import Dense
 from keras.layers import Dropout
+import datetime
+from pandas import DataFrame
 
-def plot_the_loss_curve(x_value,mse):
+def plot_the_loss_curve(x_value,metric,string):
 
     plt.figure()
     plt.xlabel("Epoch")
-    plt.ylabel("Mean Squared Error")
+    plt.ylabel(string)
 
-    plt.plot(x_value,mse, label="Loss")
+    plt.plot(x_value,metric, label="Loss")
     plt.legend()
     plt.show()
-
 
 def create_model(dim, learning_rate):
 
@@ -39,42 +40,65 @@ def create_model(dim, learning_rate):
 
 def train_model(model, xvalues, yvalues, epochs, batch):
 
-    #history = model.fit(xvalues, yvalues, batch_size=batch_size, epochs=epochs, shuffle=False)
     history = model.fit(xvalues, yvalues, batch_size=batch, epochs=epochs)
 
-    # To track the progression of training, gather a snapshot
-    # of the model's mean squared error at each epoch.
+    # To track the progression of training, gather a snapshot of the model's mean squared error at each epoch.
     hist = pd.DataFrame(history.history)
 
     return hist
 
-def plot_actual_generation(ax, y_values, string):
+def plot_total_generation(x_values, y_values, string):
 
-    ax[0].plot(y_values, linewidth=0.5)
+    y_values_dates = create_dates(x_values,y_values)
+    plt.plot(y_values_dates, linewidth=0.5)
+    plt.xlabel("Settlement Periods")
+    plt.ylabel(string)
+    plt.show()
+
+def plot_actual_generation(ax, x_values, y_values, string):
+
+    y_values_dates = create_dates(x_values,y_values)
+    ax[0].plot(y_values_dates, linewidth=0.5)
     ax[0].set_xlabel("Settlement Periods")
     ax[0].set_ylabel(string)
     plt.show()
 
-def plot_predicted_generation(ax,  yvalues, string):
+def plot_predicted_generation(ax, x_values, y_values, string):
 
-    ax[1].plot( yvalues, linewidth=0.5)
+    y_values_dates = create_dates(x_values,y_values)
+    ax[1].plot(y_values_dates, linewidth=0.5)
     ax[1].set_xlabel("Settlement Periods")
     ax[1].set_ylabel(string)
     plt.show()
 
-def plot_error(ax, error, string):
-    ax[2].plot( error, linewidth=0.5)
+def plot_error(ax,x_values, error, string):
+
+    y_values_dates = create_dates(x_values,error)
+    ax[2].plot(y_values_dates, linewidth=0.5)
     ax[2].set_xlabel("Settlement Periods")
     ax[2].set_ylabel(string)
     plt.show()
 
-def plot_prediction_zoomed_in(yvalues1, yvalues2, yvalues3, string1, string2, string3):
-    plt.figure(4)
+def plot_prediction_zoomed_in(x_values, y_values, string1):
+
+    y_values_dates = create_dates(x_values, y_values)
+    plt.figure(3)
     plt.suptitle('Prediction Zoomed In', fontsize=16)
     plt.xlabel("Settlement Periods")
     plt.ylabel("Predicted Generation")
-    plt.plot(yvalues1, label=string1)
-    plt.plot(yvalues2, label=string2)
-    plt.plot(yvalues3, label=string3)
+    plt.plot(y_values_dates, label=string1)
     plt.legend()
     plt.show()
+
+def create_dates(features_df, y_values):
+
+    date_list = [datetime.datetime(year=int(features_df[i, -1]),
+                                   month=int(features_df[i, -2]),
+                                   day=int(features_df[i, -3]),
+                                   hour=int((features_df[i, -4] - 1) / 2),
+                                   minute=(i % 2) * 30) for i in range(len(features_df))]
+    df_dates = DataFrame(date_list, columns=['Date'])
+    df_dates = df_dates.set_index(['Date'])
+    df_dates['Load'] = y_values
+
+    return df_dates

@@ -5,7 +5,7 @@ from Electricity_generation.LSTM.Functions_LSTM import plot_the_loss_curve, trai
 from sklearn.preprocessing import StandardScaler
 import pandas as pd
 from sklearn.metrics import mean_absolute_error, mean_squared_error
-
+import keras
 ########################################################################################################################
 # Get data and data preprocessing.
 ########################################################################################################################
@@ -35,29 +35,30 @@ X_test = np.reshape(X_test, (X_test.shape[0],X_test.shape[1],1))
 ########################################################################################################################
 # Create the model.
 ########################################################################################################################
-
-# Define the hyperparameters.
-learning_rate = 0.001
-number_of_epochs = 50
-batch_size = 124
-
-# Create the model.
-my_model = create_model(X_train, learning_rate)
-
-# Extract the loss per epoch to plot the learning progress.
-
-hist_list = pd.DataFrame()
-
-tscv = TimeSeriesSplit()
-for train_index, test_index in tscv.split(X_train):
-      X_train_split, X_test_split = X_train[train_index], X_train[test_index]
-      y_train_split, y_test_split = y_train[train_index], y_train[test_index]
-      X_train_split = np.reshape(X_train_split, (X_train_split.shape[0],X_train_split.shape[1],1))
-      hist_split = train_model(my_model, X_train_split, y_train_split, number_of_epochs, batch_size)
-      hist_list = hist_list.append(hist_split)
-
-# Plot the loss per epoch.
-plot_the_loss_curve(np.linspace(1,len(hist_list), len(hist_list) ), hist_list['mean_absolute_error'])
+#
+# # Define the hyperparameters.
+# learning_rate = 0.001
+# number_of_epochs = 50
+# batch_size = 64
+#
+# # Create the model.
+# my_model = create_model(X_train, learning_rate)
+#
+# # Extract the loss per epoch to plot the learning progress.
+# hist_list = pd.DataFrame()
+#
+# tscv = TimeSeriesSplit()
+# for train_index, test_index in tscv.split(X_train):
+#       X_train_split, X_test_split = X_train[train_index], X_train[test_index]
+#       y_train_split, y_test_split = y_train[train_index], y_train[test_index]
+#       X_train_split = np.reshape(X_train_split, (X_train_split.shape[0],X_train_split.shape[1],1))
+#       hist_split = train_model(my_model, X_train_split, y_train_split, number_of_epochs, batch_size)
+#       hist_list = hist_list.append(hist_split)
+#
+# # Plot the loss per epoch.
+# metric = "mean_absolute_error"
+# plot_the_loss_curve(np.linspace(1,len(hist_list), len(hist_list) ), hist_list[metric],metric)
+my_model = keras.models.load_model("my_model.h5")
 
 ########################################################################################################################
 # Predicting the generation.
@@ -91,18 +92,19 @@ print("The root mean squared error of the training set is %0.2f" % np.sqrt(mean_
 # Plot the actual recorded generation against the date.
 fig, axes = plt.subplots(3)
 
-fig.suptitle('Training + Test Set (ANN)', fontsize=16)
+fig.suptitle('Test Set (LSTM)', fontsize=16)
 # Plot the actual generation in a new subplot of 3x1.
-plot_generation(axes[0], y[-len(result_test):], "Actual Generation")
+plot_generation(axes[0], X_test_unscaled, y[-len(result_test):], "Actual Generation")
 
 # Plot the the predicted (NN) generation.
-plot_generation(axes[1], result_test, "NN prediction test set")
+plot_generation(axes[1], X_test_unscaled, result_test, "NN prediction test set")
 
 # Plot the error between the predicted and the actual temperature.
-plot_generation(axes[2], error_test, "NN error test")
+plot_generation(axes[2], X_test_unscaled, error_test, "NN error test")
 
-# Plot the predicted generation on the last 60 days.
-plot_prediction_zoomed_in(result_test[-60:], y[-60:], X_test_unscaled[-60:,0], "Predicted", "Actual", "Previous day")
+# Plot the predicted generation on the last 3 days.
+fig1, axes1 = plt.subplots(2)
+plot_prediction_zoomed_in(fig1, axes1, X_test_unscaled[-3*48:],result_test[-3*48:], y[-3*48:])
 
 ########################################################################################################################
 # Save the results in a csv file.
@@ -119,16 +121,3 @@ with open('/Users/benoitputzeys/PycharmProjects/MSc_Thesis/Compare_Models/LSTM_r
                      ])
 
 df_best = pd.read_csv("/Users/benoitputzeys/PycharmProjects/MSc_Thesis/Compare_Models/Best_Results/LSTM_result.csv")
-
-import shutil
-if mean_squared_error(y_scaler.inverse_transform(y_test), result_test) <= df_best.iloc[0,1]:
-    import csv
-    with open('/Users/benoitputzeys/PycharmProjects/MSc_Thesis/Compare_Models/Best_Results/LSTM_result.csv', 'w',newline='', ) as file:
-        writer = csv.writer(file)
-        writer.writerow(["Method", "MSE", "MAE","RMSE"])
-        writer.writerow(["LSTM",
-                         str(mean_squared_error(y_scaler.inverse_transform(y_test), result_test)),
-                         str(mean_absolute_error(y_scaler.inverse_transform(y_test), result_test)),
-                         str(np.sqrt(mean_squared_error(y_scaler.inverse_transform(y_test), result_test)))
-                         ])
-    shutil.copyfile('Generation_LSTM.py', 'Best_LSTM.py')

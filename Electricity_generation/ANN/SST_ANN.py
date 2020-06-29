@@ -5,7 +5,7 @@ from sklearn.model_selection import train_test_split, TimeSeriesSplit
 from sklearn.preprocessing import StandardScaler
 import pandas as pd
 from sklearn.metrics import mean_absolute_error, mean_squared_error
-
+import keras
 ########################################################################################################################
 # Get data and data preprocessing.
 ########################################################################################################################
@@ -36,27 +36,30 @@ y_test = y_scaler.transform(y_test)
 # Create the model.
 ########################################################################################################################
 
-# Define the hyperparameters.
-learning_rate = 0.001
-number_of_epochs = 50
-batch_size = 32
+# # Define the hyperparameters.
+# learning_rate = 0.001
+# number_of_epochs = 50
+# batch_size = 32
+#
+# # Create the model.
+# my_model = create_model(len(X_train[1]), learning_rate)
+#
+# # Extract the loss per epoch to plot the learning progress.
+#
+# hist_list = pd.DataFrame()
+#
+# tscv = TimeSeriesSplit()
+# for train_index, test_index in tscv.split(X_train):
+#       X_train_split, X_test_split = X_train[train_index], X_train[test_index]
+#       y_train_split, y_test_split = y_train[train_index], y_train[test_index]
+#       hist_split = train_model(my_model, X_train_split, y_train_split, number_of_epochs, batch_size)
+#       hist_list = hist_list.append(hist_split)
+#
+# # Plot the loss per epoch.
+# metric = "mean_absolute_error"
+# plot_the_loss_curve(np.linspace(1,len(hist_list), len(hist_list) ), hist_list[metric],metric)
 
-# Create the model.
-my_model = create_model(len(X_train[1]), learning_rate)
-
-# Extract the loss per epoch to plot the learning progress.
-
-hist_list = pd.DataFrame()
-
-tscv = TimeSeriesSplit()
-for train_index, test_index in tscv.split(X_train):
-      X_train_split, X_test_split = X_train[train_index], X_train[test_index]
-      y_train_split, y_test_split = y_train[train_index], y_train[test_index]
-      hist_split = train_model(my_model, X_train_split, y_train_split, number_of_epochs, batch_size)
-      hist_list = hist_list.append(hist_split)
-
-# Plot the loss per epoch.
-plot_the_loss_curve(np.linspace(1,len(hist_list), len(hist_list) ), hist_list['mean_absolute_error'])
+my_model = keras.models.load_model("my_model.h5")
 
 ########################################################################################################################
 # Predicting the generation.
@@ -81,30 +84,32 @@ error_test = abs(result_test[:,0] - y[-len(X_test):,0])
 print("The mean absolute error of the test set is %0.2f" % mean_absolute_error(y_scaler.inverse_transform(y_test),result_test))
 print("The mean squared error of the test set is %0.2f" % mean_squared_error(y_scaler.inverse_transform(y_test),result_test))
 print("The root mean squared error of the test set is %0.2f" % np.sqrt(mean_squared_error(y_scaler.inverse_transform(y_test),result_test)))
+print("-"*200)
 
 ########################################################################################################################
 # Plotting curves.
 ########################################################################################################################
 
 # Plot the actual recorded generation against the date.
-from Electricity_generation.ANN.Functions_ANN import plot_actual_generation, plot_predicted_generation, plot_error, plot_prediction_zoomed_in
+from Electricity_generation.ANN.Functions_ANN import plot_actual_generation, plot_predicted_generation, plot_error, plot_prediction_zoomed_in, plot_total_generation
+
+plot_total_generation(X,y,"Total generation (Train + Test Set")
 
 # Plot the actual recorded generation against the date.
 fig, axes = plt.subplots(3)
 
-fig.suptitle('Training + Test Set (ANN)', fontsize=16)
+fig.suptitle('Test Set (ANN)', fontsize=16)
 # Plot the actual generation in a new subplot of 3x1.
-plot_actual_generation(axes, y[-len(result_test):], "Actual Generation")
+plot_actual_generation(axes, X[len(X)-len(y_test):,:], y[-len(y_test):], "Actual Generation")
 
 # Plot the the predicted (NN) generation.
-plot_predicted_generation(axes, result_test, "NN prediction test set")
+plot_predicted_generation(axes, X[len(X)-len(result_test):,:], result_test, "NN prediction test set")
 
 # Plot the error between the predicted and the actual temperature.
-plot_error(axes, error_test, "NN error test set")
+plot_error(axes, X[len(X)-len(error_test):,:], error_test, "NN error test set")
 
-# Plot the predicted generation on the last 60 days.
-plot_prediction_zoomed_in(result_test[-60:], y[-60:], X_test_unscaled[-60:,0], "Predicted", "Actual", "Previous day")
-
+# Plot the prediction over the last 3 days.
+plot_prediction_zoomed_in(X[-48*3:], result_test[-48*3:], "Prediction last 3 days")
 
 ########################################################################################################################
 # Save the results in a csv file.
@@ -122,18 +127,4 @@ with open('/Users/benoitputzeys/PycharmProjects/MSc_Thesis/Compare_Models/ANN_re
 
 df_best = pd.read_csv("/Users/benoitputzeys/PycharmProjects/MSc_Thesis/Compare_Models/Best_Results/ANN_result.csv")
 
-my_model.save("my_model_test.h5")
-
-
-import shutil
-if mean_squared_error(y_scaler.inverse_transform(y_test), result_test) <= df_best.iloc[0,1]:
-    import csv
-    with open('/Users/benoitputzeys/PycharmProjects/MSc_Thesis/Compare_Models/Best_Results/ANN_result.csv', 'w',newline='', ) as file:
-        writer = csv.writer(file)
-        writer.writerow(["Method", "MSE", "MAE","RMSE"])
-        writer.writerow(["ANN",
-                         str(mean_squared_error(y_scaler.inverse_transform(y_test), result_test)),
-                         str(mean_absolute_error(y_scaler.inverse_transform(y_test), result_test)),
-                         str(np.sqrt(mean_squared_error(y_scaler.inverse_transform(y_test), result_test)))
-                         ])
-    shutil.copyfile('Generation_ANN.py', 'Best_ANN.py')
+my_model.save("my_model.h5")

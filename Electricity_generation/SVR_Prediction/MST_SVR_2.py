@@ -1,15 +1,26 @@
 import numpy as np
-import pandas as pd
-import tensorflow as tf
-from tensorflow.keras import layers
 from matplotlib import pyplot as plt
-from sklearn.impute import SimpleImputer
 from sklearn.preprocessing import StandardScaler
-from sklearn.svm import SVR
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_absolute_error, mean_squared_error
+import datetime
 from pandas import DataFrame
+import pandas as pd
+from sklearn.svm import SVR
 
+
+def create_dates(features_df, y_values):
+
+    date_list = [datetime.datetime(year=int(features_df[i, -1]),
+                                   month=int(features_df[i, -2]),
+                                   day=int(features_df[i, -3]),
+                                   hour=int((features_df[i, -4] - 1) / 2),
+                                   minute=(i % 2) * 30) for i in range(len(features_df))]
+    df_dates = DataFrame(date_list, columns=['Date'])
+    df_dates = df_dates.set_index(['Date'])
+    df_dates['Load'] = y_values
+
+    return df_dates
 
 ########################################################################################################################
 # Get data and data preprocessing.
@@ -18,20 +29,23 @@ from pandas import DataFrame
 from numpy import genfromtxt
 
 # Get the X (containing the features) and y (containing the labels) values
-X = genfromtxt('/Users/benoitputzeys/PycharmProjects/MSc_Thesis/Data_Entsoe/Data_Preprocessing/X.csv', delimiter=',')
-y = genfromtxt('/Users/benoitputzeys/PycharmProjects/MSc_Thesis/Data_Entsoe/Data_Preprocessing/y.csv', delimiter=',')
+X = genfromtxt('/Users/benoitputzeys/PycharmProjects/MSc_Thesis/Data_Entsoe/Data_Preprocessing/For_Multi_Step_Prediction_Outside_Test_Set/X.csv', delimiter=',')
+y = genfromtxt('/Users/benoitputzeys/PycharmProjects/MSc_Thesis/Data_Entsoe/Data_Preprocessing/For_Multi_Step_Prediction_Outside_Test_Set/y.csv', delimiter=',')
 y = np.reshape(y, (len(y), 1))
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state = 0, shuffle = False)
+X_train_1, X_train_2, y_train_1, y_train_2 = train_test_split(X_train, y_train, test_size = 0.5, random_state = 0, shuffle = False)
+# Save the unscaled data for later for data representation.
 X_test_unscaled = X_test
-X_train_unscaled = X_train
+X_train_unscaled_1 = X_train_1
 
 # Feature Scaling
 x_scaler = StandardScaler()
 y_scaler = StandardScaler()
-X_train = x_scaler.fit_transform(X_train)
+X_train_1 = x_scaler.fit_transform(X_train_1)
+X_train_2 = x_scaler.transform(X_train_2)
 X_test = x_scaler.transform(X_test)
-y_train = y_scaler.fit_transform(y_train)
+y_train_1 = y_scaler.fit_transform(y_train_1)
 y_test = y_scaler.transform(y_test)
 
 ########################################################################################################################
@@ -42,124 +56,102 @@ y_test = y_scaler.transform(y_test)
 regressor = SVR(kernel = 'rbf')
 regressor.fit(X_train, y_train)
 
-# Compute the prediction and rescale
-intermediate_result_test_prediction = regressor.predict(X_test)
-intermediate_result_train_prediction = regressor.predict(X_train)
+result_train_1 = y_scaler.inverse_transform(regressor.predict(X_train_1))
+result_train_2 = y_scaler.inverse_transform(regressor.predict(X_train_2))
 
-#print(intermediate_result)
-result_test = y_scaler.inverse_transform(intermediate_result_test_prediction)
-result_train = y_scaler.inverse_transform(intermediate_result_train_prediction)
+result_train_1 = result_train_1.reshape((len(result_train_1), 1))
+result_train_2 = result_train_2.reshape((len(result_train_2), 1))
 
-#print(result)
-result_test = result_test.reshape((len(result_test), 1))
-result_train = result_train.reshape((len(result_train), 1))
-
-# Multi-Step
-X_future_features = pd.DataFrame(data=X_test_unscaled,  columns=["0","1","2","3","4","5"])
-DoW_SP = genfromtxt(
-    '/Users/benoitputzeys/PycharmProjects/MSc_Thesis/Data_Entsoe/Data_Preprocessing/For_Multi_Step_Prediction/DoW_SP_2.csv',
-    delimiter=',')
-
-result_future = y_test
-for i in range(0,48*7):
-    if i == 0:
-        prev_value = y_test[-2,0]
-    elif i == 1:
-        prev_value = y_test[-1, 0]
-    else:
-        prev_value = result_future[i-2]
-
-    rolling_mean_10 = X_future_features["0"].rolling(window=10).mean().values[-1]
-    rolling_mean_50 = X_future_features["0"].rolling(window=50).mean().values[-1]
-    exp_20 = X_future_features["0"].ewm(span=20, adjust=False).mean().values[-1]
-    exp_50 = X_future_features["0"].ewm(span=50, adjust=False).mean().values[-1]
-
-    newrow = [[y_scaler.inverse_transform(prev_value.reshape(1,)), rolling_mean_10, rolling_mean_50, exp_20, exp_50, DoW_SP[i]]]
-
-    df_row = DataFrame(newrow, columns=["0", "1", "2", "3", "4", "5"])
-    X_future_features = pd.concat([X_future_features,df_row], axis=0)
-    result_future = np.append(result_future,regressor.predict(x_scaler.transform(newrow)))
-
-    regressor = SVR(kernel = 'rbf')
-    regressor.fit(x_scaler.transform(X_future_features), result_future)
+########################################################################################################################
+# Data processing for plotting curves and printing the errors.
+########################################################################################################################
 
 print("-"*200)
-
-error_train = result_train - y_scaler.inverse_transform(y_train)
-print("The mean absolute error of the training set is %0.2f" % mean_absolute_error(y_scaler.inverse_transform(y_train),result_train))
-print("The mean squared error of the training set is %0.2f" % mean_squared_error(y_scaler.inverse_transform(y_train),result_train))
-print("The root mean squared error of the training set is %0.2f" % np.sqrt(mean_squared_error(y_scaler.inverse_transform(y_train),result_train)))
+error_train_1 = result_train_1 - y_scaler.inverse_transform(y_train_1)
+print("The mean absolute error of the training set 1 is %0.2f" % mean_absolute_error(y_scaler.inverse_transform(y_train_1),result_train_1))
+print("The mean squared error of the training set 1 is %0.2f" % mean_squared_error(y_scaler.inverse_transform(y_train_1),result_train_1))
+print("The root mean squared error of the training set 1 is %0.2f" % np.sqrt(mean_squared_error(y_scaler.inverse_transform(y_train_1),result_train_1)))
 
 print("-"*200)
-
-error_test = result_test - y_scaler.inverse_transform(y_test)
-print("The mean absolute error of the training set is %0.2f" % mean_absolute_error(y_scaler.inverse_transform(y_test),result_test))
-print("The mean squared error of the training set is %0.2f" % mean_squared_error(y_scaler.inverse_transform(y_test),result_test))
-print("The root mean squared error of the training set is %0.2f" % np.sqrt(mean_squared_error(y_scaler.inverse_transform(y_test),result_test)))
+error_train_2 = result_train_2 - y_train_2
+print("The mean absolute error of the training set 2 is %0.2f" % mean_absolute_error(y_train_2,result_train_2))
+print("The mean squared error of the training set 2 is %0.2f" % mean_squared_error(y_train_2,result_train_2))
+print("The root mean squared error of the training 2 set is %0.2f" % np.sqrt(mean_squared_error(y_train_2,result_train_2)))
+print("-"*200)
 
 ########################################################################################################################
 # Visualising the results
 ########################################################################################################################
 
-figure1 = plt.figure(1)
-plt.plot(y, linewidth=0.5)
-plt.title('Training + Test Set (SVR)')
-plt.xlabel('Settlement Period')
-plt.ylabel('Actual Value (Training + Test Set)')
+# y_values_dates = create_dates(X, y)
+# figure1 = plt.figure(1)
+# plt.plot(y_values_dates, linewidth=0.5)
+# plt.title('Training + Test Set (SVR)')
+# plt.xlabel('Settlement Period')
+# plt.ylabel('Actual Value (Training + Test Set)')
 
+y_values_dates = create_dates(X_train_unscaled_1, X_train_unscaled_1[:,0])
 fig, ax = plt.subplots(3)
-fig.suptitle('SVR: Training Set', fontsize=16)
-ax[0].plot(X_train_unscaled[:,0],linewidth=0.5)
+fig.suptitle('SVR: Training Set 1', fontsize=16)
+ax[0].plot(y_values_dates,linewidth=0.5)
 ax[0].set_xlabel('Settlement Period')
-ax[0].set_ylabel('Actual Value: Training Set')
+ax[0].set_ylabel('Actual Value: Training Set 1')
 
-ax[1].plot( result_train, linewidth=0.5)
+y_values_dates = create_dates(X[:len(result_train_1)], result_train_1)
+ax[1].plot(y_values_dates, linewidth=0.5)
 ax[1].set_xlabel('Settlement Period')
-ax[1].set_ylabel('Prediction on training set')
+ax[1].set_ylabel('Prediction on Training Set 1')
 
-ax[2].plot(abs(error_train), linewidth=0.5)
+y_values_dates = create_dates(X[:len(error_train_1)], abs(error_train_1))
+ax[2].plot(y_values_dates, linewidth=0.5)
 ax[2].set_xlabel('Settlement Period')
-ax[2].set_ylabel('Absolute error: Training set')
+ax[2].set_ylabel('Absolute error: Training set 2')
 plt.show()
 
+y_values_dates = create_dates(X[len(X_train_1):(len(X_train_1)+len(X_train_2))], X_train_2[:,0])
 fig2, ax2 = plt.subplots(3)
-fig2.suptitle('SVR: Testing Set', fontsize=16)
-ax2[0].plot(X_test_unscaled[:,0], linewidth=0.5)
+fig2.suptitle('SVR: Training Set 2', fontsize=16)
+ax2[0].plot(y_values_dates, linewidth=0.5)
 ax2[0].set_xlabel('Settlement Period')
-ax2[0].set_ylabel('Actual Value: Test Set')
+ax2[0].set_ylabel('Actual Value: Training Set 2')
 
-ax2[1].plot(result_test,linewidth=0.5)
+y_values_dates = create_dates(X[len(X_train_1):(len(X_train_1)+len(X_train_2))], result_train_2)
+ax2[1].plot(y_values_dates,linewidth=0.5)
 ax2[1].set_xlabel('Settlement Period')
-ax2[1].set_ylabel('Prediction on test set')
+ax2[1].set_ylabel('Prediction on Training Set 2')
 
-ax2[2].plot(abs(error_test), linewidth=0.5)
+y_values_dates = create_dates(X[len(X_train_1):(len(X_train_1)+len(X_train_2))], abs(error_train_2))
+ax2[2].plot(y_values_dates, linewidth=0.5)
 ax2[2].set_xlabel('Settlement Period')
-ax2[2].set_ylabel('Absolute error: Test set.')
+ax2[2].set_ylabel('Absolute error: Training Set 2')
 plt.show()
 
-fig3, ax3 = plt.subplots(2)
-fig3.suptitle('SVR: Future Evaluation', fontsize=16)
-ax3[0].plot(y_scaler.inverse_transform(result_future)[-48*7:], linewidth=0.5)
-ax3[0].set_xlabel('Settlement Period')
-ax3[0].set_ylabel('Prediction')
+fig, axes = plt.subplots(2)
+axes[0].plot(result_train_1[-48*7:], label = "Prediction")
+axes[0].plot(y_scaler.inverse_transform(y_train_1[-48*7:]), label = "Actual")
+axes[0].set_xlabel("Settlement Periods")
+axes[0].set_ylabel("Electricity Load [MW]")
+axes[0].legend()
 
-ax3[1].plot(result_test[-48*7:],linewidth=0.5)
-ax3[1].set_xlabel('Settlement Period')
-ax3[1].set_ylabel('Prediction on test set')
+axes[1].plot(abs(result_train_1[-48*7:]-y_scaler.inverse_transform(y_train_1[-48*7:])), label = "Error")
+axes[1].set_xlabel("Settlement Periods")
+axes[1].set_ylabel("Electricity Load [MW]")
+axes[1].legend()
 
-plt.show()
+fig1, axes1 = plt.subplots(2)
+axes1[0].plot(result_train_2[-48*7:], label = "Prediction")
+axes1[0].plot(y_train_2[-48*7:], label = "Actual")
+axes1[0].set_xlabel("Settlement Periods")
+axes1[0].set_ylabel("Electricity Load [MW]")
+axes1[0].legend()
 
+axes1[1].plot(abs(result_train_2[-48*7:]-(y_train_2[-48*7:])), label = "Error")
+axes1[1].set_xlabel("Settlement Periods")
+axes1[1].set_ylabel("Electricity Load [MW]")
+axes1[1].legend()
 
 ########################################################################################################################
 # Save the results in a csv file.
 ########################################################################################################################
 
-import csv
-with open('/Users/benoitputzeys/PycharmProjects/MSc_Thesis/Compare_Models/SVR_result.csv', 'w', newline='',) as file:
-    writer = csv.writer(file)
-    writer.writerow(["Method","MSE","MAE","RMSE"])
-    writer.writerow(["SVR",
-                     str(mean_squared_error(y_scaler.inverse_transform(y_test),result_test)),
-                     str(mean_absolute_error(y_scaler.inverse_transform(y_test),result_test)),
-                     str(np.sqrt(mean_squared_error(y_scaler.inverse_transform(y_test),result_test)))
-                     ])
+pd.DataFrame(result_train_2).to_csv("/Users/benoitputzeys/PycharmProjects/MSc_Thesis/Electricity_generation/Hybrid_Model/RF_prediction.csv")

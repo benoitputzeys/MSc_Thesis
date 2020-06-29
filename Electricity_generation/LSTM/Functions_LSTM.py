@@ -8,6 +8,8 @@ from keras.layers import Dense
 from keras.layers import LSTM
 from keras.layers import Dropout
 from keras.optimizers import RMSprop
+import datetime
+from pandas import DataFrame
 
 def create_model(input_variable, learning_rate):
     # Initialising the NN
@@ -57,28 +59,49 @@ def train_model(model, xvalues, yvalues, epochs, batch):
 
     return hist
 
-def plot_the_loss_curve(epochs, difference):
+def plot_the_loss_curve(epochs, difference,string):
 
     plt.figure(1)
     plt.xlabel("Epoch")
-    plt.ylabel("Mean Squared Error")
+    plt.ylabel(string)
     plt.plot(epochs, difference)
     plt.legend()
     plt.show()
 
-def plot_generation(ax, y_values, string):
-    ax.plot(y_values, linewidth=0.5)
+def plot_generation(ax, x_values, y_values, string):
+
+    y_values_dates = create_dates(x_values, y_values)
+    ax.plot(y_values_dates, linewidth=0.5)
     ax.set_xlabel("Settlement Periods")
     ax.set_ylabel(string)
     plt.show()
 
-def plot_prediction_zoomed_in( yvalues1, yvalues2, yvalues3, string1, string2, string3 ):
-    plt.figure(4)
-    plt.suptitle('Prediction Zoomed In', fontsize=16)
-    plt.xlabel("Settlement Periods")
-    plt.ylabel("Generation")
-    plt.plot( yvalues1 , label=string1)
-    plt.plot( yvalues2 , label=string2)
-    plt.plot( yvalues3 , label=string3)
-    plt.legend()
-    plt.show()
+def plot_prediction_zoomed_in(fig, ax, x_values, prediction, true_values):
+
+    y_values_dates = create_dates(x_values, prediction)
+    fig.suptitle('LSTM: Single Step Prediction', fontsize=16)
+    ax[0].plot(y_values_dates, label="LSTM Prediction")
+    ax[0].set_xlabel("Settlement Periods")
+    ax[0].set_ylabel("Electricity Load [MW]")
+    y_values_dates = create_dates(x_values, true_values)
+    ax[0].plot(y_values_dates, label="Actual")
+    fig.legend()
+
+    y_values_dates = create_dates(x_values, abs(prediction-true_values))
+    ax[1].plot(y_values_dates, label="Absolute Error", color="black")
+    ax[1].set_xlabel("Settlement Periods")
+    ax[1].set_ylabel("Error in Prediction [MW]")
+    fig.legend()
+
+def create_dates(features_df, y_values):
+
+    date_list = [datetime.datetime(year=int(features_df[i, -1]),
+                                   month=int(features_df[i, -2]),
+                                   day=int(features_df[i, -3]),
+                                   hour=int((features_df[i, -4] - 1) / 2),
+                                   minute=(i % 2) * 30) for i in range(len(features_df))]
+    df_dates = DataFrame(date_list, columns=['Date'])
+    df_dates = df_dates.set_index(['Date'])
+    df_dates['Load'] = y_values
+
+    return df_dates

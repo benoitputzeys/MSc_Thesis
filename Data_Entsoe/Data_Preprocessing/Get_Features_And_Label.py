@@ -23,10 +23,14 @@ df18 = pd.read_csv(
     "/Users/benoitputzeys/PycharmProjects/MSc_Thesis/Data_Entsoe/Total_Load_Country/Total Load - Day Ahead _ Actual_201801010000-201901010000.csv")
 df18['Actual Total Load [MW] - United Kingdom (UK)'] = df18['Actual Total Load [MW] - United Kingdom (UK)'].astype(        float)
 df18 = df18.truncate(before=151 * 48)
+df18 = df18.drop([14405])
+df18 = df18.drop([14406])
 
 df19 = pd.read_csv(
     "/Users/benoitputzeys/PycharmProjects/MSc_Thesis/Data_Entsoe/Total_Load_Country/Total Load - Day Ahead _ Actual_201901010000-202001010000.csv")
 df19['Actual Total Load [MW] - United Kingdom (UK)'] = df19['Actual Total Load [MW] - United Kingdom (UK)'].astype(        float)
+df19 = df19.drop([14356])
+df19 = df19.drop([14357])
 
 # This csv data has missing values for the last 152 days of the year as they lie in the future. (Get rid of them)
 df20 = pd.read_csv(
@@ -57,43 +61,23 @@ df_features["Exp_Moving_Average_20_D"] = exp_20
 df_features["Exp_Moving_Average_50_D"] = exp_50
 
 # Create the settlement period feature and the day of week feature.
-counter = 0
-SP = 0
-DoW = 0
+counter = SP = DoW = Day = Month = Year = 0
+
 for i in range(len(df_features)):
     counter = counter + 1
     DoW = np.append(DoW, pd.to_datetime([df.iloc[i, 0][0:10]], format='%d.%m.%Y').weekday.values[0])
+    Day = np.append(Day, pd.to_datetime([df.iloc[i, 0][0:10]], format='%d.%m.%Y').day[0])
+    Month = np.append(Month, pd.to_datetime([df.iloc[i, 0][0:10]], format='%d.%m.%Y').month[0])
+    Year = np.append(Year, pd.to_datetime([df.iloc[i, 0][0:10]], format='%d.%m.%Y').year[0])
     if counter == 49:
         counter = 1
     SP = np.append(SP, counter)
 
-DoW = np.delete(DoW,0)
-SP = np.delete(SP,0)
-DoW_SP = DoW*SP
-DoW_SP = DoW_SP.reshape(len(DoW_SP),1)
-
-# from sklearn.preprocessing import OneHotEncoder
-#
-# SP_encoder = OneHotEncoder()
-# SP = SP.reshape(len(SP),1)
-# SP_1hot = SP_encoder.fit_transform(SP)
-# SP_1hot = SP_1hot.toarray()
-#
-# DoW_encoder = OneHotEncoder()
-# DoW = DoW.reshape(len(DoW),1)
-# DoW_1hot = DoW_encoder.fit_transform(DoW)
-# DoW_1hot = DoW_1hot.toarray()
-
-df_features = np.concatenate([df_features, DoW_SP], axis=1)
-#df_features = np.concatenate([df_features, DoW_1hot], axis=1)
-
-# df_features["Settlement_Period"] = SP
-# df_features["Day_of_Week"] = DoW
-
 # Create your input variable
-X = df_features
+X_inter = np.concatenate((DoW.reshape(len(DoW),1), SP.reshape(len(SP),1), Day.reshape(len(Day),1), Month.reshape(len(Month),1), Year.reshape(len(Year),1)), axis=1)
+X_inter = X_inter[1:]
+X = np.concatenate((df_features, X_inter), axis=1)
 y = df_label.values
-
 y = np.reshape(y, (len(y), 1))
 
 # After having shifted the data, the nan values have to be replaces in order to have good predictions.
@@ -107,13 +91,14 @@ y = replace_nan.transform(y)
 
 np.savetxt("/Users/benoitputzeys/PycharmProjects/MSc_Thesis/Data_Entsoe/Data_Preprocessing/X.csv", X, delimiter=",")
 np.savetxt("/Users/benoitputzeys/PycharmProjects/MSc_Thesis/Data_Entsoe/Data_Preprocessing/y.csv", y, delimiter=",")
-
-# plt.plot(X[-120:,0], label='Total Generation Past', linewidth=0.5 )
-# #plt.plot(y[:,0], label='Total Generation Actual', linewidth=0.5 )
-# plt.plot(X[-120:,1], label='SMA 10 Day SMA', color='orange' , linewidth=0.5 )
-# plt.plot(X[-120:,2], label='SMA 50 Day SMA', color='magenta',  linewidth=0.5 )
-# plt.plot(X[-120:,3], label='EXP 10 Day SMA', color='red',  linewidth=0.5 )
-# plt.plot(X[-120:,4], label='ECP 50 Day SMA', color='black',  linewidth=0.5 )
-  # plt.show()
-
-
+#
+# plt.plot(X[:,0], label='Electricity Generation 2 SP ago', linewidth=0.5 )
+# plt.xlabel("Actual Settlement Period")
+# plt.ylabel("Electricity Generation [MW]")
+# #plt.plot(y[-48*3:,0], label='Total Generation Actual', linewidth=0.5 )
+# plt.plot(X[:,1], label='10 Day MA', color='black' , linewidth=0.5 )
+# #plt.plot(X[-48*3:,2], label='50 Day SMA', color='black',  linewidth=0.5 )
+# #plt.plot(X[-48*3:,3], label='10 Day Exp MA', color='red',  linewidth=0.5 )
+# #plt.plot(X[-48*3:,4], label='50 Day Exp MA', color='red',  linewidth=0.5 )
+# plt.legend()
+# plt.show()
