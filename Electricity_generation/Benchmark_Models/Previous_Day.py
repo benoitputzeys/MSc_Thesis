@@ -77,7 +77,7 @@ plt.show()
 ########################################################################################################################
 
 import csv
-with open('/Users/benoitputzeys/PycharmProjects/MSc_Thesis/Compare_Models/Previous_Day_result.csv', 'w', newline='',) as file:
+with open('/Users/benoitputzeys/PycharmProjects/MSc_Thesis/Compare_Models/SST_results/Previous_Day_result.csv', 'w', newline='', ) as file:
     writer = csv.writer(file)
     writer.writerow(["Method","MSE","MAE","RMSE"])
     writer.writerow(["Previous_Day",

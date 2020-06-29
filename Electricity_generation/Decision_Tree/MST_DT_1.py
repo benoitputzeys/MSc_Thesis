@@ -49,11 +49,11 @@ y_test = y_scaler.transform(y_test)
 # Create the model.
 ########################################################################################################################
 
-# # Fit the Decision Tree to our data
-# regressor = DecisionTreeRegressor(random_state = 0)
-# regressor.fit(X_train, y_train)
+# Fit the Decision Tree to our data
+regressor = DecisionTreeRegressor(random_state = 0)
+regressor.fit(X_train, y_train)
 
-regressor = pickle.load(open("my_model.sav", 'rb'))
+# regressor = pickle.load(open("my_model.sav", 'rb'))
 
 # Single-Step prediction
 result_train = y_scaler.inverse_transform(regressor.predict(X_train))
@@ -128,5 +128,5 @@ fig5.legend()
 # Save the results in a csv file.
 ########################################################################################################################
 
-pd.DataFrame(result_future).to_csv("/Users/benoitputzeys/PycharmProjects/MSc_Thesis/Electricity_generation/Hybrid_Model/DT_prediction.csv")
+pd.DataFrame(result_future).to_csv("/Electricity_generation/Hybrid_Model/Pred_train2_other_metrics/DT_prediction.csv")
 

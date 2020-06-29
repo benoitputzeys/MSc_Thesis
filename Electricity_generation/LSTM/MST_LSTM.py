@@ -113,5 +113,5 @@ fig2.legend()
 # Save the results in a csv file.
 ########################################################################################################################
 
-pd.DataFrame(result_future).to_csv("/Users/benoitputzeys/PycharmProjects/MSc_Thesis/Electricity_generation/Hybrid_Model/LSTM_prediction.csv")
+pd.DataFrame(result_future).to_csv("/Electricity_generation/Hybrid_Model/Pred_train2_other_metrics/LSTM_prediction.csv")
 

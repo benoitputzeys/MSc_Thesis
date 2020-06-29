@@ -80,7 +80,7 @@ axes1[1].set_xlabel('Settlement Period')
 axes1[1].set_ylabel('Difference')
 
 y_values = create_dates(X_train[-48*3:],y_train[-48*3:]-mean)
-axes1[2].plot(y_values**2,label = "Squarred Difference",color = 'red')
+axes1[2].plot(y_values**2,label = "Squared Difference",color = 'red')
 axes1[2].set_xlabel('Settlement Period')
 axes1[2].set_ylabel('Squared Difference')
 fig1.legend()

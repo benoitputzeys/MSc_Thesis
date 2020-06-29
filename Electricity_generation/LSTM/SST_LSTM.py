@@ -111,7 +111,7 @@ plot_prediction_zoomed_in(fig1, axes1, X_test_unscaled[-3*48:],result_test[-3*48
 ########################################################################################################################
 
 import csv
-with open('/Users/benoitputzeys/PycharmProjects/MSc_Thesis/Compare_Models/LSTM_result.csv', 'w', newline='',) as file:
+with open('/Compare_Models/SST_results/LSTM_result.csv', 'w', newline='', ) as file:
     writer = csv.writer(file)
     writer.writerow(["Method","MSE","MAE","RMSE"])
     writer.writerow(["LSTM",

@@ -185,5 +185,6 @@ plt.show()
 # Save the results in a csv file.
 ########################################################################################################################
 
-pd.DataFrame(predictions[:48*7]).to_csv("/Users/benoitputzeys/PycharmProjects/MSc_Thesis/Electricity_generation/Hybrid_Model/SARIMA_prediction.csv")
+pd.DataFrame(predictions[:48*7]).to_csv(
+    "/Electricity_generation/Hybrid_Model/Pred_train2_other_metrics/SARIMA_prediction.csv")
 

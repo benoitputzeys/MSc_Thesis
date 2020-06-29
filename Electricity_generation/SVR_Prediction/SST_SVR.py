@@ -141,7 +141,7 @@ plt.show()
 ########################################################################################################################
 
 import csv
-with open('/Users/benoitputzeys/PycharmProjects/MSc_Thesis/Compare_Models/SVR_result.csv', 'w', newline='',) as file:
+with open('/Compare_Models/SST_results/SVR_result.csv', 'w', newline='', ) as file:
     writer = csv.writer(file)
     writer.writerow(["Method","MSE","MAE","RMSE"])
     writer.writerow(["SVR",

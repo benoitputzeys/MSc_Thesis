@@ -116,7 +116,7 @@ plot_prediction_zoomed_in(X[-48*3:], result_test[-48*3:], "Prediction last 3 day
 ########################################################################################################################
 
 import csv
-with open('/Users/benoitputzeys/PycharmProjects/MSc_Thesis/Compare_Models/ANN_result.csv', 'w', newline='',) as file:
+with open('/Compare_Models/SST_results/ANN_result.csv', 'w', newline='', ) as file:
     writer = csv.writer(file)
     writer.writerow(["Method","MSE","MAE","RMSE"])
     writer.writerow(["ANN",

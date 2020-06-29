@@ -14,12 +14,12 @@ def create_model(dim, learning_rate):
 
     # Input shape corresponds to the number of columns (the features day, month and year) of the dataframe,
     # excpet for the output label, the temperature.
-    my_model.add(Dense(units=25, kernel_initializer='uniform', input_dim=dim, activation='relu'))
-    my_model.add(Dropout(0.1))
+    my_model.add(Dense(units=50, kernel_initializer='uniform', input_dim=dim, activation='relu'))
+    my_model.add(Dropout(0.2))
     my_model.add(Dense(units=75, kernel_initializer='uniform', activation='relu'))
-    my_model.add(Dropout(0.1))
-    my_model.add(Dense(units=25, kernel_initializer='uniform', activation='relu'))
-    my_model.add(Dropout(0.1))
+    my_model.add(Dropout(0.2))
+    my_model.add(Dense(units=50, kernel_initializer='uniform', activation='relu'))
+    my_model.add(Dropout(0.2))
     my_model.add(Dense(units=1, kernel_initializer='uniform', activation='linear'))
 
     opt = keras.optimizers.Adam(lr=learning_rate)
