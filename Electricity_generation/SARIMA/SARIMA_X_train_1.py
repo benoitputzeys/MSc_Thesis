@@ -60,7 +60,13 @@ y_diff = y_1 - y_2
 # Plot the difference.
 y_values_dates = create_dates(X_train_1[:48*7], y_diff[:48*7])
 plt.figure()
-plt.plot(y_values_dates, linewidth=0.5)
+plt.plot(X_train_1[:,0], linewidth=0.5)
+plt.plot(X_train_1[:,2], linewidth=0.5)
+plt.title('Electricity Load SARIMA Model', fontsize=20)
+plt.ylabel('Electricity Load [MW]', fontsize=16)
+
+plt.figure()
+plt.plot(X_train_2[:,0], linewidth=0.5)
 plt.title('Electricity Load SARIMA Model', fontsize=20)
 plt.ylabel('Electricity Load [MW]', fontsize=16)
 
@@ -91,8 +97,8 @@ ax[1] = plot_pacf(y_diff,ax=ax[1], lags = 50)
 # Set the hyperparameters and fit the model.
 ########################################################################################################################
 
-my_order = (1,1,3)
-my_seasonal_order = (1, 0, 1, 48)
+my_order = (0,1,1)
+my_seasonal_order = (0, 1, 1, 48)
 #model = SARIMAX(y_train, order=my_order, seasonal_order=my_seasonal_order, exog=exogenous_variable)
 model = SARIMAX(y_train_1, order=my_order, seasonal_order=my_seasonal_order)
 model_fit = model.fit()
@@ -155,9 +161,10 @@ plt.show()
 ########################################################################################################################
 
 #predictions_train_2 = model_fit.predict(len(X_train_2), exog=X_train_2[:,1])
-predictions_train_2 = model_fit.predict(start = len(X_train_1), end = len(X_train_1)+len(X_train_2)-1)
+#predictions_train_2 = model_fit.predict(start = len(X_train_1), end = len(X_train_1)+len(X_train_2)-1)
+predictions_train_2 = model_fit.forecast(steps = len(X_train_2) )
 predictions_train_2 = np.reshape(predictions_train_2,(-1,1))
-residuals = y_train_2 - predictions_train_2
+residuals = y_train_2[:len(X_train_2)] - predictions_train_2
 
 # Get the errors.
 print("-"*200)
@@ -176,7 +183,7 @@ fig.suptitle('SARIMA Model', fontsize=20)
 #y_values_dates = create_dates(X_train_2[-48*7:], y_train_2[-48*7:])
 #ax[0].plot(y_values_dates, label='Train Values')
 #y_values_dates = create_dates(X_train_2[-48*7:], y_train_2[-48*7:])
-ax[0].plot(y_train_2, label='Actual Values')
+ax[0].plot(y_train_2[:len(X_train_2)], label='Actual Values')
 #y_values_dates = create_dates(X_train_2[-48*7:], predictions_train_2[-48*7:])
 ax[0].plot(predictions_train_2, label='Predictions')
 ax[0].set_xlabel('Settlement Period Train Set 2')

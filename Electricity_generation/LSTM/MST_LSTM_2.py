@@ -18,16 +18,18 @@ from numpy import genfromtxt
 
 def create_dates(features_df, y_values):
 
-    date_list = [datetime.datetime(year=int(features_df[i, -1]),
-                                   month=int(features_df[i, -2]),
+    date_list = [datetime.datetime(year=int(round(features_df[i, -1])),
+                                   month=int(round(features_df[i, -2])),
                                    day=int(round(features_df[i, -3])),
                                    hour=int((features_df[i, -4] - 1) / 2),
-                                   minute=(i % 2) * 30) for i in range(len(features_df))]
+                                   minute=int(((features_df[i, -4] -1) % 2 ) * 30)) for i in range(len(features_df))]
+
     df_dates = DataFrame(date_list, columns=['Date'])
     df_dates = df_dates.set_index(['Date'])
     df_dates['Load'] = y_values
 
     return df_dates
+
 
 # Get the X (containing the features) and y (containing the labels) values
 X = genfromtxt('/Users/benoitputzeys/PycharmProjects/MSc_Thesis/Data_Entsoe/Data_Preprocessing/For_Multi_Step_Prediction_Outside_Test_Set/X.csv', delimiter=',')
@@ -35,7 +37,7 @@ y = genfromtxt('/Users/benoitputzeys/PycharmProjects/MSc_Thesis/Data_Entsoe/Data
 y = np.reshape(y, (len(y), 1))
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state = 0, shuffle = False)
-X_train_1, X_train_2, y_train_1, y_train_2 = train_test_split(X_train, y_train, test_size = 0.5, random_state = 0, shuffle = False)
+X_train_1, X_train_2, y_train_1, y_train_2 = train_test_split(X_train, y_train, test_size = 0.2, random_state = 0, shuffle = False)
 # Save the unscaled data for later for data representation.
 X_test_unscaled = X_test
 X_train_unscaled_1 = X_train_1

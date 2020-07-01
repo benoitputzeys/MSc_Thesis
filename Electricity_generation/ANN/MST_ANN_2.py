@@ -18,11 +18,12 @@ from numpy import genfromtxt
 
 def create_dates(features_df, y_values):
 
-    date_list = [datetime.datetime(year=int(features_df[i, -1]),
-                                   month=int(features_df[i, -2]),
+    date_list = [datetime.datetime(year=int(round(features_df[i, -1])),
+                                   month=int(round(features_df[i, -2])),
                                    day=int(round(features_df[i, -3])),
                                    hour=int((features_df[i, -4] - 1) / 2),
-                                   minute=(i % 2) * 30) for i in range(len(features_df))]
+                                   minute=int(((features_df[i, -4] -1) % 2 ) * 30)) for i in range(len(features_df))]
+
     df_dates = DataFrame(date_list, columns=['Date'])
     df_dates = df_dates.set_index(['Date'])
     df_dates['Load'] = y_values
@@ -35,7 +36,7 @@ y = genfromtxt('/Users/benoitputzeys/PycharmProjects/MSc_Thesis/Data_Entsoe/Data
 y = np.reshape(y, (len(y), 1))
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state = 0, shuffle = False)
-X_train_1, X_train_2, y_train_1, y_train_2 = train_test_split(X_train, y_train, test_size = 0.5, random_state = 0, shuffle = False)
+X_train_1, X_train_2, y_train_1, y_train_2 = train_test_split(X_train, y_train, test_size = 0.2, random_state = 0, shuffle = False)
 
 # Save the unscaled data for later for data representation.
 X_test_unscaled = X_test
@@ -53,31 +54,31 @@ y_train_1 = y_scaler.fit_transform(y_train_1)
 # Create the model.
 ########################################################################################################################
 
-# Define the hyperparameters.
-learning_rate = 0.001
-number_of_epochs = 100
-batch_size = 32
+# # Define the hyperparameters.
+# learning_rate = 0.001
+# number_of_epochs = 100
+# batch_size = 32
+#
+# # Create the model.
+# my_model = create_model(len(X_train_1[1]), learning_rate)
+#
+# # Extract the loss per epoch to plot the learning progress.
+#
+# hist_list = pd.DataFrame()
+#
+# tscv = TimeSeriesSplit()
+# for train_index, test_index in tscv.split(X_train_1):
+#       X_train_split, X_test_split = X_train_1[train_index], X_train_1[test_index]
+#       y_train_split, y_test_split = y_train_1[train_index], y_train_1[test_index]
+#       hist_split = train_model(my_model, X_train_split, y_train_split, number_of_epochs, batch_size)
+#       hist_list = hist_list.append(hist_split)
+#
+# # Plot the loss per epoch.
+# metric = "mean_absolute_error"
+# plot_the_loss_curve(np.linspace(1,len(hist_list), len(hist_list) ), hist_list[metric], metric)
+# my_model.save("my_model_MST_2.h5")
 
-# Create the model.
-my_model = create_model(len(X_train_1[1]), learning_rate)
-
-# Extract the loss per epoch to plot the learning progress.
-
-hist_list = pd.DataFrame()
-
-tscv = TimeSeriesSplit()
-for train_index, test_index in tscv.split(X_train_1):
-      X_train_split, X_test_split = X_train_1[train_index], X_train_1[test_index]
-      y_train_split, y_test_split = y_train_1[train_index], y_train_1[test_index]
-      hist_split = train_model(my_model, X_train_split, y_train_split, number_of_epochs, batch_size)
-      hist_list = hist_list.append(hist_split)
-
-# Plot the loss per epoch.
-metric = "mean_absolute_error"
-plot_the_loss_curve(np.linspace(1,len(hist_list), len(hist_list) ), hist_list[metric], metric)
-my_model.save("my_model_MST_2.h5")
-
-# my_model = keras.models.load_model("my_model_MST_2.h5")
+my_model = keras.models.load_model("my_model_MST_2.h5")
 
 ########################################################################################################################
 # Predicting the generation.
@@ -155,15 +156,15 @@ axes[1].legend()
 
 # Print the prediction of the training set 2.
 fig1, axes1 = plt.subplots(2)
-y_values_dates = create_dates(X_train_2[-48*7-1:],result_train_2[-48*7-1:])
+y_values_dates = create_dates(X_train_2,result_train_2)
 axes1[0].plot(y_values_dates, label = "Prediction")
-y_values_dates = create_dates(X_train_2[-48*7-1:],y_train_2[-48*7-1:])
+y_values_dates = create_dates(X_train_2,y_train_2)
 axes1[0].plot(y_values_dates, label = "Actual")
 axes1[0].set_xlabel("Settlement Periods Training Set 2")
 axes1[0].set_ylabel("Electricity Load [MW]")
 axes1[0].legend()
 
-y_values_dates = create_dates(X_train_2[-48*7-1:],abs(result_train_2[-48*7-1:]-(y_train_2[-48*7-1:])))
+y_values_dates = create_dates(X_train_2,abs(result_train_2-(y_train_2)))
 axes1[1].plot(y_values_dates, label = "Error")
 axes1[1].set_xlabel("Settlement Periods Training Set 2")
 axes1[1].set_ylabel("Electricity Load [MW]")
@@ -171,15 +172,15 @@ axes1[1].legend()
 
 # Print the prediction of the test set.
 fig2, axes2 = plt.subplots(2)
-y_values_dates = create_dates(X_test[-48*7:],result_test[-48*7:])
+y_values_dates = create_dates(X_test,result_test)
 axes2[0].plot(y_values_dates, label = "Prediction")
-y_values_dates = create_dates(X_test[-48*7:],y_test[-48*7:])
+y_values_dates = create_dates(X_test,y_test)
 axes2[0].plot(y_values_dates, label = "Actual")
 axes2[0].set_xlabel("Settlement Periods Test Set")
 axes2[0].set_ylabel("Electricity Load [MW]")
 axes2[0].legend()
 
-y_values_dates = create_dates(X_test[-48*7:],abs(result_test[-48*7:]-(y_test[-48*7:])))
+y_values_dates = create_dates(X_test,abs(result_test-(y_test)))
 axes2[1].plot(y_values_dates, label = "Error")
 axes2[1].set_xlabel("Settlement Periods Test Set")
 axes2[1].set_ylabel("Error in [MW]")
