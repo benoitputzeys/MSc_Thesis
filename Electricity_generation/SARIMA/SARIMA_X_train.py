@@ -35,8 +35,8 @@ def create_dates(features_df, y_values):
 from numpy import genfromtxt
 
 # Get the X (containing the features) and y (containing the labels) values
-X = genfromtxt('C:\Python\Pycharm\MSc_Thesis\Data_Entsoe\Data_Preprocessing\For_Multi_Step_Prediction_Outside_Test_Set\X.csv', delimiter=',')
-y = genfromtxt('C:\Python\Pycharm\MSc_Thesis\Data_Entsoe\Data_Preprocessing\For_Multi_Step_Prediction_Outside_Test_Set\y.csv', delimiter=',')
+X = genfromtxt('/Users/benoitputzeys/PycharmProjects/MSc_Thesis/Data_Entsoe/Data_Preprocessing/For_Multi_Step_Prediction_Outside_Test_Set/X.csv', delimiter=',')
+y = genfromtxt('/Users/benoitputzeys/PycharmProjects/MSc_Thesis/Data_Entsoe/Data_Preprocessing/For_Multi_Step_Prediction_Outside_Test_Set/y.csv', delimiter=',')
 y = np.reshape(y, (len(y), 1))
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state = 0, shuffle = False)
@@ -44,6 +44,7 @@ X_train_1, X_train_2, y_train_1, y_train_2 = train_test_split(X_train, y_train, 
 
 ex_variable_train_1 = X_train_1[:,5:]
 ex_variable_train_2 = X_train_2[:,5:]
+
 # # Plot the first 7 days in the training set.
 # y_values_dates = create_dates(X_train[:7*48], y_train[:7*48])
 # plt.figure()
@@ -114,10 +115,10 @@ print(model_fit.summary())
 # Decompose the data into seasonal component, trend and residual error of the 2.
 ########################################################################################################################
 
-# # Decompose the data.
-# ts_decompose = sm.tsa.seasonal_decompose(y_train, model='additive', period = 48)
-# ts_decompose.plot()
-# plt.show
+# Decompose the data.
+ts_decompose = sm.tsa.seasonal_decompose(y_train, model='additive', period = 48)
+ts_decompose.plot()
+plt.show
 
 # Get the prediction and its residual.
 # Define the lenght of the prediciton.
@@ -225,9 +226,9 @@ plt.show()
 ########################################################################################################################
 
 pd.DataFrame(predictions_train_2).to_csv(
-    "C:\Python\Pycharm\MSc_Thesis/Electricity_generation/Hybrid_Model/Pred_train2_other_metrics/SARIMA_prediction.csv")
+    "/Users/benoitputzeys/PycharmProjects/Electricity_generation/Hybrid_Model/Pred_train2_other_metrics/SARIMA_prediction.csv")
 pd.DataFrame(predictions_train_1).to_csv(
-    "C:\Python\Pycharm\MSc_Thesis/Electricity_generation/SARIMA/SARIMA_prediction_train_1.csv")
+    "/Users/benoitputzeys/PycharmProjects/Electricity_generation/SARIMA/SARIMA_prediction_train_1.csv")
 
 # pd.DataFrame(result_test).to_csv(
 #     "/Users/benoitputzeys/PycharmProjects/MSc_Thesis/Electricity_generation/Hybrid_Model/Pred_test_other_metrics/SARIMA_prediction.csv")

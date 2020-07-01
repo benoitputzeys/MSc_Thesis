@@ -90,24 +90,28 @@ y_train_2 = y_scaler.fit_transform(y_train_2)
 # Create the model.
 ########################################################################################################################
 
-# Define the hyperparameters.
-learning_rate = 0.001
-number_of_epochs = 125
-batch_size = 32
+# # Define the hyperparameters.
+# learning_rate = 0.001
+# number_of_epochs = 125
+# batch_size = 32
+#
+# # Create the model.
+# my_model = create_model(5, learning_rate)
+#
+# # Extract the loss per epoch to plot the learning progress.
+#
+# hist_list = pd.DataFrame()
+#
+# hist_split = train_model(my_model, all_predictions_train, y_train_2, number_of_epochs, batch_size)
+# hist_list = hist_list.append(hist_split)
+#
+# # Plot the loss per epoch.
+# metric = "mean_absolute_error"
+# plot_the_loss_curve(np.linspace(1,len(hist_list), len(hist_list) ), hist_list[metric], metric)
+#
+# my_model.save("my_model.h5")
 
-# Create the model.
-my_model = create_model(5, learning_rate)
-
-# Extract the loss per epoch to plot the learning progress.
-
-hist_list = pd.DataFrame()
-
-hist_split = train_model(my_model, all_predictions_train, y_train_2, number_of_epochs, batch_size)
-hist_list = hist_list.append(hist_split)
-
-# Plot the loss per epoch.
-metric = "mean_absolute_error"
-plot_the_loss_curve(np.linspace(1,len(hist_list), len(hist_list) ), hist_list[metric], metric)
+my_model = keras.models.load_model("my_model.h5")
 
 ########################################################################################################################
 # Make predictions and compute the errors.
@@ -155,152 +159,166 @@ axes[1].legend()
 # Predictions on the whole training set 2.
 ########################################################################################################################
 
-fig, axes = plt.subplots(6)
-axes[0].plot(ANN_train, color = 'blue', linewidth=0.5)
-axes[0].plot(y_train_2, color = 'orange', linewidth=0.5)
-axes[0].set_xlabel('ANN prediction train set 2')
-axes[0].set_ylabel('ANN [MW]')
-
-axes[1].plot(LSTM_train, color = 'blue', linewidth=0.5)
-axes[1].plot(y_train_2, color = 'orange', linewidth=0.5)
-axes[1].set_xlabel('LSTM prediction train set 2')
-axes[1].set_ylabel('LSTM [MW]')
-
-axes[2].plot(SVR_train, color = 'blue', linewidth=0.5)
-axes[2].plot(y_train_2, color = 'orange', linewidth=0.5)
-axes[2].set_xlabel('SVR prediction train set 2')
-axes[2].set_ylabel('SVR [MW]')
-
-axes[3].plot(DT_train, color = 'blue', linewidth=0.5)
-axes[3].plot(y_train_2, color = 'orange', linewidth=0.5)
-axes[3].set_xlabel('DT prediction train set 2')
-axes[3].set_ylabel('DT [MW]')
-
-axes[4].plot(RF_train, color = 'blue', linewidth=0.5)
-axes[4].plot(y_train_2, color = 'orange', linewidth=0.5)
-axes[4].set_xlabel('RF prediction train set 2')
-axes[4].set_ylabel('RF [MW]')
-
-axes[5].plot(result_train_2, color = 'blue', linewidth=0.5)
-axes[5].plot(y_train_2, color = 'orange', linewidth=0.5)
-axes[5].set_xlabel('Hybrid prediction train set 2')
-axes[5].set_ylabel('Hybrid [MW]')
-
-########################################################################################################################
-# Predictions on the first 7 days in the training set.
-########################################################################################################################
-
 fig1, axes1 = plt.subplots(6)
-axes1[0].plot(ANN_train[:48*7], color = 'blue', linewidth=0.5)
-axes1[0].plot(y_train_2[:48*7], color = 'orange', linewidth=0.5)
-axes1[0].set_xlabel('ANN prediction train set 2')
-axes1[0].set_ylabel('ANN [MW]')
-
-axes1[1].plot(LSTM_train[:48*7], color = 'blue', linewidth=0.5)
-axes1[1].plot(y_train_2[:48*7], color = 'orange', linewidth=0.5)
-axes1[1].set_xlabel('LSTM prediction train set 2')
-axes1[1].set_ylabel('LSTM [MW]')
-
-axes1[2].plot(SVR_train[:48*7], color = 'blue', linewidth=0.5)
-axes1[2].plot(y_train_2[:48*7], color = 'orange', linewidth=0.5)
-axes1[2].set_xlabel('SVR prediction train set 2')
-axes1[2].set_ylabel('SVR [MW]')
-
-axes1[3].plot(DT_train[:48*7], color = 'blue', linewidth=0.5)
-axes1[3].plot(y_train_2[:48*7], color = 'orange', linewidth=0.5)
-axes1[3].set_xlabel('DT prediction train set 2')
-axes1[3].set_ylabel('DT [MW]')
-
-axes1[4].plot(RF_train[:48*7], color = 'blue', linewidth=0.5)
-axes1[4].plot(y_train_2[:48*7], color = 'orange', linewidth=0.5)
-axes1[4].set_xlabel('RF prediction train set 2')
-axes1[4].set_ylabel('RF [MW]')
-
-axes1[5].plot(result_train_2[:48*7], color = 'blue', linewidth=0.5)
-axes1[5].plot(y_train_2[:48*7], color = 'orange', linewidth=0.5)
-axes1[5].set_xlabel('Hybrid prediction train set 2')
-axes1[5].set_ylabel('Hybrid [MW]')
-
-########################################################################################################################
-# Plot predictions on the whole test set.
-########################################################################################################################
-
-fig1, axes1 = plt.subplots(6)
-axes1[0].plot(ANN_test, color = 'blue', linewidth=0.5)
-axes1[0].plot(y_test, color = 'orange', linewidth=0.5)
-axes1[0].set_xlabel('ANN prediction test set')
-axes1[0].set_ylabel('ANN [MW]')
-
-axes1[1].plot(LSTM_test, color = 'blue', linewidth=0.5)
-axes1[1].plot(y_test, color = 'orange', linewidth=0.5)
-axes1[1].set_xlabel('LSTM prediction test set')
-axes1[1].set_ylabel('LSTM [MW]')
-
-axes1[2].plot(SVR_test, color = 'blue', linewidth=0.5)
-axes1[2].plot(y_test, color = 'orange', linewidth=0.5)
-axes1[2].set_xlabel('SVR prediction test set')
-axes1[2].set_ylabel('SVR [MW]')
-
-axes1[3].plot(DT_test, color = 'blue', linewidth=0.5)
-axes1[3].plot(y_test, color = 'orange', linewidth=0.5)
-axes1[3].set_xlabel('DT prediction test set')
-axes1[3].set_ylabel('DT [MW]')
-
-axes1[4].plot(RF_test, color = 'blue', linewidth=0.5)
-axes1[4].plot(y_test, color = 'orange', linewidth=0.5)
-axes1[4].set_xlabel('RF prediction test set')
-axes1[4].set_ylabel('RF [MW]')
-
-axes1[5].plot(result_test, color = 'blue', linewidth=0.5)
-axes1[5].plot(y_test, color = 'orange', linewidth=0.5)
-axes1[5].set_xlabel('Hybrid prediction test set')
-axes1[5].set_ylabel('Hybrid [MW]')
-
-########################################################################################################################
-# Plot predictions on the first 7 days of the test set.
-########################################################################################################################
-
-fig1, axes1 = plt.subplots(6)
-left = 0.2  # the left side of the subplots of the figure
+left = 0.1  # the left side of the subplots of the figure
 right = 0.9   # the right side of the subplots of the figure
 bottom = 0.1  # the bottom of the subplots of the figure
-top = 0.98     # the top of the subplots of the figure
+top = 0.9     # the top of the subplots of the figure
 wspace = 0.5  # the amount of width reserved for space between subplots,
               # expressed as a fraction of the average axis width
 hspace = 0.65  # the amount of height reserved for space between subplots,
               # expressed as a fraction of the average axis height
 fig1.subplots_adjust(left=left, bottom=bottom, right=right, top=top, wspace=wspace, hspace=hspace)
 
-axes1[0].plot(ANN_test[:48*7], color = 'blue', linewidth=0.5)
-axes1[0].plot(y_test[:48*7], color = 'orange', linewidth=0.5)
-axes1[0].set_xlabel('ANN prediction test set')
-axes1[0].set_ylabel('[MW]')
+axes1[0].title.set_text("Predictions on the whole training set (1).")
+axes1[0].plot(ANN_train, color = 'blue', linewidth=0.5, label = "Prediction")
+axes1[0].plot(y_train_2, color = 'orange', linewidth=0.5, label = "True values")
+axes1[0].set_ylabel('(ANN) [MW]')
+fig1.legend()
 
-axes1[1].plot(LSTM_test[:48*7], color = 'blue', linewidth=0.5)
-axes1[1].plot(y_test[:48*7], color = 'orange', linewidth=0.5)
-axes1[1].set_xlabel('LSTM prediction test set')
-axes1[1].set_ylabel('[MW]')
+axes1[1].plot(LSTM_train, color = 'blue', linewidth=0.5)
+axes1[1].plot(y_train_2, color = 'orange', linewidth=0.5)
+axes1[1].set_ylabel('(LSTM) [MW]')
 
-axes1[2].plot(SVR_test[:48*7], color = 'blue', linewidth=0.5)
-axes1[2].plot(y_test[:48*7], color = 'orange', linewidth=0.5)
-axes1[2].set_xlabel('SVR prediction test set')
-axes1[2].set_ylabel('[MW]')
+axes1[2].plot(SVR_train, color = 'blue', linewidth=0.5)
+axes1[2].plot(y_train_2, color = 'orange', linewidth=0.5)
+axes1[2].set_ylabel('(SVR) [MW]')
 
-axes1[3].plot(DT_test[:48*7], color = 'blue', linewidth=0.5)
-axes1[3].plot(y_test[:48*7], color = 'orange', linewidth=0.5)
-axes1[3].set_xlabel('DT prediction test set')
-axes1[3].set_ylabel('[MW]')
+axes1[3].plot(DT_train, color = 'blue', linewidth=0.5)
+axes1[3].plot(y_train_2, color = 'orange', linewidth=0.5)
+axes1[3].set_ylabel('(DT) [MW]')
 
-axes1[4].plot(RF_test[:48*7], color = 'blue', linewidth=0.5)
-axes1[4].plot(y_test[:48*7], color = 'orange', linewidth=0.5)
-axes1[4].set_xlabel('RF prediction test set')
-axes1[4].set_ylabel('[MW]')
+axes1[4].plot(RF_train, color = 'blue', linewidth=0.5)
+axes1[4].plot(y_train_2, color = 'orange', linewidth=0.5)
+axes1[4].set_ylabel('(RF) [MW]')
 
-axes1[5].plot(result_test[:48*7], color = 'blue', linewidth=0.5)
-axes1[5].plot(y_test[:48*7], color = 'orange', linewidth=0.5)
-axes1[5].set_xlabel('Hybrid prediction test set')
-axes1[5].set_ylabel('[MW]')
-fig1.show()
+axes1[5].plot(result_train_2, color = 'blue', linewidth=0.5)
+axes1[5].plot(y_train_2, color = 'orange', linewidth=0.5)
+axes1[5].set_ylabel('Hybrid [MW]')
+
+########################################################################################################################
+# Predictions on the first 7 days in the training set.
+########################################################################################################################
+
+fig2, axes2 = plt.subplots(6)
+left = 0.1  # the left side of the subplots of the figure
+right = 0.9   # the right side of the subplots of the figure
+bottom = 0.1  # the bottom of the subplots of the figure
+top = 0.9     # the top of the subplots of the figure
+wspace = 0.5  # the amount of width reserved for space between subplots,
+              # expressed as a fraction of the average axis width
+hspace = 0.65  # the amount of height reserved for space between subplots,
+              # expressed as a fraction of the average axis height
+fig2.subplots_adjust(left=left, bottom=bottom, right=right, top=top, wspace=wspace, hspace=hspace)
+
+axes2[0].title.set_text("Predictions on the first 7 days in the training set (2).")
+axes2[0].plot(ANN_train[:48*7], color = 'blue', linewidth=0.5,label = "Prediction")
+axes2[0].plot(y_train_2[:48*7], color = 'orange', linewidth=0.5, label = "True values")
+axes2[0].set_ylabel('(ANN) [MW]')
+fig2.legend()
+
+axes2[1].plot(LSTM_train[:48*7], color = 'blue', linewidth=0.5)
+axes2[1].plot(y_train_2[:48*7], color = 'orange', linewidth=0.5)
+axes2[1].set_ylabel('(LSTM) [MW]')
+
+axes2[2].plot(SVR_train[:48*7], color = 'blue', linewidth=0.5)
+axes2[2].plot(y_train_2[:48*7], color = 'orange', linewidth=0.5)
+axes2[2].set_ylabel('(SVR) [MW]')
+
+axes2[3].plot(DT_train[:48*7], color = 'blue', linewidth=0.5)
+axes2[3].plot(y_train_2[:48*7], color = 'orange', linewidth=0.5)
+axes2[3].set_ylabel('(DT) [MW]')
+
+axes2[4].plot(RF_train[:48*7], color = 'blue', linewidth=0.5)
+axes2[4].plot(y_train_2[:48*7], color = 'orange', linewidth=0.5)
+axes2[4].set_ylabel('(RF) [MW]')
+
+axes2[5].plot(result_train_2[:48*7], color = 'blue', linewidth=0.5)
+axes2[5].plot(y_train_2[:48*7], color = 'orange', linewidth=0.5)
+axes2[5].set_ylabel('(Hybrid) [MW]')
+
+########################################################################################################################
+# Plot predictions on the whole test set.
+########################################################################################################################
+
+fig3, axes3 = plt.subplots(6)
+left = 0.1  # the left side of the subplots of the figure
+right = 0.9   # the right side of the subplots of the figure
+bottom = 0.1  # the bottom of the subplots of the figure
+top = 0.9     # the top of the subplots of the figure
+wspace = 0.5  # the amount of width reserved for space between subplots,
+              # expressed as a fraction of the average axis width
+hspace = 0.65  # the amount of height reserved for space between subplots,
+              # expressed as a fraction of the average axis height
+fig3.subplots_adjust(left=left, bottom=bottom, right=right, top=top, wspace=wspace, hspace=hspace)
+
+axes3[0].title.set_text("Predictions on the whole test set.")
+axes3[0].plot(ANN_test, color = 'blue', linewidth=0.5,label = "Prediction")
+axes3[0].plot(y_test, color = 'orange', linewidth=0.5, label = "True values")
+axes3[0].set_ylabel('(ANN) [MW]')
+fig3.legend()
+
+axes3[1].plot(LSTM_test, color = 'blue', linewidth=0.5)
+axes3[1].plot(y_test, color = 'orange', linewidth=0.5)
+axes3[1].set_ylabel('(LSTM) [MW]')
+
+axes3[2].plot(SVR_test, color = 'blue', linewidth=0.5)
+axes3[2].plot(y_test, color = 'orange', linewidth=0.5)
+axes3[2].set_ylabel('(SVR) [MW]')
+
+axes3[3].plot(DT_test, color = 'blue', linewidth=0.5)
+axes3[3].plot(y_test, color = 'orange', linewidth=0.5)
+axes3[3].set_ylabel('(DT) [MW]')
+
+axes3[4].plot(RF_test, color = 'blue', linewidth=0.5)
+axes3[4].plot(y_test, color = 'orange', linewidth=0.5)
+axes3[4].set_ylabel('(RF) [MW]')
+
+axes3[5].plot(result_test, color = 'blue', linewidth=0.5)
+axes3[5].plot(y_test, color = 'orange', linewidth=0.5)
+axes3[5].set_ylabel('(Hybrid) [MW]')
+
+########################################################################################################################
+# Plot predictions on the first 7 days of the test set.
+########################################################################################################################
+
+fig4, axes4 = plt.subplots(6)
+left = 0.1  # the left side of the subplots of the figure
+right = 0.9   # the right side of the subplots of the figure
+bottom = 0.1  # the bottom of the subplots of the figure
+top = 0.9     # the top of the subplots of the figure
+wspace = 0.5  # the amount of width reserved for space between subplots,
+              # expressed as a fraction of the average axis width
+hspace = 0.65  # the amount of height reserved for space between subplots,
+              # expressed as a fraction of the average axis height
+fig4.subplots_adjust(left=left, bottom=bottom, right=right, top=top, wspace=wspace, hspace=hspace)
+
+axes4[0].title.set_text("Predictions on the first 7 days of the test set.")
+axes4[0].plot(ANN_test[:48*7], color = 'blue', linewidth=0.5, label = "Prediction")
+axes4[0].plot(y_test[:48*7], color = 'orange', linewidth=0.5, label = "True values")
+axes4[0].set_ylabel('(ANN) [MW]')
+fig4.legend()
+
+axes4[1].plot(LSTM_test[:48*7], color = 'blue', linewidth=0.5)
+axes4[1].plot(y_test[:48*7], color = 'orange', linewidth=0.5)
+axes4[1].set_ylabel('[MW]')
+
+axes4[2].plot(SVR_test[:48*7], color = 'blue', linewidth=0.5)
+axes4[2].plot(y_test[:48*7], color = 'orange', linewidth=0.5)
+axes4[2].set_ylabel('(SVR) [MW]')
+
+axes4[3].plot(DT_test[:48*7], color = 'blue', linewidth=0.5)
+axes4[3].plot(y_test[:48*7], color = 'orange', linewidth=0.5)
+axes4[3].set_ylabel('(DT) [MW]')
+
+axes4[4].plot(RF_test[:48*7], color = 'blue', linewidth=0.5)
+axes4[4].plot(y_test[:48*7], color = 'orange', linewidth=0.5)
+axes4[4].set_ylabel('(RF) [MW]')
+
+axes4[5].plot(result_test[:48*7], color = 'blue', linewidth=0.5)
+axes4[5].plot(y_test[:48*7], color = 'orange', linewidth=0.5)
+axes4[5].set_ylabel('(Hybrid) [MW]')
+fig4.show()
 
 ########################################################################################################################
 # Save the results on the prediction on the test set.
