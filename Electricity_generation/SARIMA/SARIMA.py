@@ -35,8 +35,8 @@ def create_dates(features_df, y_values):
 from numpy import genfromtxt
 
 # Get the X (containing the features) and y (containing the labels) values
-X = genfromtxt('/Users/benoitputzeys/PycharmProjects/MSc_Thesis/Data_Entsoe/Data_Preprocessing/For_Multi_Step_Prediction_Outside_Test_Set/X.csv', delimiter=',')
-y = genfromtxt('/Users/benoitputzeys/PycharmProjects/MSc_Thesis/Data_Entsoe/Data_Preprocessing/For_Multi_Step_Prediction_Outside_Test_Set/y.csv', delimiter=',')
+X = genfromtxt('/Users/benoitputzeys/PycharmProjects/MSc_Thesis/Data_Entsoe/Data_Preprocessing/For_Multi_Step_Prediction/X.csv', delimiter=',')
+y = genfromtxt('/Users/benoitputzeys/PycharmProjects/MSc_Thesis/Data_Entsoe/Data_Preprocessing/For_Multi_Step_Prediction/y.csv', delimiter=',')
 y = np.reshape(y, (len(y), 1))
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state = 0, shuffle = False)
@@ -102,21 +102,21 @@ ex_variable_train_2 = X_train_2[:,5:]
 # Set the hyperparameters and fit the model.
 ########################################################################################################################
 
-my_order = (0,1,1)
-my_seasonal_order = (0, 1, 1, 48)
-model = SARIMAX(y_train_1, order=my_order, seasonal_order=my_seasonal_order, exog=ex_variable_train_1)
-#model = SARIMAX(y_train_1, order=my_order, seasonal_order=my_seasonal_order)
-model_fit = model.fit()
-
-# Summary of the model
-print(model_fit.summary())
+# my_order = (0,1,1)
+# my_seasonal_order = (0, 1, 1, 48)
+# model = SARIMAX(y_train_1, order=my_order, seasonal_order=my_seasonal_order, exog=ex_variable_train_1)
+# #model = SARIMAX(y_train_1, order=my_order, seasonal_order=my_seasonal_order)
+# model_fit = model.fit()
+#
+# # Summary of the model
+# print(model_fit.summary())
 
 ########################################################################################################################
 # Decompose the data into seasonal component, trend and residual error of the 2.
 ########################################################################################################################
 
 # Decompose the data.
-ts_decompose = sm.tsa.seasonal_decompose(y_train, model='additive', period = 48)
+ts_decompose = sm.tsa.seasonal_decompose(y_train[:48*7*2], model='additive', period = 48)
 ts_decompose.plot()
 plt.show
 
@@ -137,6 +137,12 @@ print("The mean absolute error of the test set is %0.2f" % np.average(abs(residu
 print("The mean squared error of the test set is %0.2f" % np.average(abs(residuals_1)**2))
 print("The root mean squared error of the test set is %0.2f" % np.sqrt(np.mean(abs(residuals_1)**2)))
 print("The mean absolute percent error of the test set is %0.2f" % np.mean(abs((y_train_1-predictions_train_1)/y_train_1)))
+print("-"*200)
+
+print("The mean absolute error of the train set 2 is %0.2f" % np.average(abs(residuals_2)))
+print("The mean squared error of the train set 2 is %0.2f" % np.average(abs(residuals_2)**2))
+print("The root mean squared error of the train set 2 is %0.2f" % np.sqrt(np.mean(abs(residuals_2)**2)))
+print("The mean absolute percent error of the train set 2 is %0.2f" % np.mean(abs((y_train_2-predictions_train_2)/y_train_2)))
 print("-"*200)
 
 ########################################################################################################################
@@ -166,14 +172,6 @@ plt.show()
 ########################################################################################################################
 # Plot the prediction on the train set 2.
 ########################################################################################################################
-
-# Get the errors.
-print("-"*200)
-print("The mean absolute error of the train set 2 is %0.2f" % np.average(abs(residuals_2)))
-print("The mean squared error of the train set 2 is %0.2f" % np.average(abs(residuals_2)**2))
-print("The root mean squared error of the train set 2 is %0.2f" % np.sqrt(np.mean(abs(residuals_2)**2)))
-print("The mean absolute percent error of the train set 2 is %0.2f" % np.mean(abs((y_train_2-predictions_train_2)/y_train_2)))
-print("-"*200)
 
 fig, ax = plt.subplots(2)
 fig.suptitle('SARIMA Model', fontsize=20)
@@ -225,10 +223,8 @@ plt.show()
 # Save the results in a csv file.
 ########################################################################################################################
 
-pd.DataFrame(predictions_train_2).to_csv(
-    "/Users/benoitputzeys/PycharmProjects/Electricity_generation/Hybrid_Model/Pred_train2_other_metrics/SARIMA_prediction.csv")
-pd.DataFrame(predictions_train_1).to_csv(
-    "/Users/benoitputzeys/PycharmProjects/Electricity_generation/SARIMA/SARIMA_prediction_train_1.csv")
+pd.DataFrame(predictions_train_2).to_csv("Electricity_generation/Hybrid_Model/Pred_train2_other_metrics/SARIMA_prediction.csv")
+pd.DataFrame(predictions_train_1).to_csv("Electricity_generation/SARIMA/SARIMA_prediction_train_1.csv")
 
 # pd.DataFrame(result_test).to_csv(
 #     "/Users/benoitputzeys/PycharmProjects/MSc_Thesis/Electricity_generation/Hybrid_Model/Pred_test_other_metrics/SARIMA_prediction.csv")

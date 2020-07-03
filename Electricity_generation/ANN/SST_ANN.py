@@ -13,8 +13,8 @@ import keras
 from numpy import genfromtxt
 
 # Get the X (containing the features) and y (containing the labels) values
-X = genfromtxt('/Users/benoitputzeys/PycharmProjects/MSc_Thesis/Data_Entsoe/Data_Preprocessing/X.csv', delimiter=',')
-y = genfromtxt('/Users/benoitputzeys/PycharmProjects/MSc_Thesis/Data_Entsoe/Data_Preprocessing/y.csv', delimiter=',')
+X = genfromtxt('Data_Entsoe/Data_Preprocessing/X.csv', delimiter=',')
+y = genfromtxt('Data_Entsoe/Data_Preprocessing/y.csv', delimiter=',')
 y = np.reshape(y, (len(y), 1))
 
 # Split data into train set and test set.
@@ -58,6 +58,7 @@ y_test = y_scaler.transform(y_test)
 # # Plot the loss per epoch.
 # metric = "mean_absolute_error"
 # plot_the_loss_curve(np.linspace(1,len(hist_list), len(hist_list) ), hist_list[metric],metric)
+# my_model.save("my_model.h5")
 
 my_model = keras.models.load_model("my_model.h5")
 
@@ -124,7 +125,3 @@ with open('/Compare_Models/SST_results/ANN_result.csv', 'w', newline='', ) as fi
                      str(mean_absolute_error(y_scaler.inverse_transform(y_test),result_test)),
                      str(np.sqrt(mean_squared_error(y_scaler.inverse_transform(y_test),result_test)))
                      ])
-
-df_best = pd.read_csv("/Users/benoitputzeys/PycharmProjects/MSc_Thesis/Compare_Models/Best_Results/ANN_result.csv")
-
-my_model.save("my_model.h5")

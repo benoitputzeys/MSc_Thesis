@@ -29,8 +29,8 @@ def create_dates(features_df, y_values):
 from numpy import genfromtxt
 
 # Get the X (containing the features) and y (containing the labels) values
-X = genfromtxt('/Users/benoitputzeys/PycharmProjects/MSc_Thesis/Data_Entsoe/Data_Preprocessing/X.csv', delimiter=',')
-y = genfromtxt('/Users/benoitputzeys/PycharmProjects/MSc_Thesis/Data_Entsoe/Data_Preprocessing/y.csv', delimiter=',')
+X = genfromtxt('Data_Entsoe/Data_Preprocessing/X.csv', delimiter=',')
+y = genfromtxt('Data_Entsoe/Data_Preprocessing/y.csv', delimiter=',')
 y = np.reshape(y, (len(y), 1))
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state = 0, shuffle = False)
@@ -131,4 +131,4 @@ fig5.legend()
 # Save the results in a csv file.
 ########################################################################################################################
 
-pd.DataFrame(result_future).to_csv("/Electricity_generation/Hybrid_Model/Pred_train2_other_metrics/RF_prediction.csv")
+pd.DataFrame(result_future).to_csv("Electricity_generation/Hybrid_Model/Pred_train2_other_metrics/RF_prediction.csv")

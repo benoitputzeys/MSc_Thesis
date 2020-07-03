@@ -12,8 +12,8 @@ from sklearn.metrics import mean_absolute_error, mean_squared_error
 from numpy import genfromtxt
 
 # Get the X (containing the features) and y (containing the labels) values
-X = genfromtxt('/Users/benoitputzeys/PycharmProjects/MSc_Thesis/Data_Entsoe/Data_Preprocessing/X.csv', delimiter=',')
-y = genfromtxt('/Users/benoitputzeys/PycharmProjects/MSc_Thesis/Data_Entsoe/Data_Preprocessing/y.csv', delimiter=',')
+X = genfromtxt('Data_Entsoe/Data_Preprocessing/X.csv', delimiter=',')
+y = genfromtxt('Data_Entsoe/Data_Preprocessing/y.csv', delimiter=',')
 y = np.reshape(y, (len(y), 1))
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state = 0, shuffle = False)
@@ -54,11 +54,11 @@ print("The mean squared error of the training set is %0.2f" % mean_squared_error
 print("The root mean squared error of the training set is %0.2f" % np.sqrt(mean_squared_error(y_scaler.inverse_transform(y_train),result_train)))
 
 print("-"*200)
-
 error_test = result_test - y_scaler.inverse_transform(y_test)
 print("The mean absolute error of the training set is %0.2f" % mean_absolute_error(y_scaler.inverse_transform(y_test),result_test))
 print("The mean squared error of the training set is %0.2f" % mean_squared_error(y_scaler.inverse_transform(y_test),result_test))
 print("The root mean squared error of the training set is %0.2f" % np.sqrt(mean_squared_error(y_scaler.inverse_transform(y_test),result_test)))
+print("-"*200)
 
 ########################################################################################################################
 # Visualising the results
@@ -106,7 +106,7 @@ plt.show()
 ########################################################################################################################
 
 import csv
-with open('/Compare_Models/SST_results/Random_Forest_result.csv', 'w', newline='', ) as file:
+with open('Compare_Models/SST_results/Random_Forest_result.csv', 'w', newline='', ) as file:
     writer = csv.writer(file)
     writer.writerow(["Method","MSE","MAE","RMSE"])
     writer.writerow(["Random_Forest" ,

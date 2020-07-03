@@ -1,4 +1,3 @@
-# NN-Predicitons
-Repository for predicitons of timeseries data with NN.
-
-This is an initial repository for my master's thesis and is used mainly to test Git, GitHub, commits and how it links with PyCharm. 
+# Electricity Load-Predicitons
+Repository for predicitons of timeseries data. This is the main repository for my master's thesis at
+Imperial College London for the MSc Sustainable Energy Futures. 

@@ -6,35 +6,29 @@ import matplotlib.pyplot as plt
 import math
 
 # Import the timeseries data and convert the strings to floats
-df15 = pd.read_csv(
-    "/Users/benoitputzeys/PycharmProjects/MSc_Thesis/Data_Entsoe/Total_Load_Country/Total Load - Day Ahead _ Actual_201501010000-201601010000.csv")
-df15['Actual Total Load [MW] - United Kingdom (UK)'] = df15['Actual Total Load [MW] - United Kingdom (UK)'].astype(        float)
+df15 = pd.read_csv("Data_Entsoe/Total_Load_Country/Total Load - Day Ahead _ Actual_201501010000-201601010000.csv")
+df15['Actual Total Load [MW] - United Kingdom (UK)'] = df15['Actual Total Load [MW] - United Kingdom (UK)'].astype(float)
 
-df16 = pd.read_csv(
-    "/Users/benoitputzeys/PycharmProjects/MSc_Thesis/Data_Entsoe/Total_Load_Country/Total Load - Day Ahead _ Actual_201601010000-201701010000.csv")
-df16['Actual Total Load [MW] - United Kingdom (UK)'] = df16['Actual Total Load [MW] - United Kingdom (UK)'].astype(        float)
+df16 = pd.read_csv("Data_Entsoe/Total_Load_Country/Total Load - Day Ahead _ Actual_201601010000-201701010000.csv")
+df16['Actual Total Load [MW] - United Kingdom (UK)'] = df16['Actual Total Load [MW] - United Kingdom (UK)'].astype(float)
 
-df17 = pd.read_csv(
-    "/Users/benoitputzeys/PycharmProjects/MSc_Thesis/Data_Entsoe/Total_Load_Country/Total Load - Day Ahead _ Actual_201701010000-201801010000.csv")
-df17['Actual Total Load [MW] - United Kingdom (UK)'] = df17['Actual Total Load [MW] - United Kingdom (UK)'].astype(        float)
+df17 = pd.read_csv("Data_Entsoe/Total_Load_Country/Total Load - Day Ahead _ Actual_201701010000-201801010000.csv")
+df17['Actual Total Load [MW] - United Kingdom (UK)'] = df17['Actual Total Load [MW] - United Kingdom (UK)'].astype(float)
 
 # This csv data has missing values for the first 151 days of the year. (Get rid of them)
-df18 = pd.read_csv(
-    "/Users/benoitputzeys/PycharmProjects/MSc_Thesis/Data_Entsoe/Total_Load_Country/Total Load - Day Ahead _ Actual_201801010000-201901010000.csv")
-df18['Actual Total Load [MW] - United Kingdom (UK)'] = df18['Actual Total Load [MW] - United Kingdom (UK)'].astype(        float)
+df18 = pd.read_csv("Data_Entsoe/Total_Load_Country/Total Load - Day Ahead _ Actual_201801010000-201901010000.csv")
+df18['Actual Total Load [MW] - United Kingdom (UK)'] = df18['Actual Total Load [MW] - United Kingdom (UK)'].astype(float)
 df18 = df18.truncate(before=151 * 48)
 df18 = df18.drop([14405])
 df18 = df18.drop([14406])
 
-df19 = pd.read_csv(
-    "/Users/benoitputzeys/PycharmProjects/MSc_Thesis/Data_Entsoe/Total_Load_Country/Total Load - Day Ahead _ Actual_201901010000-202001010000.csv")
-df19['Actual Total Load [MW] - United Kingdom (UK)'] = df19['Actual Total Load [MW] - United Kingdom (UK)'].astype(        float)
+df19 = pd.read_csv("Data_Entsoe/Total_Load_Country/Total Load - Day Ahead _ Actual_201901010000-202001010000.csv")
+df19['Actual Total Load [MW] - United Kingdom (UK)'] = df19['Actual Total Load [MW] - United Kingdom (UK)'].astype(float)
 df19 = df19.drop([14356])
 df19 = df19.drop([14357])
 
 # This csv data has missing values for the last 152 days of the year as they lie in the future. (Get rid of them)
-df20 = pd.read_csv(
-    "/Users/benoitputzeys/PycharmProjects/MSc_Thesis/Data_Entsoe/Total_Load_Country/Total Load - Day Ahead _ Actual_202001010000-202101010000.csv")
+df20 = pd.read_csv("Data_Entsoe/Total_Load_Country/Total Load - Day Ahead _ Actual_202001010000-202101010000.csv")
 df20.loc[df20['Actual Total Load [MW] - United Kingdom (UK)'] == '-', 'Actual Total Load [MW] - United Kingdom (UK)'] = 0
 df20['Actual Total Load [MW] - United Kingdom (UK)'] = df20['Actual Total Load [MW] - United Kingdom (UK)'].astype(float)
 df20 = df20.truncate(after=152*48-1)
@@ -91,8 +85,8 @@ replace_nan = SimpleImputer(missing_values=np.nan, strategy='mean')
 replace_nan.fit(y)
 y = replace_nan.transform(y)
 
-np.savetxt("/Users/benoitputzeys/PycharmProjects/MSc_Thesis/Data_Entsoe/Data_Preprocessing/For_Multi_Step_Prediction_Outside_Test_Set/X.csv", X, delimiter=",")
-np.savetxt("/Users/benoitputzeys/PycharmProjects/MSc_Thesis/Data_Entsoe/Data_Preprocessing/For_Multi_Step_Prediction_Outside_Test_Set/y.csv", y, delimiter=",")
+np.savetxt("Data_Entsoe/Data_Preprocessing/For_Multi_Step_Prediction/X.csv", X, delimiter=",")
+np.savetxt("Data_Entsoe/Data_Preprocessing/For_Multi_Step_Prediction/y.csv", y, delimiter=",")
 #
 # plt.plot(X[:,0], label='Electricity Generation 2 SP ago', linewidth=0.5 )
 # plt.xlabel("Actual Settlement Period")

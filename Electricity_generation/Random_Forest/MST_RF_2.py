@@ -30,8 +30,8 @@ def create_dates(features_df, y_values):
 from numpy import genfromtxt
 
 # Get the X (containing the features) and y (containing the labels) values
-X = genfromtxt('/Users/benoitputzeys/PycharmProjects/MSc_Thesis/Data_Entsoe/Data_Preprocessing/For_Multi_Step_Prediction_Outside_Test_Set/X.csv', delimiter=',')
-y = genfromtxt('/Users/benoitputzeys/PycharmProjects/MSc_Thesis/Data_Entsoe/Data_Preprocessing/For_Multi_Step_Prediction_Outside_Test_Set/y.csv', delimiter=',')
+X = genfromtxt('Data_Entsoe/Data_Preprocessing/For_Multi_Step_Prediction/X.csv', delimiter=',')
+y = genfromtxt('Data_Entsoe/Data_Preprocessing/For_Multi_Step_Prediction/y.csv', delimiter=',')
 y = np.reshape(y, (len(y), 1))
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state = 0, shuffle = False)
@@ -191,13 +191,11 @@ axes2[1].legend()
 # Save the results in a csv file.
 ########################################################################################################################
 
-pd.DataFrame(result_train_2).to_csv(
-    "/Users/benoitputzeys/PycharmProjects/MSc_Thesis/Electricity_generation/Hybrid_Model/Pred_train2_other_metrics/RF_prediction.csv")
-pd.DataFrame(result_test).to_csv(
-    "/Users/benoitputzeys/PycharmProjects/MSc_Thesis/Electricity_generation/Hybrid_Model/Pred_test_other_metrics/RF_prediction.csv")
+pd.DataFrame(result_train_2).to_csv("Electricity_generation/Hybrid_Model/Pred_train2_other_metrics/RF_prediction.csv")
+pd.DataFrame(result_test).to_csv("Electricity_generation/Hybrid_Model/Pred_test_other_metrics/RF_prediction.csv")
 
 import csv
-with open('/Users/benoitputzeys/PycharmProjects/MSc_Thesis/Compare_Models/MST2_results/Random_Forest_result.csv', 'w', newline='',) as file:
+with open('Compare_Models/MST2_results/Random_Forest_result.csv', 'w', newline='',) as file:
     writer = csv.writer(file)
     writer.writerow(["Method","MSE","MAE","RMSE"])
     writer.writerow(["Random_Forest",

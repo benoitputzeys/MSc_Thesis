@@ -14,23 +14,23 @@ import keras
 from numpy import genfromtxt
 
 # Get the X (containing the features) and y (containing the labels) values
-ANN_train = genfromtxt('/Users/benoitputzeys/PycharmProjects/MSc_Thesis/Electricity_generation/Hybrid_Model/Pred_train2_other_metrics/ANN_prediction.csv', delimiter=',')
-RF_train = genfromtxt('/Users/benoitputzeys/PycharmProjects/MSc_Thesis/Electricity_generation/Hybrid_Model/Pred_train2_other_metrics/RF_prediction.csv', delimiter=',')
-DT_train = genfromtxt('/Users/benoitputzeys/PycharmProjects/MSc_Thesis/Electricity_generation/Hybrid_Model/Pred_train2_other_metrics/DT_prediction.csv', delimiter=',')
-SVR_train = genfromtxt('/Users/benoitputzeys/PycharmProjects/MSc_Thesis/Electricity_generation/Hybrid_Model/Pred_train2_other_metrics/SVR_prediction.csv', delimiter=',')
-LSTM_train = genfromtxt('/Users/benoitputzeys/PycharmProjects/MSc_Thesis/Electricity_generation/Hybrid_Model/Pred_train2_other_metrics/LSTM_prediction.csv', delimiter=',')
-SARIMA_train = genfromtxt('/Users/benoitputzeys/PycharmProjects/MSc_Thesis/Electricity_generation/Hybrid_Model/Pred_train2_other_metrics/SARIMA_prediction.csv', delimiter=',')
+ANN_train = genfromtxt('Electricity_generation/Hybrid_Model/Pred_train2_other_metrics/ANN_prediction.csv', delimiter=',')
+RF_train = genfromtxt('Electricity_generation/Hybrid_Model/Pred_train2_other_metrics/RF_prediction.csv', delimiter=',')
+DT_train = genfromtxt('Electricity_generation/Hybrid_Model/Pred_train2_other_metrics/DT_prediction.csv', delimiter=',')
+SVR_train = genfromtxt('Electricity_generation/Hybrid_Model/Pred_train2_other_metrics/SVR_prediction.csv', delimiter=',')
+LSTM_train = genfromtxt('Electricity_generation/Hybrid_Model/Pred_train2_other_metrics/LSTM_prediction.csv', delimiter=',')
+SARIMA_train = genfromtxt('Electricity_generation/Hybrid_Model/Pred_train2_other_metrics/SARIMA_prediction.csv', delimiter=',')
 
-ANN_test = genfromtxt('/Users/benoitputzeys/PycharmProjects/MSc_Thesis/Electricity_generation/Hybrid_Model/Pred_test_other_metrics/ANN_prediction.csv', delimiter=',')
-RF_test = genfromtxt('/Users/benoitputzeys/PycharmProjects/MSc_Thesis/Electricity_generation/Hybrid_Model/Pred_test_other_metrics/RF_prediction.csv', delimiter=',')
-DT_test = genfromtxt('/Users/benoitputzeys/PycharmProjects/MSc_Thesis/Electricity_generation/Hybrid_Model/Pred_test_other_metrics/DT_prediction.csv', delimiter=',')
-SVR_test = genfromtxt('/Users/benoitputzeys/PycharmProjects/MSc_Thesis/Electricity_generation/Hybrid_Model/Pred_test_other_metrics/SVR_prediction.csv', delimiter=',')
-LSTM_test = genfromtxt('/Users/benoitputzeys/PycharmProjects/MSc_Thesis/Electricity_generation/Hybrid_Model/Pred_test_other_metrics/LSTM_prediction.csv', delimiter=',')
-SARIMA_test = genfromtxt('/Users/benoitputzeys/PycharmProjects/MSc_Thesis/Electricity_generation/Hybrid_Model/Pred_test_other_metrics/SARIMA_prediction.csv', delimiter=',')
+ANN_test = genfromtxt('Electricity_generation/Hybrid_Model/Pred_test_other_metrics/ANN_prediction.csv', delimiter=',')
+RF_test = genfromtxt('Electricity_generation/Hybrid_Model/Pred_test_other_metrics/RF_prediction.csv', delimiter=',')
+DT_test = genfromtxt('Electricity_generation/Hybrid_Model/Pred_test_other_metrics/DT_prediction.csv', delimiter=',')
+SVR_test = genfromtxt('Electricity_generation/Hybrid_Model/Pred_test_other_metrics/SVR_prediction.csv', delimiter=',')
+LSTM_test = genfromtxt('Electricity_generation/Hybrid_Model/Pred_test_other_metrics/LSTM_prediction.csv', delimiter=',')
+SARIMA_test = genfromtxt('Electricity_generation/Hybrid_Model/Pred_test_other_metrics/SARIMA_prediction.csv', delimiter=',')
 
 # Get the X (containing the features) and y (containing the labels) values
-X = genfromtxt('/Users/benoitputzeys/PycharmProjects/MSc_Thesis/Data_Entsoe/Data_Preprocessing/For_Multi_Step_Prediction_Outside_Test_Set/X.csv', delimiter=',')
-y = genfromtxt('/Users/benoitputzeys/PycharmProjects/MSc_Thesis/Data_Entsoe/Data_Preprocessing/For_Multi_Step_Prediction_Outside_Test_Set/y.csv', delimiter=',')
+X = genfromtxt('Data_Entsoe/Data_Preprocessing/For_Multi_Step_Prediction/X.csv', delimiter=',')
+y = genfromtxt('Data_Entsoe/Data_Preprocessing/For_Multi_Step_Prediction/y.csv', delimiter=',')
 y = np.reshape(y, (len(y), 1))
 
 # Save the unscaled data for later for data representation.
@@ -325,7 +325,7 @@ fig4.show()
 ########################################################################################################################
 
 import csv
-with open('/Users/benoitputzeys/PycharmProjects/MSc_Thesis/Compare_Models/MST2_results/Hybrid_result.csv', 'w', newline='',) as file:
+with open('Compare_Models/MST2_results/Hybrid_result.csv', 'w', newline='',) as file:
     writer = csv.writer(file)
     writer.writerow(["Method","MSE","MAE","RMSE"])
     writer.writerow(["Hybrid",

@@ -13,8 +13,8 @@ import keras
 from numpy import genfromtxt
 
 # Get the X (containing the features) and y (containing the labels) values
-X = genfromtxt('/Users/benoitputzeys/PycharmProjects/MSc_Thesis/Data_Entsoe/Data_Preprocessing/X.csv', delimiter=',')
-y = genfromtxt('/Users/benoitputzeys/PycharmProjects/MSc_Thesis/Data_Entsoe/Data_Preprocessing/y.csv', delimiter=',')
+X = genfromtxt('Data_Entsoe/Data_Preprocessing/X.csv', delimiter=',')
+y = genfromtxt('Data_Entsoe/Data_Preprocessing/y.csv', delimiter=',')
 y = np.reshape(y, (len(y), 1))
 
 # Split data into train set and test set.
@@ -84,6 +84,7 @@ error_test = abs(result_test[:,0] - y[-len(X_test):,0])
 print("The mean absolute error of the training set is %0.2f" % mean_absolute_error(y_scaler.inverse_transform(y_test),result_test))
 print("The mean squared error of the training set is %0.2f" % mean_squared_error(y_scaler.inverse_transform(y_test),result_test))
 print("The root mean squared error of the training set is %0.2f" % np.sqrt(mean_squared_error(y_scaler.inverse_transform(y_test),result_test)))
+print("-"*200)
 
 ########################################################################################################################
 # Plotting curves.
@@ -111,7 +112,7 @@ plot_prediction_zoomed_in(fig1, axes1, X_test_unscaled[-3*48:],result_test[-3*48
 ########################################################################################################################
 
 import csv
-with open('/Compare_Models/SST_results/LSTM_result.csv', 'w', newline='', ) as file:
+with open('Compare_Models/SST_results/LSTM_result.csv', 'w', newline='', ) as file:
     writer = csv.writer(file)
     writer.writerow(["Method","MSE","MAE","RMSE"])
     writer.writerow(["LSTM",
@@ -120,4 +121,3 @@ with open('/Compare_Models/SST_results/LSTM_result.csv', 'w', newline='', ) as f
                      str(np.sqrt(mean_squared_error(y_scaler.inverse_transform(y_test),result_test)))
                      ])
 
-df_best = pd.read_csv("/Users/benoitputzeys/PycharmProjects/MSc_Thesis/Compare_Models/Best_Results/LSTM_result.csv")

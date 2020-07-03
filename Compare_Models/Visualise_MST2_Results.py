@@ -1,12 +1,12 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 
-ANN = pd.read_csv("/Users/benoitputzeys/PycharmProjects/MSc_Thesis/Compare_Models/MST2_results/ANN_result.csv")
-Decision_Tree = pd.read_csv("/Users/benoitputzeys/PycharmProjects/MSc_Thesis/Compare_Models/MST2_results/Decision_Tree_result.csv")
-LSTM = pd.read_csv("/Users/benoitputzeys/PycharmProjects/MSc_Thesis/Compare_Models/MST2_results/LSTM_result.csv")
-Random_Forest = pd.read_csv("/Users/benoitputzeys/PycharmProjects/MSc_Thesis/Compare_Models/MST2_results/Random_Forest_result.csv")
-SVR = pd.read_csv("/Users/benoitputzeys/PycharmProjects/MSc_Thesis/Compare_Models/MST2_results/SVR_result.csv")
-Hybrid = pd.read_csv("/Users/benoitputzeys/PycharmProjects/MSc_Thesis/Compare_Models/MST2_results/Hybrid_result.csv")
+ANN = pd.read_csv("Compare_Models/MST2_results/ANN_result.csv")
+Decision_Tree = pd.read_csv("Compare_Models/MST2_results/Decision_Tree_result.csv")
+LSTM = pd.read_csv("Compare_Models/MST2_results/LSTM_result.csv")
+Random_Forest = pd.read_csv("Compare_Models/MST2_results/Random_Forest_result.csv")
+SVR = pd.read_csv("Compare_Models/MST2_results/SVR_result.csv")
+Hybrid = pd.read_csv("Compare_Models/MST2_results/Hybrid_result.csv")
 
 frames = ([ANN, Decision_Tree, LSTM, Random_Forest, SVR, Hybrid])
 #frames = ([ Decision_Tree, LSTM, Random_Forest, SVR, Previous_Day, Hybrid])
