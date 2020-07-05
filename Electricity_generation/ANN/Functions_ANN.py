@@ -9,13 +9,12 @@ from pandas import DataFrame
 
 def plot_the_loss_curve(x_value,metric,string):
 
-    figure_0 = plt.figure()
-    figure_0.xlabel("Epoch")
-    figure_0.ylabel(string)
+    plt.xlabel("Epoch")
+    plt.ylabel(string)
 
-    figure_0.plot(x_value,metric, label="Loss")
-    figure_0.legend()
-    figure_0.show()
+    plt.plot(x_value,metric, label="Loss")
+    plt.legend()
+    plt.show()
 
 def create_model(dim, learning_rate):
 
@@ -47,13 +46,13 @@ def train_model(model, xvalues, yvalues, epochs, batch):
 
     return hist
 
-def plot_total_generation(fig, x_values, y_values, string):
+def plot_total_generation(x_values, y_values, string):
 
     y_values_dates = create_dates(x_values,y_values)
-    fig.plot(y_values_dates, linewidth=0.5)
-    fig.xlabel("Settlement Periods")
-    fig.ylabel(string)
-    fig.show()
+    plt.plot(y_values_dates, linewidth=0.5)
+    plt.xlabel("Settlement Periods")
+    plt.ylabel(string)
+    plt.show()
 
 def plot_actual_generation(ax, x_values, y_values, string):
 

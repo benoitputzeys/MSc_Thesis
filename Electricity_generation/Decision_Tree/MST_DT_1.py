@@ -104,26 +104,27 @@ print("-"*200)
 ########################################################################################################################
 
 y_values_dates = create_dates(X_future_features[-48*7:].to_numpy(),result_future)
-figure1 = plt.figure(5)
+figure1 = plt.figure(1)
 plt.plot(y_values_dates, linewidth=0.5)
 plt.title('Prediction 7 days in the future with DT')
 plt.xlabel('Settlement Period')
 plt.ylabel('Electricity Load [MW]')
+plt.show()
 
-fig5, axes5 = plt.subplots(2)
-axes5[0].plot(y_values_dates, linewidth=0.5, label ="Prediction 7 days in the future with DT")
-axes5[0].set_xlabel("Settlement Period")
-axes5[0].set_ylabel("Electricity Load [MW]")
+fig2, axes2 = plt.subplots(2)
+axes2[0].plot(y_values_dates, linewidth=0.5, label ="Prediction 7 days in the future with DT")
+axes2[0].set_xlabel("Settlement Period")
+axes2[0].set_ylabel("Electricity Load [MW]")
 y_values_dates = create_dates(X_future_features[-48*7:].to_numpy(), y_scaler.inverse_transform(y_test[:48*7]))
-axes5[0].plot(y_values_dates,linewidth=0.5, label="Actual")
+axes2[0].plot(y_values_dates,linewidth=0.5, label="Actual")
 
 y_values_dates = create_dates(X_future_features[-48*7:].to_numpy(),error_test)
-fig5.legend()
-axes5[1].plot(y_values_dates,linewidth=0.5, label ="Absolute Error",color= "black")
-axes5[1].set_xlabel("Settlement Period")
-axes5[1].set_ylabel("Error in Prediction [MW]")
-fig5.legend()
-
+fig2.legend()
+axes2[1].plot(y_values_dates,linewidth=0.5, label ="Absolute Error",color= "black")
+axes2[1].set_xlabel("Settlement Period")
+axes2[1].set_ylabel("Error in Prediction [MW]")
+fig2.legend()
+fig2.show()
 ########################################################################################################################
 # Save the results in a csv file.
 ########################################################################################################################

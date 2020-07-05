@@ -111,7 +111,7 @@ y_train_2 = y_scaler.fit_transform(y_train_2)
 #
 # my_model.save("my_model.h5")
 
-my_model = keras.models.load_model("my_model.h5")
+my_model = keras.models.load_model("Electricity_generation/Hybrid_Model/my_model.h5")
 
 ########################################################################################################################
 # Make predictions and compute the errors.

@@ -1,3 +1,0 @@
-[submodule "kgp/backend/gpml"]
-	path = kgp/backend/gpml
-	url = https://github.com/alshedivat/gpml

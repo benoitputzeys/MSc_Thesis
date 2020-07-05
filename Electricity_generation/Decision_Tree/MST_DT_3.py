@@ -91,25 +91,19 @@ print("-"*200)
 # Visualising the results
 ########################################################################################################################
 
-figure1 = plt.figure(1)
-plt.plot(y, linewidth=0.5)
-plt.title('Training + Test Set (Decision Tree)')
-plt.xlabel('Settlement Period')
-plt.ylabel('Actual Value (Training + Test Set)')
+fig1, ax1 = plt.subplots(3)
+fig1.suptitle('Decision Tree: Training Set', fontsize=16)
+ax1[0].plot(X_train_unscaled[:,0],linewidth=0.5)
+ax1[0].set_xlabel('Settlement Period')
+ax1[0].set_ylabel('Actual Value: Training Set')
 
-fig, ax = plt.subplots(3)
-fig.suptitle('Decision Tree: Training Set', fontsize=16)
-ax[0].plot(X_train_unscaled[:,0],linewidth=0.5)
-ax[0].set_xlabel('Settlement Period')
-ax[0].set_ylabel('Actual Value: Training Set')
+ax1[1].plot(result_train, linewidth=0.5)
+ax1[1].set_xlabel('Settlement Period')
+ax1[1].set_ylabel('Single-Step Prediction on training set')
 
-ax[1].plot(result_train, linewidth=0.5)
-ax[1].set_xlabel('Settlement Period')
-ax[1].set_ylabel('Single-Step Prediction on training set')
-
-ax[2].plot(abs(error_train), linewidth=0.5)
-ax[2].set_xlabel('Settlement Period')
-ax[2].set_ylabel('Absolute error: Training set')
+ax1[2].plot(abs(error_train), linewidth=0.5)
+ax1[2].set_xlabel('Settlement Period')
+ax1[2].set_ylabel('Absolute error: Training set')
 plt.show()
 
 fig2, ax2 = plt.subplots(3)
@@ -127,11 +121,12 @@ ax2[2].set_xlabel('Settlement Period')
 ax2[2].set_ylabel('Absolute error: Test set.')
 plt.show()
 
-figure1 = plt.figure(4)
+figure3 = plt.figure(3)
 plt.plot(y_scaler.inverse_transform(result_future)[-48*7:], linewidth=0.5)
 plt.title('Prediction 7 days in the future')
 plt.xlabel('Settlement Period')
 plt.ylabel('Prediction')
+plt.show()
 
 values = X_future_features-X_future_features.shift(-1)
 

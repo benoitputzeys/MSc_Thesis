@@ -74,7 +74,6 @@ def plot_generation(ax, x_values, y_values, string):
     ax.plot(y_values_dates, linewidth=0.5)
     ax.set_xlabel("Settlement Periods")
     ax.set_ylabel(string)
-    plt.show()
 
 def plot_prediction_zoomed_in(fig, ax, x_values, prediction, true_values):
 

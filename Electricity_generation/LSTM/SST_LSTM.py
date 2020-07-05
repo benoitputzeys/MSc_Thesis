@@ -35,29 +35,31 @@ X_test = np.reshape(X_test, (X_test.shape[0],X_test.shape[1],1))
 ########################################################################################################################
 # Create the model.
 ########################################################################################################################
+
+## Define the hyperparameters.
+#learning_rate = 0.001
+#number_of_epochs = 50
+#batch_size = 64
 #
-# # Define the hyperparameters.
-# learning_rate = 0.001
-# number_of_epochs = 50
-# batch_size = 64
+## Create the model.
+#my_model = create_model(X_train, learning_rate)
 #
-# # Create the model.
-# my_model = create_model(X_train, learning_rate)
+## Extract the loss per epoch to plot the learning progress.
+#hist_list = pd.DataFrame()
 #
-# # Extract the loss per epoch to plot the learning progress.
-# hist_list = pd.DataFrame()
+#tscv = TimeSeriesSplit()
+#for train_index, test_index in tscv.split(X_train):
+#      X_train_split, X_test_split = X_train[train_index], X_train[test_index]
+#      y_train_split, y_test_split = y_train[train_index], y_train[test_index]
+#      X_train_split = np.reshape(X_train_split, (X_train_split.shape[0],X_train_split.shape[1],1))
+#      hist_split = train_model(my_model, X_train_split, y_train_split, number_of_epochs, batch_size)
+#      hist_list = hist_list.append(hist_split)
 #
-# tscv = TimeSeriesSplit()
-# for train_index, test_index in tscv.split(X_train):
-#       X_train_split, X_test_split = X_train[train_index], X_train[test_index]
-#       y_train_split, y_test_split = y_train[train_index], y_train[test_index]
-#       X_train_split = np.reshape(X_train_split, (X_train_split.shape[0],X_train_split.shape[1],1))
-#       hist_split = train_model(my_model, X_train_split, y_train_split, number_of_epochs, batch_size)
-#       hist_list = hist_list.append(hist_split)
+#my_model.save("Electricity_generation/LSTM/my_model.h5")
 #
-# # Plot the loss per epoch.
-# metric = "mean_absolute_error"
-# plot_the_loss_curve(np.linspace(1,len(hist_list), len(hist_list) ), hist_list[metric],metric)
+## Plot the loss per epoch.
+#metric = "mean_absolute_error"
+#plot_the_loss_curve(np.linspace(1,len(hist_list), len(hist_list) ), hist_list[metric],metric)
 my_model = keras.models.load_model("my_model.h5")
 
 ########################################################################################################################
@@ -91,22 +93,23 @@ print("-"*200)
 ########################################################################################################################
 
 # Plot the actual recorded generation against the date.
-fig, axes = plt.subplots(3)
+fig1, axes1 = plt.subplots(3)
 
-fig.suptitle('Test Set (LSTM)', fontsize=16)
+fig1.suptitle('Test Set (LSTM)', fontsize=16)
 # Plot the actual generation in a new subplot of 3x1.
-plot_generation(axes[0], X_test_unscaled, y[-len(result_test):], "Actual Generation")
+plot_generation(axes1[0], X_test_unscaled, y[-len(result_test):], "Actual Generation")
 
 # Plot the the predicted (NN) generation.
-plot_generation(axes[1], X_test_unscaled, result_test, "NN prediction test set")
+plot_generation(axes1[1], X_test_unscaled, result_test, "NN prediction test set")
 
 # Plot the error between the predicted and the actual temperature.
-plot_generation(axes[2], X_test_unscaled, error_test, "NN error test")
+plot_generation(axes1[2], X_test_unscaled, error_test, "NN error test")
+plt.show()
 
 # Plot the predicted generation on the last 3 days.
-fig1, axes1 = plt.subplots(2)
-plot_prediction_zoomed_in(fig1, axes1, X_test_unscaled[-3*48:],result_test[-3*48:], y[-3*48:])
-
+fig2, axes2 = plt.subplots(2)
+plot_prediction_zoomed_in(fig2, axes2, X_test_unscaled[-3*48:],result_test[-3*48:], y[-3*48:])
+plt.show()
 ########################################################################################################################
 # Save the results in a csv file.
 ########################################################################################################################

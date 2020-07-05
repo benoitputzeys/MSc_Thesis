@@ -38,7 +38,7 @@ y_test = y_scaler.transform(y_test)
 # Create the model.
 ########################################################################################################################
 
-my_model = keras.models.load_model("my_model.h5")
+my_model = keras.models.load_model("Electricity_generation/LSTM/my_model.h5")
 
 ########################################################################################################################
 # Predicting the generation.

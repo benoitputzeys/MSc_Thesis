@@ -56,7 +56,7 @@ y_test = y_scaler.transform(y_test)
 # # Fit the SVR to our data
 # regressor = SVR(kernel = 'rbf')
 # regressor.fit(X_train, y_train)
-regressor = pickle.load(open("my_model.sav", 'rb'))
+regressor = pickle.load(open("Electricity_generation/SVR_Prediction/my_model.sav", 'rb'))
 
 # Compute the prediction and rescale
 intermediate_result_test_prediction = regressor.predict(X_test)
@@ -116,22 +116,22 @@ plt.title('Prediction 7 days in the future with SVR')
 plt.xlabel('Settlement Period')
 plt.ylabel('Electricity Load [MW]')
 
-fig5, axes5 = plt.subplots(2)
+fig2, axes2 = plt.subplots(2)
 y_values_dates = create_dates(X_train_unscaled[-48*3:], y_scaler.inverse_transform(y_train[-48*3:]))
-axes5[0].plot(y_values_dates, linewidth=0.5, label ="Past load")
+axes2[0].plot(y_values_dates, linewidth=0.5, label ="Past load")
 y_values_dates = create_dates(X_future_features[-48*7:].to_numpy(),result_future)
-axes5[0].plot(y_values_dates, linewidth=0.5, label ="Prediction 7 days in the future with SVR")
-axes5[0].set_xlabel("Settlement Period")
-axes5[0].set_ylabel("Electricity Load [MW]")
+axes2[0].plot(y_values_dates, linewidth=0.5, label ="Prediction 7 days in the future with SVR")
+axes2[0].set_xlabel("Settlement Period")
+axes2[0].set_ylabel("Electricity Load [MW]")
 y_values_dates = create_dates(X_future_features[-48*7:].to_numpy(), y_scaler.inverse_transform(y_test[:48*7]))
-axes5[0].plot(y_values_dates,linewidth=0.5, label="Actual")
+axes2[0].plot(y_values_dates,linewidth=0.5, label="Actual")
 
 y_values_dates = create_dates(X_future_features[-48*7:].to_numpy(),error_test)
-fig5.legend()
-axes5[1].plot(y_values_dates,linewidth=0.5, label ="Absolute Error",color= "black")
-axes5[1].set_xlabel("Settlement Period")
-axes5[1].set_ylabel("Error in Prediction [MW]")
-fig5.legend()
+fig2.legend()
+axes2[1].plot(y_values_dates,linewidth=0.5, label ="Absolute Error",color= "black")
+axes2[1].set_xlabel("Settlement Period")
+axes2[1].set_ylabel("Error in Prediction [MW]")
+fig2.legend()
 
 ########################################################################################################################
 # Save the results in a csv file.

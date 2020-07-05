@@ -127,65 +127,65 @@ from Electricity_generation.ANN.Functions_ANN import plot_actual_generation, plo
 #plot_total_generation(X_train_1, y_train_1, "Total generation (Train + Test Set")
 
 # Plot the actual recorded generation against the date.
-fig, axes = plt.subplots(3)
+fig1, axes1 = plt.subplots(3)
 
-fig.suptitle('Train Set 1 (LSTM)', fontsize=16)
+fig1.suptitle('Train Set 1 (LSTM)', fontsize=16)
 # Plot the actual generation in a new subplot of 3x1.
-plot_actual_generation(axes, X_train_1, y_train_1, "Actual Generation")
+plot_actual_generation(axes1, X_train_1, y_train_1, "Actual Generation")
 
 # Plot the the predicted (NN) generation.
-plot_predicted_generation(axes, X_train_1, result_train_1, "NN prediction train set 1")
+plot_predicted_generation(axes1, X_train_1, result_train_1, "NN prediction train set 1")
 
 # Plot the error between the predicted and the actual temperature.
-plot_error(axes, X_train_1, error_train_1, "NN error train set 1")
+plot_error(axes1, X_train_1, error_train_1, "NN error train set 1")
 
 # Print the prediction of the training set 1.
 y_values_dates = create_dates(X_train_1[-48*7:],result_train_1[-48*7:])
-fig, axes = plt.subplots(2)
-axes[0].plot(y_values_dates, label = "Prediction")
-y_values_dates = create_dates(X_train_1[-48*7:],y_train_1[-48*7:])
-axes[0].plot(y_values_dates, label = "Actual")
-axes[0].set_xlabel("Settlement Periods Training Set 1")
-axes[0].set_ylabel("Electricity Load [MW]")
-axes[0].legend()
-
-y_values_dates = create_dates(X_train_1[-48*7:],abs(result_train_1[-48*7:]-y_train_1[-48*7:]))
-axes[1].plot(y_values_dates, label = "Error")
-axes[1].set_xlabel("Settlement Periods Training Set 1")
-axes[1].set_ylabel("Electricity Load [MW]")
-axes[1].legend()
-
-# Print the prediction of the training set 2.
-fig1, axes1 = plt.subplots(2)
-y_values_dates = create_dates(X_train_2[-48*7-1:],result_train_2[-48*7-1:])
-axes1[0].plot(y_values_dates, label = "Prediction")
-y_values_dates = create_dates(X_train_2[-48*7-1:],y_train_2[-48*7-1:])
-axes1[0].plot(y_values_dates, label = "Actual")
-axes1[0].set_xlabel("Settlement Periods Training Set 2")
-axes1[0].set_ylabel("Electricity Load [MW]")
-axes1[0].legend()
-
-y_values_dates = create_dates(X_train_2[-48*7-1:],abs(result_train_2[-48*7-1:]-(y_train_2[-48*7-1:])))
-axes1[1].plot(y_values_dates, label = "Error")
-axes1[1].set_xlabel("Settlement Periods Training Set 2")
-axes1[1].set_ylabel("Electricity Load [MW]")
-axes1[1].legend()
-
-# Print the prediction of the test set.
 fig2, axes2 = plt.subplots(2)
-y_values_dates = create_dates(X_test[-48*7:],result_test[-48*7:])
 axes2[0].plot(y_values_dates, label = "Prediction")
-y_values_dates = create_dates(X_test[-48*7:],y_test[-48*7:])
+y_values_dates = create_dates(X_train_1[-48*7:],y_train_1[-48*7:])
 axes2[0].plot(y_values_dates, label = "Actual")
-axes2[0].set_xlabel("Settlement Periods Test Set")
+axes2[0].set_xlabel("Settlement Periods Training Set 1")
 axes2[0].set_ylabel("Electricity Load [MW]")
 axes2[0].legend()
 
-y_values_dates = create_dates(X_test[-48*7:],abs(result_test[-48*7:]-(y_test[-48*7:])))
+y_values_dates = create_dates(X_train_1[-48*7:],abs(result_train_1[-48*7:]-y_train_1[-48*7:]))
 axes2[1].plot(y_values_dates, label = "Error")
-axes2[1].set_xlabel("Settlement Periods Test Set")
-axes2[1].set_ylabel("Error in [MW]")
+axes2[1].set_xlabel("Settlement Periods Training Set 1")
+axes2[1].set_ylabel("Electricity Load [MW]")
 axes2[1].legend()
+
+# Print the prediction of the training set 2.
+fig3, axes3 = plt.subplots(2)
+y_values_dates = create_dates(X_train_2[-48*7-1:],result_train_2[-48*7-1:])
+axes3[0].plot(y_values_dates, label = "Prediction")
+y_values_dates = create_dates(X_train_2[-48*7-1:],y_train_2[-48*7-1:])
+axes3[0].plot(y_values_dates, label = "Actual")
+axes3[0].set_xlabel("Settlement Periods Training Set 2")
+axes3[0].set_ylabel("Electricity Load [MW]")
+axes3[0].legend()
+
+y_values_dates = create_dates(X_train_2[-48*7-1:],abs(result_train_2[-48*7-1:]-(y_train_2[-48*7-1:])))
+axes3[1].plot(y_values_dates, label = "Error")
+axes3[1].set_xlabel("Settlement Periods Training Set 2")
+axes3[1].set_ylabel("Electricity Load [MW]")
+axes3[1].legend()
+
+# Print the prediction of the test set.
+fig4, axes4 = plt.subplots(2)
+y_values_dates = create_dates(X_test[-48*7:],result_test[-48*7:])
+axes4[0].plot(y_values_dates, label = "Prediction")
+y_values_dates = create_dates(X_test[-48*7:],y_test[-48*7:])
+axes4[0].plot(y_values_dates, label = "Actual")
+axes4[0].set_xlabel("Settlement Periods Test Set")
+axes4[0].set_ylabel("Electricity Load [MW]")
+axes4[0].legend()
+
+y_values_dates = create_dates(X_test[-48*7:],abs(result_test[-48*7:]-(y_test[-48*7:])))
+axes4[1].plot(y_values_dates, label = "Error")
+axes4[1].set_xlabel("Settlement Periods Test Set")
+axes4[1].set_ylabel("Error in [MW]")
+axes4[1].legend()
 
 ########################################################################################################################
 # Save the results in a csv file.
