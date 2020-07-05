@@ -125,24 +125,18 @@ from numpy import genfromtxt
 
 # Get the X (containing the features) and y (containing the labels) values
 X = genfromtxt('Data_Entsoe/Data_Preprocessing/X.csv', delimiter=',')
-X = X[:48*100,:]
+X = X[:48*50,:]
 
 y = genfromtxt('Data_Entsoe/Data_Preprocessing/y.csv', delimiter=',')
 y = np.reshape(y, (len(y), 1))
-y = y[:48*100]
+y = y[:48*50]
 
 # Split data into train set and test set.
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=1, shuffle = False)
 
-num_forecast_steps = 48 * 10
+num_forecast_steps = 48 * 7
 
 X_axis = np.linspace(1,len(X_train),len(X_train))
-plt.plot(X_axis)
-plt.show()
-
-co2_dates = np.arange("1966-01", "2019-02", dtype="datetime64[M]")
-co2_loc = mdates.YearLocator(3)
-co2_fmt = mdates.DateFormatter('%Y')
 
 fig = plt.figure(figsize=(12, 6))
 ax = fig.add_subplot(1, 1, 1)
@@ -155,12 +149,27 @@ ax.set_xlabel("Settlement Periods")
 fig.suptitle("Testing TF Proability",fontsize=15)
 plt.show()
 
-
 def build_model(observed_time_series):
-  trend = sts.LocalLinearTrend(observed_time_series=observed_time_series)
-  seasonal = tfp.sts.Seasonal(
-      num_seasons=48, observed_time_series=observed_time_series)
-  model = sts.Sum([trend, seasonal], observed_time_series=observed_time_series)
+  #Does not really have an upwards trend.
+  #trend = sts.LocalLinearTrend(observed_time_series=observed_time_series)
+  seasonal_day = tfp.sts.Seasonal(
+      num_seasons=48,
+      num_steps_per_season=48*7,
+      observed_time_series=observed_time_series,
+      name = 'Daily_Seasonality')
+  seasonal_week = tfp.sts.Seasonal(
+      num_seasons=7,
+      num_steps_per_season=48*7,
+      observed_time_series=observed_time_series,
+      name = 'Weekly_Seasonality')
+  autoregressive = sts.Autoregressive(
+      order=1,
+      observed_time_series=observed_time_series,
+      name='autoregressive')
+  model = sts.Sum([seasonal_day,
+                   seasonal_week,
+                   autoregressive],
+                  observed_time_series=observed_time_series)
   return model
 
 load_model = build_model(y_train)
@@ -170,7 +179,7 @@ variational_posteriors = tfp.sts.build_factored_surrogate_posterior(
     model=load_model)
 
 # Allow external control of optimization to reduce test runtimes.
-num_variational_steps = 200 # @param { isTemplate: true}
+num_variational_steps = 100 # @param { isTemplate: true}
 num_variational_steps = int(num_variational_steps)
 
 optimizer = tf.optimizers.Adam(learning_rate=.1)
@@ -178,8 +187,7 @@ optimizer = tf.optimizers.Adam(learning_rate=.1)
 @tf.function(experimental_compile=True)
 def train():
   elbo_loss_curve = tfp.vi.fit_surrogate_posterior(
-    target_log_prob_fn=load_model.joint_log_prob(
-        observed_time_series=y_train),
+    target_log_prob_fn=load_model.joint_log_prob(observed_time_series=y_train),
     surrogate_posterior=variational_posteriors,
     optimizer=optimizer,
     num_steps=num_variational_steps)
@@ -205,7 +213,7 @@ load_forecast_dist = tfp.sts.forecast(
       parameter_samples=q_samples_load_,
       num_steps_forecast=num_forecast_steps)
 
-num_samples=10
+num_samples=5
 
 load_forecast_mean, load_forecast_scale, load_forecast_samples = (
     load_forecast_dist.mean().numpy()[..., 0],
@@ -213,7 +221,7 @@ load_forecast_mean, load_forecast_scale, load_forecast_samples = (
     load_forecast_dist.sample(num_samples).numpy()[..., 0])
 
 fig, ax = plot_forecast(
-    X_axis, y,
+    X_axis, y_train,
     load_forecast_mean, load_forecast_scale, load_forecast_samples,
     x_locator=None,
     x_formatter=None,
@@ -224,3 +232,18 @@ ax.set_ylabel("Load [MW]")
 ax.set_xlabel("Settlement Period")
 plt.show()
 #fig.autofmt_xdate()
+
+# Build a dict mapping components to distributions over
+# their contribution to the observed signal.
+component_dists = sts.decompose_by_component(
+    load_model,
+    observed_time_series=y_train,
+    parameter_samples=q_samples_load_)
+
+load_component_means_, load_component_stddevs_ = (
+    {k.name: c.mean() for k, c in component_dists.items()},
+    {k.name: c.stddev() for k, c in component_dists.items()})
+
+_ = plot_components(X_axis, load_component_means_, load_component_stddevs_,
+                    x_locator=None, x_formatter=None)
+plt.show()
