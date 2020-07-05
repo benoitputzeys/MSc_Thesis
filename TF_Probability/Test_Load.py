@@ -154,12 +154,11 @@ def build_model(observed_time_series):
   #trend = sts.LocalLinearTrend(observed_time_series=observed_time_series)
   seasonal_day = tfp.sts.Seasonal(
       num_seasons=48,
-      num_steps_per_season=48*7,
       observed_time_series=observed_time_series,
       name = 'Daily_Seasonality')
   seasonal_week = tfp.sts.Seasonal(
       num_seasons=7,
-      num_steps_per_season=48*7,
+      num_steps_per_season=48,
       observed_time_series=observed_time_series,
       name = 'Weekly_Seasonality')
   autoregressive = sts.Autoregressive(
@@ -223,8 +222,6 @@ load_forecast_mean, load_forecast_scale, load_forecast_samples = (
 fig, ax = plot_forecast(
     X_axis, y_train,
     load_forecast_mean, load_forecast_scale, load_forecast_samples,
-    x_locator=None,
-    x_formatter=None,
     title="Load forecast")
 ax.axvline(X_axis[-num_forecast_steps], linestyle="--")
 ax.legend(loc="upper left")
