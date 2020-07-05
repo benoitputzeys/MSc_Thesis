@@ -21,8 +21,8 @@ def create_dates(features_df, y_values):
     date_list = [datetime.datetime(year=int(round(features_df[i, -1])),
                                    month=int(round(features_df[i, -2])),
                                    day=int(round(features_df[i, -3])),
-                                   hour=int((features_df[i, -4] - 1) / 2),
-                                   minute=int(((features_df[i, -4] -1) % 2 ) * 30)) for i in range(len(features_df))]
+                                   hour=int((round(features_df[i, -4])-1) / 2),
+                                   minute=int(((round(features_df[i, -4])-1) % 2 ) * 30))  for i in range(len(features_df))]
 
     df_dates = DataFrame(date_list, columns=['Date'])
     df_dates = df_dates.set_index(['Date'])

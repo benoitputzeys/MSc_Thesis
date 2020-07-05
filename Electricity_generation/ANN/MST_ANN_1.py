@@ -87,10 +87,11 @@ print("-"*200)
 ########################################################################################################################
 
 figure1 = plt.figure(1)
-plt.plot(create_dates(X_future_features[-48*7:].to_numpy(),result_future), linewidth=0.5)
-plt.title('Prediction 7 days in the future with ANN')
-plt.xlabel('Settlement Period')
-plt.ylabel('Electricity Load [MW]')
+figure1.plot(create_dates(X_future_features[-48*7:].to_numpy(),result_future), linewidth=0.5)
+figure1.title('Prediction 7 days in the future with ANN')
+figure1.xlabel('Settlement Period')
+figure1.ylabel('Electricity Load [MW]')
+figure1.show()
 
 fig2, axes2 = plt.subplots(2)
 axes2[0].plot(create_dates(X_train_unscaled[-48*3:], y_scaler.inverse_transform(y_train[-48*3:])), linewidth=0.5, label ="Past load")

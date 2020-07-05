@@ -16,20 +16,6 @@ from pandas import DataFrame
 
 from numpy import genfromtxt
 
-def create_dates(features_df, y_values):
-
-    date_list = [datetime.datetime(year=int(round(features_df[i, -1])),
-                                   month=int(round(features_df[i, -2])),
-                                   day=int(round(features_df[i, -3])),
-                                   hour=int((features_df[i, -4] - 1) / 2),
-                                   minute=int(((features_df[i, -4] -1) % 2 ) * 30)) for i in range(len(features_df))]
-
-    df_dates = DataFrame(date_list, columns=['Date'])
-    df_dates = df_dates.set_index(['Date'])
-    df_dates['Load'] = y_values
-
-    return df_dates
-
 # Get the X (containing the features) and y (containing the labels) values
 X = genfromtxt('Data_Entsoe/Data_Preprocessing/For_Multi_Step_Prediction/X.csv', delimiter=',')
 y = genfromtxt('Data_Entsoe/Data_Preprocessing/For_Multi_Step_Prediction/y.csv', delimiter=',')
@@ -54,31 +40,32 @@ y_train_1 = y_scaler.fit_transform(y_train_1)
 # Create the model.
 ########################################################################################################################
 
-# # Define the hyperparameters.
-# learning_rate = 0.001
-# number_of_epochs = 100
-# batch_size = 32
-#
-# # Create the model.
-# my_model = create_model(len(X_train_1[1]), learning_rate)
-#
-# # Extract the loss per epoch to plot the learning progress.
-#
-# hist_list = pd.DataFrame()
-#
-# tscv = TimeSeriesSplit()
-# for train_index, test_index in tscv.split(X_train_1):
-#       X_train_split, X_test_split = X_train_1[train_index], X_train_1[test_index]
-#       y_train_split, y_test_split = y_train_1[train_index], y_train_1[test_index]
-#       hist_split = train_model(my_model, X_train_split, y_train_split, number_of_epochs, batch_size)
-#       hist_list = hist_list.append(hist_split)
-#
-# # Plot the loss per epoch.
-# metric = "mean_absolute_error"
-# plot_the_loss_curve(np.linspace(1,len(hist_list), len(hist_list) ), hist_list[metric], metric)
-# my_model.save("my_model_MST_2.h5")
+# Define the hyperparameters.
+learning_rate = 0.001
+number_of_epochs = 100
+batch_size = 32
 
-my_model = keras.models.load_model("my_model_MST_2.h5")
+# Create the model.
+my_model = create_model(len(X_train_1[1]), learning_rate)
+
+# Extract the loss per epoch to plot the learning progress.
+
+hist_list = pd.DataFrame()
+
+tscv = TimeSeriesSplit()
+for train_index, test_index in tscv.split(X_train_1):
+      X_train_split, X_test_split = X_train_1[train_index], X_train_1[test_index]
+      y_train_split, y_test_split = y_train_1[train_index], y_train_1[test_index]
+      hist_split = train_model(my_model, X_train_split, y_train_split, number_of_epochs, batch_size)
+      hist_list = hist_list.append(hist_split)
+
+# Plot the loss per epoch.
+metric = "mean_absolute_error"
+plot_the_loss_curve(np.linspace(1,len(hist_list), len(hist_list) ), hist_list[metric], metric)
+
+my_model.save("my_model_MST_2.h5")
+
+# my_model = keras.models.load_model("my_model_MST_2.h5")
 
 ########################################################################################################################
 # Predicting the generation.
@@ -121,70 +108,71 @@ print("-"*200)
 ########################################################################################################################
 
 # Plot the actual recorded generation against the date.
-from Electricity_generation.ANN.Functions_ANN import plot_actual_generation, plot_predicted_generation, plot_error, plot_prediction_zoomed_in, plot_total_generation
+from Electricity_generation.ANN.Functions_ANN import plot_actual_generation, plot_predicted_generation, plot_error, plot_prediction_zoomed_in, plot_total_generation, create_dates
 
 #plot_total_generation(X_train_1, y_train_1, "Total generation (Train + Test Set")
 
 # Plot the actual recorded generation against the date.
-fig, axes = plt.subplots(3)
-
-fig.suptitle('Train Set 1 (ANN)', fontsize=16)
+fig1, axes1 = plt.subplots(3)
+fig1.suptitle('Train Set 1 (ANN)', fontsize=16)
 # Plot the actual generation in a new subplot of 3x1.
-plot_actual_generation(axes, X_train_1, y_train_1, "Actual Generation")
-
+plot_actual_generation(axes1, X_train_1, y_train_1, "Actual Generation")
 # Plot the the predicted (NN) generation.
-plot_predicted_generation(axes, X_train_1, result_train_1, "NN prediction train set 1")
-
+plot_predicted_generation(axes1, X_train_1, result_train_1, "NN prediction train set 1")
 # Plot the error between the predicted and the actual temperature.
-plot_error(axes, X_train_1, error_train_1, "NN error train set 1")
+plot_error(axes1, X_train_1, error_train_1, "NN error train set 1")
+fig1.show()
 
 # Print the prediction of the training set 1.
 y_values_dates = create_dates(X_train_1[-48*7:],result_train_1[-48*7:])
-fig, axes = plt.subplots(2)
-axes[0].plot(y_values_dates, label = "Prediction")
-y_values_dates = create_dates(X_train_1[-48*7:],y_train_1[-48*7:])
-axes[0].plot(y_values_dates, label = "Actual")
-axes[0].set_xlabel("Settlement Periods Training Set 1")
-axes[0].set_ylabel("Electricity Load [MW]")
-axes[0].legend()
-
-y_values_dates = create_dates(X_train_1[-48*7:],abs(result_train_1[-48*7:]-y_train_1[-48*7:]))
-axes[1].plot(y_values_dates, label = "Error")
-axes[1].set_xlabel("Settlement Periods Training Set 1")
-axes[1].set_ylabel("Electricity Load [MW]")
-axes[1].legend()
-
-# Print the prediction of the training set 2.
-fig1, axes1 = plt.subplots(2)
-y_values_dates = create_dates(X_train_2,result_train_2)
-axes1[0].plot(y_values_dates, label = "Prediction")
-y_values_dates = create_dates(X_train_2,y_train_2)
-axes1[0].plot(y_values_dates, label = "Actual")
-axes1[0].set_xlabel("Settlement Periods Training Set 2")
-axes1[0].set_ylabel("Electricity Load [MW]")
-axes1[0].legend()
-
-y_values_dates = create_dates(X_train_2,abs(result_train_2-(y_train_2)))
-axes1[1].plot(y_values_dates, label = "Error")
-axes1[1].set_xlabel("Settlement Periods Training Set 2")
-axes1[1].set_ylabel("Electricity Load [MW]")
-axes1[1].legend()
-
-# Print the prediction of the test set.
 fig2, axes2 = plt.subplots(2)
-y_values_dates = create_dates(X_test,result_test)
 axes2[0].plot(y_values_dates, label = "Prediction")
-y_values_dates = create_dates(X_test,y_test)
+y_values_dates = create_dates(X_train_1[-48*7:],y_train_1[-48*7:])
 axes2[0].plot(y_values_dates, label = "Actual")
-axes2[0].set_xlabel("Settlement Periods Test Set")
+axes2[0].set_xlabel("Settlement Periods Training Set 1")
 axes2[0].set_ylabel("Electricity Load [MW]")
 axes2[0].legend()
 
-y_values_dates = create_dates(X_test,abs(result_test-(y_test)))
+y_values_dates = create_dates(X_train_1[-48*7:],abs(result_train_1[-48*7:]-y_train_1[-48*7:]))
 axes2[1].plot(y_values_dates, label = "Error")
-axes2[1].set_xlabel("Settlement Periods Test Set")
-axes2[1].set_ylabel("Error in [MW]")
+axes2[1].set_xlabel("Settlement Periods Training Set 1")
+axes2[1].set_ylabel("Electricity Load [MW]")
 axes2[1].legend()
+fig2.show()
+
+# Print the prediction of the training set 2.
+fig3, axes3 = plt.subplots(2)
+y_values_dates = create_dates(X_train_2,result_train_2)
+axes3[0].plot(y_values_dates, label = "Prediction")
+y_values_dates = create_dates(X_train_2,y_train_2)
+axes3[0].plot(y_values_dates, label = "Actual")
+axes3[0].set_xlabel("Settlement Periods Training Set 2")
+axes3[0].set_ylabel("Electricity Load [MW]")
+axes3[0].legend()
+
+y_values_dates = create_dates(X_train_2,abs(result_train_2-(y_train_2)))
+axes3[1].plot(y_values_dates, label = "Error")
+axes3[1].set_xlabel("Settlement Periods Training Set 2")
+axes3[1].set_ylabel("Electricity Load [MW]")
+axes3[1].legend()
+fig3.show()
+
+# Print the prediction of the test set.
+fig4, axes4 = plt.subplots(2)
+y_values_dates = create_dates(X_test,result_test)
+axes4[0].plot(y_values_dates, label = "Prediction")
+y_values_dates = create_dates(X_test,y_test)
+axes4[0].plot(y_values_dates, label = "Actual")
+axes4[0].set_xlabel("Settlement Periods Test Set")
+axes4[0].set_ylabel("Electricity Load [MW]")
+axes4[0].legend()
+
+y_values_dates = create_dates(X_test,abs(result_test-(y_test)))
+axes4[1].plot(y_values_dates, label = "Error")
+axes4[1].set_xlabel("Settlement Periods Test Set")
+axes4[1].set_ylabel("Error in [MW]")
+axes4[1].legend()
+fig4.show()
 
 ########################################################################################################################
 # Save the results in a csv file.

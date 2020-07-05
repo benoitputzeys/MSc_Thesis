@@ -9,13 +9,13 @@ from pandas import DataFrame
 
 def plot_the_loss_curve(x_value,metric,string):
 
-    plt.figure()
-    plt.xlabel("Epoch")
-    plt.ylabel(string)
+    figure_0 = plt.figure()
+    figure_0.xlabel("Epoch")
+    figure_0.ylabel(string)
 
-    plt.plot(x_value,metric, label="Loss")
-    plt.legend()
-    plt.show()
+    figure_0.plot(x_value,metric, label="Loss")
+    figure_0.legend()
+    figure_0.show()
 
 def create_model(dim, learning_rate):
 
@@ -47,13 +47,13 @@ def train_model(model, xvalues, yvalues, epochs, batch):
 
     return hist
 
-def plot_total_generation(x_values, y_values, string):
+def plot_total_generation(fig, x_values, y_values, string):
 
     y_values_dates = create_dates(x_values,y_values)
-    plt.plot(y_values_dates, linewidth=0.5)
-    plt.xlabel("Settlement Periods")
-    plt.ylabel(string)
-    plt.show()
+    fig.plot(y_values_dates, linewidth=0.5)
+    fig.xlabel("Settlement Periods")
+    fig.ylabel(string)
+    fig.show()
 
 def plot_actual_generation(ax, x_values, y_values, string):
 
@@ -61,7 +61,6 @@ def plot_actual_generation(ax, x_values, y_values, string):
     ax[0].plot(y_values_dates, linewidth=0.5)
     ax[0].set_xlabel("Settlement Periods")
     ax[0].set_ylabel(string)
-    plt.show()
 
 def plot_predicted_generation(ax, x_values, y_values, string):
 
@@ -69,7 +68,6 @@ def plot_predicted_generation(ax, x_values, y_values, string):
     ax[1].plot(y_values_dates, linewidth=0.5)
     ax[1].set_xlabel("Settlement Periods")
     ax[1].set_ylabel(string)
-    plt.show()
 
 def plot_error(ax,x_values, error, string):
 
@@ -77,26 +75,23 @@ def plot_error(ax,x_values, error, string):
     ax[2].plot(y_values_dates, linewidth=0.5)
     ax[2].set_xlabel("Settlement Periods")
     ax[2].set_ylabel(string)
-    plt.show()
 
 def plot_prediction_zoomed_in(x_values, y_values, string1):
 
     y_values_dates = create_dates(x_values, y_values)
-    plt.figure(3)
     plt.suptitle('Prediction Zoomed In', fontsize=16)
     plt.xlabel("Settlement Periods")
     plt.ylabel("Predicted Generation")
     plt.plot(y_values_dates, label=string1)
     plt.legend()
-    plt.show()
 
 def create_dates(features_df, y_values):
 
     date_list = [datetime.datetime(year=int(round(features_df[i, -1])),
                                    month=int(round(features_df[i, -2])),
                                    day=int(round(features_df[i, -3])),
-                                   hour=int((features_df[i, -4] - 1) / 2),
-                                   minute=int(((features_df[i, -4] -1) % 2 ) * 30)) for i in range(len(features_df))]
+                                   hour=int((round(features_df[i, -4]) - 1) / 2),
+                                   minute=int(((round(features_df[i, -4]) - 1) % 2) * 30)) for i in range(len(features_df))]
 
     df_dates = DataFrame(date_list, columns=['Date'])
     df_dates = df_dates.set_index(['Date'])
