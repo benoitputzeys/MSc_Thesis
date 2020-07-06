@@ -35,9 +35,9 @@ def build_model(input,learning_rate):
         tfp.layers.DenseVariational(64, activation='relu', input_dim=len(input[1]),
         make_posterior_fn = posterior_mean_field,
         make_prior_fn = prior_trainable),
-        tfp.layers.DenseVariational(64, activation='relu',
-                                    make_posterior_fn=posterior_mean_field,
-                                    make_prior_fn=prior_trainable),
+        # tfp.layers.DenseVariational(64, activation='relu',
+        #                             make_posterior_fn=posterior_mean_field,
+        #                             make_prior_fn=prior_trainable),
         layers.Dense(64, activation='relu'),
         layers.Dense(1),
     ])

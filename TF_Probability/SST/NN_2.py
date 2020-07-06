@@ -63,11 +63,11 @@ def prior_trainable(kernel_size: int, bias_size: int, dtype: any) -> tf.keras.Mo
 
 def build_model():
     model = keras.Sequential([
-        tfp.layers.DenseVariational(64, activation='relu',
+        tfp.layers.DenseVariational(128, activation='relu',
                                 input_dim=len(X_train[1]),
                                 make_posterior_fn=posterior_mean_field,
                                 make_prior_fn=prior_trainable),
-        layers.Dense(64, activation='relu'),
+        layers.Dense(128, activation='relu'),
         layers.Dense(1),
     ])
 

@@ -2,7 +2,7 @@ from matplotlib import pylab as plt
 import numpy as np
 from sklearn.model_selection import train_test_split
 from numpy import genfromtxt
-from TF_Probability.Functions import build_model
+from TF_Probability.SST.Functions import build_model
 from sklearn.preprocessing import StandardScaler
 
 # Get the X (containing the features) and y (containing the labels) values
@@ -16,11 +16,11 @@ y = y[:48*8]
 # Split data into train set and test set.
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=1, shuffle = False)
 
-x_scaler = StandardScaler()
-y_scaler = StandardScaler()
-X_train = x_scaler.fit_transform(X_train)
-X_test = x_scaler.transform(X_test)
-y_train = y_scaler.fit_transform(y_train)
+# x_scaler = StandardScaler()
+# y_scaler = StandardScaler()
+# X_train = x_scaler.fit_transform(X_train)
+# X_test = x_scaler.transform(X_test)
+# y_train = y_scaler.fit_transform(y_train)
 
 epochs = 5000
 learning_rate = 0.001
@@ -38,7 +38,7 @@ plt.plot(model.history.history["mean_absolute_error"])
 plt.show()
 
 # Make a single prediction on the test set and plot.
-prediction = y_scaler.inverse_transform(model.predict(X_test))
+prediction = model.predict(X_test)
 
 fig1 = plt
 fig1.plot(prediction, label = "prediction", color = "blue")
@@ -49,7 +49,7 @@ fig1.legend()
 fig1.show()
 
 # Make a 100 predictions on the test set and plot.
-yhats = [y_scaler.inverse_transform(model.predict(X_test)) for _ in range(100)]
+yhats = [model.predict(X_test) for _ in range(100)]
 predictions = np.array(yhats)
 predictions = predictions.reshape(-1,len(predictions[1]))
 predictions_vector = predictions.reshape(-1, 1)
@@ -79,7 +79,7 @@ plt.xlabel("Prediction Error")
 _ = plt.ylabel("Count")
 plt.show()
 
-plt.plot(x_scaler.inverse_transform(X_train[:,0]))
+plt.plot(X_train[:,0])
 plt.xlabel("SP")
 plt.ylabel("Load [MW]")
 plt.show()
