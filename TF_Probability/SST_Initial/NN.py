@@ -2,14 +2,14 @@ from matplotlib import pylab as plt
 import numpy as np
 from sklearn.model_selection import train_test_split
 from numpy import genfromtxt
-from TF_Probability.MST.Functions import build_model
+from TF_Probability.SST_Initial.Functions import build_model
 from sklearn.preprocessing import StandardScaler
 
 # Get the X (containing the features) and y (containing the labels) values
-X = genfromtxt('Data_Entsoe/Data_Preprocessing/For_Multi_Step_Prediction/X.csv', delimiter=',')
+X = genfromtxt('Data_Entsoe/Data_Preprocessing/X.csv', delimiter=',')
 X = X[:48*8,:]
 
-y = genfromtxt('Data_Entsoe/Data_Preprocessing/For_Multi_Step_Prediction/y.csv', delimiter=',')
+y = genfromtxt('Data_Entsoe/Data_Preprocessing/y.csv', delimiter=',')
 y = np.reshape(y, (len(y), 1))
 y = y[:48*8]
 

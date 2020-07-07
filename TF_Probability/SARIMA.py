@@ -244,3 +244,26 @@ load_component_means_, load_component_stddevs_ = (
 _ = plot_components(X_axis, load_component_means_, load_component_stddevs_,
                     x_locator=None, x_formatter=None)
 plt.show()
+
+
+# Calculate the errors
+print("-"*200)
+errors = abs(load_forecast_mean.reshape(-1,1)-y_train[:48*7])
+print("The mean absolute error of the test set is %0.2f" % np.mean(errors))
+print("The mean squared error of the test set is %0.2f" % np.mean(errors**2))
+print("The root mean squared error of the test set is %0.2f" % np.sqrt(np.mean(errors**2)))
+print("-"*200)
+
+########################################################################################################################
+# Save the results in a csv file.
+########################################################################################################################
+
+import csv
+with open('TF_Probability/Results/SARIMA_result.csv', 'w', newline='', ) as file:
+    writer = csv.writer(file)
+    writer.writerow(["Method","MSE","MAE","RMSE"])
+    writer.writerow(["SARIMA",
+                     str(np.mean(errors**2)),
+                     str(np.mean(errors)),
+                     str(np.sqrt(np.mean(errors**2)))
+                     ])

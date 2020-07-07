@@ -2,16 +2,16 @@ from matplotlib import pylab as plt
 import numpy as np
 from sklearn.model_selection import train_test_split
 from numpy import genfromtxt
-from TF_Probability.SST.Functions import build_model
+from TF_Probability.MST_Rd_Weights.Functions import build_model
 from sklearn.preprocessing import StandardScaler
 
 # Get the X (containing the features) and y (containing the labels) values
-X = genfromtxt('Data_Entsoe/Data_Preprocessing/X.csv', delimiter=',')
-X = X[:48*8,:]
+X = genfromtxt('Data_Entsoe/Data_Preprocessing/For_Multi_Step_Prediction/X.csv', delimiter=',')
+X = X[:48*7*5,:]
 
-y = genfromtxt('Data_Entsoe/Data_Preprocessing/y.csv', delimiter=',')
+y = genfromtxt('Data_Entsoe/Data_Preprocessing/For_Multi_Step_Prediction/y.csv', delimiter=',')
 y = np.reshape(y, (len(y), 1))
-y = y[:48*8]
+y = y[:48*7*5]
 
 # Split data into train set and test set.
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=1, shuffle = False)
@@ -34,7 +34,7 @@ model.fit(X_train,y_train, epochs=epochs, batch_size=batches, verbose=False)
 model.summary()
 
 # Plot the learning progress.
-plt.plot(model.history.history["mean_absolute_error"])
+plt.plot(model.history.history["mean_absolute_error"][600:])
 plt.show()
 
 # Make a single prediction on the test set and plot.
@@ -48,15 +48,16 @@ fig1.ylabel('Load [MW]')
 fig1.legend()
 fig1.show()
 
-# Make a 100 predictions on the test set and plot.
-yhats = [model.predict(X_test) for _ in range(100)]
+# Make a 1000 predictions on the test set and calculate the errors for each prediction.
+yhats = [model.predict(X_test) for _ in range(1000)]
 predictions = np.array(yhats)
 predictions = predictions.reshape(-1,len(predictions[1]))
+# Make one large column vector containing all the predictions
 predictions_vector = predictions.reshape(-1, 1)
 
+# Create a np array with all the predictions in the first column and the corresponding error in the next column.
 predictions_and_errors = np.zeros((len(predictions_vector),2))
 predictions_and_errors[:,:-1] = predictions_vector
-
 j=0
 for i in range (len(predictions_vector)):
         predictions_and_errors[i,1] = predictions_vector[i]-y_test[j]
@@ -64,9 +65,19 @@ for i in range (len(predictions_vector)):
         if j == len(y_test):
             j=0
 
+# Calculate the stddev from the 1000 predictions.
+mean = (sum(predictions)/1000).reshape(-1,1)
+stddev = np.zeros((len(X_test),1))
+for i in range (len(X_test)):
+    stddev[i,0] = np.std(predictions[:,i])
+
+# Plot the result with the truth in red and the predictions in blue.
 fig2=plt
-fig2.plot(predictions[1,:].T,label = "prediction", alpha = 0.1, color = "blue")
-fig2.plot(predictions[1:,:].T, alpha = 0.1, color = "blue")
+fig2.plot(mean,label = "Mean prediction", color = "blue")
+# Potentially include all the predictions made
+#fig2.plot(predictions[1:,:].T, alpha = 0.1, color = "blue")
+fig2.plot(mean+2*stddev, alpha = 0.1, color = "blue")
+fig2.plot(mean-2*stddev, alpha = 0.1, color = "blue")
 fig2.plot(y_test, label = "true", alpha = 1, color = "red")
 fig2.xlabel('Settlement Periods (Test Set)')
 fig2.ylabel('Load [MW]')
@@ -77,9 +88,4 @@ fig2.show()
 plt.hist(predictions_and_errors[:,1], bins = 25)
 plt.xlabel("Prediction Error")
 _ = plt.ylabel("Count")
-plt.show()
-
-plt.plot(X_train[:,0])
-plt.xlabel("SP")
-plt.ylabel("Load [MW]")
 plt.show()
