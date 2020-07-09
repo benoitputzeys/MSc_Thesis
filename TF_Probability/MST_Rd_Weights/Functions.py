@@ -30,20 +30,20 @@ def prior_trainable(kernel_size: int, bias_size: int, dtype: any) -> tf.keras.Mo
             reinterpreted_batch_ndims=1)),
     ])
 
-def build_model(input,learning_rate):
+def build_model(input_dim,learning_rate):
     model = keras.Sequential([
-        tfp.layers.DenseVariational(128, activation='relu', input_dim=len(input[1]),
+        #layers.Dense(128, activation='relu', input_dim=len(input[1])),
+        tfp.layers.DenseVariational(128, activation='relu', input_dim=input_dim,
         make_posterior_fn = posterior_mean_field,
         make_prior_fn = prior_trainable),
-        # tfp.layers.DenseVariational(64, activation='relu',
-        #                             make_posterior_fn=posterior_mean_field,
-        #                             make_prior_fn=prior_trainable),
         layers.Dense(128, activation='relu'),
         layers.Dense(1),
     ])
 
     opt = keras.optimizers.RMSprop(lr=learning_rate)
-    model.compile(optimizer=opt, loss='mae', metrics=['mean_squared_error','mean_absolute_error','mean_absolute_percentage_error'])
+    model.compile(optimizer=opt, loss='mae', metrics=['mean_squared_error',
+                                                      'mean_absolute_error',
+                                                      'mean_absolute_percentage_error'])
 
     return model
 

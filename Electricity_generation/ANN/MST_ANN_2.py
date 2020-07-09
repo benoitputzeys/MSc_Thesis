@@ -65,7 +65,7 @@ metric = "mean_absolute_error"
 plot_the_loss_curve(np.linspace(1,len(hist_list), len(hist_list) ), hist_list[metric], metric)
 my_model.save("my_model_MST_2.h5")
 
-# my_model = keras.models.load_model("my_model_MST_2.h5")
+my_model = keras.models.load_model("Electricity_generation/ANN/my_model_MST_2.h5")
 
 ########################################################################################################################
 # Predicting the generation.
@@ -160,16 +160,20 @@ fig3.show()
 # Print the prediction of the test set.
 fig4, axes4 = plt.subplots(2)
 y_values_dates = create_dates(X_test,result_test)
-axes4[0].plot(y_values_dates, label = "Prediction")
+axes4[0].plot(y_values_dates, label = "Prediction", linewidth = 0.5)
 y_values_dates = create_dates(X_test,y_test)
-axes4[0].plot(y_values_dates, label = "Actual")
+axes4[0].plot(y_values_dates, label = "Actual", linewidth = 0.5)
 axes4[0].set_xlabel("Settlement Periods Test Set")
+for tick in axes4[0].get_xticklabels():
+    tick.set_rotation(20)
 axes4[0].set_ylabel("Electricity Load [MW]")
 axes4[0].legend()
 
 y_values_dates = create_dates(X_test,abs(result_test-(y_test)))
-axes4[1].plot(y_values_dates, label = "Error")
+axes4[1].plot(y_values_dates, label = "Error", color = "black", linewidth = 0.5)
 axes4[1].set_xlabel("Settlement Periods Test Set")
+for tick in axes4[1].get_xticklabels():
+    tick.set_rotation(20)
 axes4[1].set_ylabel("Error in [MW]")
 axes4[1].legend()
 fig4.show()

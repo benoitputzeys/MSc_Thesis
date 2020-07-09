@@ -36,7 +36,7 @@ def plot_forecast(x, y,
   num_steps_train = num_steps - num_steps_forecast
 
 
-  ax.plot(x, y, lw=2, color=c1, label='ground truth')
+  ax.plot(x[-48*3:], y[-48*3:], lw=2, color="red", label='ground truth')
 
   forecast_steps = np.arange(
       x[num_steps_train],
@@ -45,11 +45,11 @@ def plot_forecast(x, y,
 
   ax.plot(forecast_steps, forecast_samples.T, lw=1, color=c2, alpha=0.1)
 
-  ax.plot(forecast_steps, forecast_mean, lw=2, ls='--', color=c2,
+  ax.plot(forecast_steps, forecast_mean, lw=2, color="blue",
            label='forecast')
   ax.fill_between(forecast_steps,
                    forecast_mean-2*forecast_scale,
-                   forecast_mean+2*forecast_scale, color=c2, alpha=0.2)
+                   forecast_mean+2*forecast_scale, color="blue", alpha=0.2)
 
   ymin, ymax = min(np.min(forecast_samples), np.min(y)), max(np.max(forecast_samples), np.max(y))
   yrange = ymax-ymin
@@ -223,6 +223,19 @@ fig, ax = plot_forecast(
     X_axis, y_train,
     load_forecast_mean, load_forecast_scale, load_forecast_samples,
     title="Load forecast")
+
+plt.plot(X_axis[-48 * 7-48 * 3:-48 * 7], y_train[-48 * 3:], color="red", label='Training Set')
+plt.plot(X_axis[-48 * 7:], load_forecast_mean, color="blue",label='Forecast with 2x standard deviation')
+plt.fill_between(X_axis[-48 * 7:],load_forecast_mean-2*load_forecast_scale,load_forecast_mean+2*load_forecast_scale, color="blue", alpha=0.2)
+plt.axvline(X_axis[-48*7], linestyle="--", color = "black")
+plt.title("SARIMA model with probabilistic prediction")
+plt.xlabel("Settelement Periods")
+plt.ylabel("Load [MW]")
+plt.legend(loc = "lower left")
+plt.figure(figsize=(30,10))
+plt.show()
+
+
 ax.axvline(X_axis[-num_forecast_steps], linestyle="--")
 ax.legend(loc="upper left")
 ax.set_ylabel("Load [MW]")
