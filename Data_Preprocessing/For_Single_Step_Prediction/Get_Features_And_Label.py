@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import datetime as dt
 
 # This csv data has missing values for the last 152 days of the year as they lie in the future. (Get rid of them)
-df = pd.read_csv("Data_Entsoe/Data_Preprocessing/For_Multi_Step_Prediction/Load_UK_Processed_Data")
+df = pd.read_csv("Data_Preprocessing/Load_GB_Processed_Data")
 df = df.rename(columns={"Unnamed: 0": "Timestamp", "0": "Load"}, errors="raise")
 
 df["Timestamp"] = [dt.datetime.strptime(df.iloc[i,0][0:16], '%Y-%m-%d %H:%M') for i in range(len(df))]
@@ -51,8 +51,8 @@ X.iloc[:,:-1] = replace_nan.transform(X.iloc[:,:-1])
 
 y = df
 
-X.to_csv("Data_Entsoe/Data_Preprocessing/For_Multi_Step_Prediction/X.csv")
-y.to_csv("Data_Entsoe/Data_Preprocessing/For_Multi_Step_Prediction/y.csv")
+X.to_csv("Data_Preprocessing/For_Multi_Step_Prediction/X.csv")
+y.to_csv("Data_Preprocessing/For_Multi_Step_Prediction/y.csv")
 #
 # plt.plot(X[:,0], label='Electricity Generation 2 SP ago', linewidth=0.5 )
 # plt.xlabel("Actual Settlement Period")
