@@ -1,26 +1,25 @@
-
 import matplotlib as mpl
 from matplotlib import pylab as plt
 import matplotlib.dates as mdates
 import seaborn as sns
-
 import collections
 import tensorflow.compat.v2 as tf
-
 import numpy as np
 import tensorflow_probability as tfp
-
 from tensorflow_probability import distributions as tfd
 from tensorflow_probability import sts
-
-tf.enable_v2_behavior()
-
 from sklearn.model_selection import train_test_split, TimeSeriesSplit
 from Electricity_generation.LSTM.Functions_LSTM import plot_the_loss_curve, train_model, create_model, plot_generation, plot_prediction_zoomed_in
 from sklearn.preprocessing import StandardScaler
 import pandas as pd
 from sklearn.metrics import mean_absolute_error, mean_squared_error
 import keras
+from numpy import genfromtxt
+import matplotlib.ticker as plticker
+from matplotlib.dates import DayLocator, HourLocator, DateFormatter, drange
+import datetime
+
+tf.enable_v2_behavior()
 
 def plot_forecast(x, y,
                   forecast_mean, forecast_scale, forecast_samples,
@@ -121,33 +120,35 @@ def plot_one_step_predictive(dates, observed_time_series,
   fig.tight_layout()
   return fig, ax
 
-from numpy import genfromtxt
-
 # Get the X (containing the features) and y (containing the labels) values
-X = genfromtxt('Data_Entsoe/Data_Preprocessing/X.csv', delimiter=',')
-X = X[:48*50,:]
+X = pd.read_csv('Data_Entsoe/Data_Preprocessing/For_Multi_Step_Prediction/X_API.csv')
+X = X.iloc[1:,1:]
+# Extract the dates and delete the respective column.
+dates = X.iloc[:,-1]
+X = X.iloc[:,:-1]
 
-y = genfromtxt('Data_Entsoe/Data_Preprocessing/y.csv', delimiter=',')
-y = np.reshape(y, (len(y), 1))
-y = y[:48*50]
+y = pd.read_csv('Data_Entsoe/Data_Preprocessing/For_Multi_Step_Prediction/y_API.csv')
+y = y.iloc[1:,2:]
 
 # Split data into train set and test set.
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=1, shuffle = False)
 
+# Plot the training set.
+fig1, axs1=plt.subplots(1,1,figsize=(12,6))
+axs1.plot(dates[:len(y_train)], y_train/1000, label="training data")
+axs1.set_ylabel("Load [GW]")
+axs1.set_xlabel("Settlement Periods")
+#fig1.suptitle("Testing TF Proability",fontsize=15, x = 0.5, y = 0.99)
+loc = plticker.MultipleLocator(base=4800) # this locator puts ticks at regular intervals
+axs1.xaxis.set_major_locator(loc)
+axs1.grid(True)
+fig1.autofmt_xdate()
+plt.show()
+
+# Specify how many steps you want to forecast. In 1 day there are 48 settlement periods.
+# To predict 1 week in advance, set this to 48*7.
 num_forecast_steps = 48 * 7
 
-X_axis = np.linspace(1,len(X_train),len(X_train))
-
-fig = plt.figure(figsize=(12, 6))
-ax = fig.add_subplot(1, 1, 1)
-#ax.plot(co2_dates[:-num_forecast_steps], co2_by_month_training_data, lw=2, label="training data")
-ax.plot(X_axis, y_train[:,0], lw=2, label="training data")
-# ax.xaxis.set_major_locator(co2_loc)
-# ax.xaxis.set_major_formatter(co2_fmt)
-ax.set_ylabel("Load [MW]")
-ax.set_xlabel("Settlement Periods")
-fig.suptitle("Testing TF Proability",fontsize=15)
-plt.show()
 
 def build_model(observed_time_series):
   #Does not really have an upwards trend.
