@@ -149,10 +149,7 @@ plt.show()
 # To predict 1 week in advance, set this to 48*7.
 num_forecast_steps = 48 * 7
 
-
 def build_model(observed_time_series):
-  #Does not really have an upwards trend.
-  #trend = sts.LocalLinearTrend(observed_time_series=observed_time_series)
   seasonal_day = tfp.sts.Seasonal(
       num_seasons=48,
       observed_time_series=observed_time_series,
@@ -162,12 +159,20 @@ def build_model(observed_time_series):
       num_steps_per_season=48,
       observed_time_series=observed_time_series,
       name = 'Weekly_Seasonality')
+  seasonal_year = tfp.sts.Seasonal(
+      num_seasons=1,
+      num_steps_per_season=48*365,
+      observed_time_series=observed_time_series,
+      name = 'Yearly_Seasonality')
+  trend = sts.LocalLinearTrend(observed_time_series=observed_time_series)
   autoregressive = sts.Autoregressive(
       order=1,
       observed_time_series=observed_time_series,
       name='autoregressive')
   model = sts.Sum([seasonal_day,
                    seasonal_week,
+                   seasonal_year,
+                   trend,
                    autoregressive],
                   observed_time_series=observed_time_series)
   return model
@@ -175,8 +180,7 @@ def build_model(observed_time_series):
 load_model = build_model(y_train)
 
 # Build the variational surrogate posteriors `qs`.
-variational_posteriors = tfp.sts.build_factored_surrogate_posterior(
-    model=load_model)
+variational_posteriors = tfp.sts.build_factored_surrogate_posterior(model=load_model)
 
 # Allow external control of optimization to reduce test runtimes.
 num_variational_steps = 100 # @param { isTemplate: true}
@@ -220,29 +224,25 @@ load_forecast_mean, load_forecast_scale, load_forecast_samples = (
     load_forecast_dist.stddev().numpy()[..., 0],
     load_forecast_dist.sample(num_samples).numpy()[..., 0])
 
-fig, ax = plot_forecast(
-    X_axis, y_train,
-    load_forecast_mean, load_forecast_scale, load_forecast_samples,
-    title="Load forecast")
+fig2, ax2 = plot_forecast(dates[:len(y_train)], y_train,
+                        load_forecast_mean, load_forecast_scale, load_forecast_samples,
+                        title="Load forecast")
 
-plt.plot(X_axis[-48 * 7-48 * 3:-48 * 7], y_train[-48 * 3:], color="red", label='Training Set')
-plt.plot(X_axis[-48 * 7:], load_forecast_mean, color="blue",label='Forecast with 2x standard deviation')
-plt.fill_between(X_axis[-48 * 7:],load_forecast_mean-2*load_forecast_scale,load_forecast_mean+2*load_forecast_scale, color="blue", alpha=0.2)
-plt.axvline(X_axis[-48*7], linestyle="--", color = "black")
-plt.title("SARIMA model with probabilistic prediction")
-plt.xlabel("Settelement Periods")
-plt.ylabel("Load [MW]")
-plt.legend(loc = "lower left")
-plt.figure(figsize=(30,10))
+fig2, axs2=plt.subplots(1,1,figsize=(12,6))
+axs2.plot(dates[len(y_train)-48*3:len(y_train)], y_train[-48 * 3:], color="red", label='Training Set')
+axs2.plot(dates[len(y_train):48*7], load_forecast_mean, color="blue",label='Forecast with 2x standard deviation')
+axs2.fill_between(dates[len(y_train):len(y_train)+48*7],load_forecast_mean-2*load_forecast_scale,load_forecast_mean+2*load_forecast_scale, color="blue", alpha=0.2)
+axs2.axvline(dates[len(y_train):48*7], linestyle="--", color = "black")
+axs2.title("SARIMA model with probabilistic prediction")
+axs2.set_xlabel("Settelement Periods")
+axs2.set_ylabel("Load [MW]")
+axs2.legend(loc = "lower left")
+loc = plticker.MultipleLocator(base=4800) # this locator puts ticks at regular intervals
+axs2.xaxis.set_major_locator(loc)
+axs2.grid(True)
+fig2.autofmt_xdate()
+axs2.show()
 plt.show()
-
-
-ax.axvline(X_axis[-num_forecast_steps], linestyle="--")
-ax.legend(loc="upper left")
-ax.set_ylabel("Load [MW]")
-ax.set_xlabel("Settlement Period")
-plt.show()
-#fig.autofmt_xdate()
 
 # Build a dict mapping components to distributions over
 # their contribution to the observed signal.
@@ -255,7 +255,7 @@ load_component_means_, load_component_stddevs_ = (
     {k.name: c.mean() for k, c in component_dists.items()},
     {k.name: c.stddev() for k, c in component_dists.items()})
 
-_ = plot_components(X_axis, load_component_means_, load_component_stddevs_,
+_ = plot_components(dates, load_component_means_, load_component_stddevs_,
                     x_locator=None, x_formatter=None)
 plt.show()
 
