@@ -9,7 +9,7 @@ import tensorflow_probability as tfp
 from tensorflow_probability import distributions as tfd
 from tensorflow_probability import sts
 from sklearn.model_selection import train_test_split, TimeSeriesSplit
-from Electricity_generation.LSTM.Functions_LSTM import plot_the_loss_curve, train_model, create_model, plot_generation, plot_prediction_zoomed_in
+from Electricity_Generation_Prediction.LSTM.Functions_LSTM import plot_the_loss_curve, train_model, create_model, plot_generation, plot_prediction_zoomed_in
 from sklearn.preprocessing import StandardScaler
 import pandas as pd
 from sklearn.metrics import mean_absolute_error, mean_squared_error
@@ -150,6 +150,7 @@ plt.show()
 num_forecast_steps = 48 * 7
 
 def build_model(observed_time_series):
+  trend = sts.LocalLinearTrend(observed_time_series=observed_time_series)
   seasonal_day = tfp.sts.Seasonal(
       num_seasons=48,
       observed_time_series=observed_time_series,
@@ -164,15 +165,14 @@ def build_model(observed_time_series):
       num_steps_per_season=48*365,
       observed_time_series=observed_time_series,
       name = 'Yearly_Seasonality')
-  trend = sts.LocalLinearTrend(observed_time_series=observed_time_series)
   autoregressive = sts.Autoregressive(
       order=1,
       observed_time_series=observed_time_series,
       name='autoregressive')
-  model = sts.Sum([seasonal_day,
+  model = sts.Sum([trend,
+                   seasonal_day,
                    seasonal_week,
                    seasonal_year,
-                   trend,
                    autoregressive],
                   observed_time_series=observed_time_series)
   return model
@@ -258,7 +258,6 @@ load_component_means_, load_component_stddevs_ = (
 _ = plot_components(dates, load_component_means_, load_component_stddevs_,
                     x_locator=None, x_formatter=None)
 plt.show()
-
 
 # Calculate the errors
 print("-"*200)
