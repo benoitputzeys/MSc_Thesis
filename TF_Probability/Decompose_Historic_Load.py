@@ -87,23 +87,20 @@ axs2[2].grid(True)
 fig2.autofmt_xdate(rotation = 15)
 fig2.show()
 
+X = pd.read_csv('Data_Preprocessing/For_Multi_Step_Prediction/X.csv', delimiter=',')
+settlement_period = X["Settlement Period"]+(48*X["Day of Week"])
+
 # Create a dataframe that contains the correct indices (1-336) and the load values.
-df_ds_ws_rs = pd.DataFrame({'Index':ds_ws_rs.index, 'Load':ds_ws_rs.values})
-j=1
-for i in range(len(ds_ws_rs)):
-    df_ds_ws_rs["Index"][i] = j
-    j = j+1
-    if j==48*7+1:
-        j=1
+df_ds_ws_rs = pd.DataFrame({'SP':settlement_period, 'Load':ds_ws_rs.values})
 
 # Add the mean of the week in question to the reconstructed series.
-mean = np.mean(series.iloc[-48*7-87:-87])
+mean = np.mean(series.iloc[-48*7:])
 projected_load = df_ds_ws_rs.iloc[:, 1] + mean
 
 # Plot the projected loads onto a single week to see the variation in the timeseries.
 fig3, axs3=plt.subplots(1,1,figsize=(12,6))
-axs3.scatter(df_ds_ws_rs.iloc[:, 0], projected_load/1000, alpha=0.05, label = "Projected Loads", color = "blue")
-axs3.plot(df_ds_ws_rs.iloc[:48*7, 0], series[-48*7-87:-87]/1000, color = "red", label = "Load from week in question")
+axs3.scatter(settlement_period, projected_load/1000, alpha=0.05, label = "Projected Loads", color = "blue")
+axs3.plot(settlement_period[-48*7:], series[-48*7:]/1000, color = "red", label = "Load from week in question")
 axs3.set_ylabel("Load [GW]", size = 14)
 axs3.set_xlabel("Settlement Period", size = 14)
 axs3.grid(True)
@@ -114,8 +111,8 @@ fig3.show()
 df_stats = pd.DataFrame({'Index':np.linspace(1,336,336), 'Mean':np.linspace(1,336,336), 'Stddev':np.linspace(1,336,336)})
 
 for i in range(337):
-    df_stats.iloc[i-1,1]=np.mean(df_ds_ws_rs[df_ds_ws_rs["Index"]==i].iloc[:,-1])
-    df_stats.iloc[i-1,2]=np.std(df_ds_ws_rs[df_ds_ws_rs["Index"]==i].iloc[:,-1])
+    df_stats.iloc[i-1,1]=np.mean(df_ds_ws_rs[df_ds_ws_rs["SP"]==i].iloc[:,-1])
+    df_stats.iloc[i-1,2]=np.std(df_ds_ws_rs[df_ds_ws_rs["SP"]==i].iloc[:,-1])
 
 fig4, axs4=plt.subplots(1,1,figsize=(12,6))
 axs4.plot(df_stats.iloc[:,0], df_stats.iloc[:,1]/1000, color = "blue", label = "Mean of all projected loads")
