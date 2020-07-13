@@ -95,25 +95,26 @@ df_ds_ws_rs = pd.DataFrame({'SP':settlement_period, 'Load':ds_ws_rs.values})
 
 # Add the mean of the week in question to the reconstructed series.
 mean = np.mean(series.iloc[-48*7:])
-projected_load = df_ds_ws_rs.iloc[:, 1] + mean
+projected_load = df_ds_ws_rs.iloc[:, 1]
 
 # Plot the projected loads onto a single week to see the variation in the timeseries.
 fig3, axs3=plt.subplots(1,1,figsize=(12,6))
 axs3.scatter(settlement_period, projected_load/1000, alpha=0.05, label = "Projected Loads", color = "blue")
-axs3.plot(settlement_period[-48*7:], series[-48*7:]/1000, color = "red", label = "Load from week in question")
+#axs3.plot(settlement_period[-48*7:], series[-48*7:]/1000, color = "red", label = "Load from week in question")
 axs3.set_ylabel("Load [GW]", size = 14)
 axs3.set_xlabel("Settlement Period", size = 14)
 axs3.grid(True)
 axs3.legend()
 fig3.show()
 
-# Plot the mean and variation for each x.
+# Compute the mean and variation for each x.
 df_stats = pd.DataFrame({'Index':np.linspace(1,336,336), 'Mean':np.linspace(1,336,336), 'Stddev':np.linspace(1,336,336)})
 
 for i in range(337):
     df_stats.iloc[i-1,1]=np.mean(df_ds_ws_rs[df_ds_ws_rs["SP"]==i].iloc[:,-1])
     df_stats.iloc[i-1,2]=np.std(df_ds_ws_rs[df_ds_ws_rs["SP"]==i].iloc[:,-1])
 
+# Plot the mean and variation for each x.
 fig4, axs4=plt.subplots(1,1,figsize=(12,6))
 axs4.plot(df_stats.iloc[:,0], df_stats.iloc[:,1]/1000, color = "blue", label = "Mean of all projected loads")
 axs4.fill_between(df_stats.iloc[:,0],  (df_stats.iloc[:,1]-df_stats.iloc[:,2])/1000,  (df_stats.iloc[:,1]+df_stats.iloc[:,2])/1000,alpha=0.2, color = "blue", label = "Stddev")
@@ -122,5 +123,16 @@ axs4.set_xlabel("Settlement Period", size = 14)
 axs4.legend()
 axs4.grid(True)
 fig4.show()
+
+# Use the "template" above and add the mean of the week in question to it.
+fig5, axs5=plt.subplots(1,1,figsize=(12,6))
+axs5.plot(settlement_period[-336:], (df_stats.iloc[:,1]+mean)/1000, color = "blue", label = "Mean of all projected loads")
+axs5.plot(settlement_period[-336:], series[-48*7:]/1000, color = "red", label = "Actual Load of most recent week")
+axs5.fill_between(df_stats.iloc[:,0], ((df_stats.iloc[:,1]-df_stats.iloc[:,2])+mean)/1000, ((df_stats.iloc[:,1]+df_stats.iloc[:,2])+mean)/1000,alpha=0.2, color = "blue", label = "Stddev")
+axs5.set_ylabel("Load [GW]", size = 14)
+axs5.set_xlabel("Settlement Period", size = 14)
+axs5.legend()
+axs5.grid(True)
+fig5.show()
 
 print(np.mean(df_stats.iloc[:,1]))
