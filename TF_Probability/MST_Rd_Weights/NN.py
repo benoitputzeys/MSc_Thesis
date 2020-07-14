@@ -8,14 +8,14 @@ import pandas as pd
 import matplotlib.ticker as plticker
 
 # Get the X (containing the features) and y (containing the labels) values
-X = pd.read_csv('Data_Entsoe/Data_Preprocessing/For_Multi_Step_Prediction/X_API.csv', delimiter=',')
+X = pd.read_csv('Data_Preprocessing/For_Multi_Step_Prediction/X.csv', delimiter=',')
 X = X.drop(['Unnamed: 0'], axis=1)
 dates = X.iloc[:,-1]
-X = X.iloc[-48*7*8:,:-1]
+X = X.iloc[8760:69277:,:-1]
 
-y = pd.read_csv('Data_Entsoe/Data_Preprocessing/For_Multi_Step_Prediction/y_API.csv', delimiter=',')
+y = pd.read_csv('Data_Preprocessing/For_Multi_Step_Prediction/y.csv', delimiter=',')
 y = y.drop(['Unnamed: 0'], axis=1)
-y = y.iloc[-48*7*8:,-1]
+y = y.iloc[8760:69277:,-1]
 
 # Split data into train set and test set.
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=1, shuffle = False)
@@ -28,7 +28,7 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_
 
 epochs = 5000
 learning_rate = 0.001
-batches = 16
+batches = 32
 
 # Build the model.
 model = build_model(X_train.shape[1],learning_rate)
@@ -111,3 +111,32 @@ plt.hist(error_column, bins = 25)
 plt.xlabel("Prediction Error")
 plt.ylabel("Count")
 plt.show()
+
+# Calculate the errors from the mean to the actual vaules.
+print("-"*200)
+errors = abs(load_forecast_mean.reshape(-1,1)-y_train[:48*7])
+print("The mean absolute error of the test set is %0.2f" % np.mean(predictions_vector))
+print("The mean squared error of the test set is %0.2f" % np.mean(predictions_vector**2))
+print("The root mean squared error of the test set is %0.2f" % np.sqrt(np.mean(predictions_vector**2)))
+print("-"*200)
+
+########################################################################################################################
+# Save the results in a csv file.
+########################################################################################################################
+
+import csv
+with open('TF_Probability/Results/NN_error.csv', 'w', newline='', ) as file:
+    writer = csv.writer(file)
+    writer.writerow(["Method","MSE","MAE","RMSE"])
+    writer.writerow(["NN",
+                     str(np.mean(predictions_vector**2)),
+                     str(np.mean(predictions_vector)),
+                     str(np.sqrt(np.mean(predictions_vector**2)))
+                     ])
+with open('TF_Probability/Results/NN_prediction.csv', 'w', newline='', ) as file:
+    writer = csv.writer(file)
+    writer.writerow(["Method","Mean","Stddev"])
+    writer.writerow(["NN",
+                     str(mean),
+                     str(stddev),
+                     ])

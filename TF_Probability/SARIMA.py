@@ -121,13 +121,13 @@ def plot_one_step_predictive(dates, observed_time_series,
   return fig, ax
 
 # Get the X (containing the features) and y (containing the labels) values
-X = pd.read_csv('Data_Entsoe/Data_Preprocessing/For_Multi_Step_Prediction/X_API.csv')
+X = pd.read_csv('Data_Preprocessing/For_Multi_Step_Prediction/X.csv')
 X = X.iloc[1:,1:]
 # Extract the dates and delete the respective column.
 dates = X.iloc[:,-1]
 X = X.iloc[:,:-1]
 
-y = pd.read_csv('Data_Entsoe/Data_Preprocessing/For_Multi_Step_Prediction/y_API.csv')
+y = pd.read_csv('Data_Preprocessing/For_Multi_Step_Prediction/y.csv')
 y = y.iloc[1:,2:]
 
 # Split data into train set and test set.
@@ -135,7 +135,7 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_
 
 # Plot the training set.
 fig1, axs1=plt.subplots(1,1,figsize=(12,6))
-axs1.plot(dates[:len(y_train)], y_train/1000, label="training data")
+axs1.plot(dates[:len(y_train)], y_train/1000, label="training data", color = "blue", linewidth = 0.5)
 axs1.set_ylabel("Load [GW]")
 axs1.set_xlabel("Settlement Periods")
 #fig1.suptitle("Testing TF Proability",fontsize=15, x = 0.5, y = 0.99)
@@ -272,7 +272,7 @@ print("-"*200)
 ########################################################################################################################
 
 import csv
-with open('TF_Probability/Results/SARIMA_result.csv', 'w', newline='', ) as file:
+with open('TF_Probability/Results/SARIMA_error.csv', 'w', newline='', ) as file:
     writer = csv.writer(file)
     writer.writerow(["Method","MSE","MAE","RMSE"])
     writer.writerow(["SARIMA",

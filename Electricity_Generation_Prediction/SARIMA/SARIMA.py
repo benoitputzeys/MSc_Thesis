@@ -230,7 +230,7 @@ pd.DataFrame(predictions_train_1).to_csv("Electricity_Generation_Prediction/SARI
 #     "/Users/benoitputzeys/PycharmProjects/MSc_Thesis/Electricity_Generation_Prediction/Hybrid_Model/Pred_test_other_metrics/SARIMA_prediction.csv")
 #
 # import csv
-# with open('/Users/benoitputzeys/PycharmProjects/MSc_Thesis/Compare_Models/MST2_results/SARIMA_result.csv', 'w', newline='',) as file:
+# with open('/Users/benoitputzeys/PycharmProjects/MSc_Thesis/Compare_Models/MST2_results/SARIMA_error.csv', 'w', newline='',) as file:
 #     writer = csv.writer(file)
 #     writer.writerow(["Method","MSE","MAE","RMSE"])
 #     writer.writerow(["SARIMA",
