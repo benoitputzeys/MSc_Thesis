@@ -7,7 +7,6 @@ import tensorflow_probability as tfp
 from tensorflow_probability import sts
 tf.enable_v2_behavior()
 from sklearn.model_selection import train_test_split, TimeSeriesSplit
-import matplotlib.ticker as plticker
 
 def plot_components(dates,
                     component_means_dict,
@@ -74,33 +73,31 @@ seasonal_week = tfp.sts.Seasonal(
     num_steps_per_season=48,
     observed_time_series=y_train,
     name = 'Weekly_Seasonality')
-seasonal_annual = tfp.sts.Seasonal(
-    num_seasons=1,
-    num_steps_per_season=48*365,
-    observed_time_series=y_train,
-    name = 'Annual_Seasonality')
 load_model = sts.Sum([seasonal_day,
-                 seasonal_week,
-                 seasonal_annual],
+                 seasonal_week],
                 observed_time_series=y_train)
 
-plt.plot(seasonal_day)
-plt.show()
-
 # Build the variational surrogate posteriors `qs`.
-variational_posteriors = tfp.sts.build_factored_surrogate_posterior(model=load_model)
+variational_posteriors = tfp.sts.build_factored_surrogate_posterior(
+    model=load_model)
 
 # Allow external control of optimization to reduce test runtimes.
 num_variational_steps = 100 # @param { isTemplate: true}
 num_variational_steps = int(num_variational_steps)
 
 optimizer = tf.optimizers.Adam(learning_rate=.1)
+# Using fit_surrogate_posterior to build and optimize the variational loss function.
+@tf.function(experimental_compile=True)
 
-elbo_loss_curve = tfp.vi.fit_surrogate_posterior(
+def train():
+  elbo_loss_curve = tfp.vi.fit_surrogate_posterior(
     target_log_prob_fn=load_model.joint_log_prob(observed_time_series=y_train),
     surrogate_posterior=variational_posteriors,
     optimizer=optimizer,
     num_steps=num_variational_steps)
+  return elbo_loss_curve
+
+elbo_loss_curve = train()
 
 plt.plot(elbo_loss_curve)
 plt.show()
@@ -120,7 +117,7 @@ load_forecast_dist = tfp.sts.forecast(
       parameter_samples=q_samples_load_,
       num_steps_forecast=num_forecast_steps)
 
-num_samples=10
+num_samples=5
 
 load_forecast_mean, load_forecast_scale, load_forecast_samples = (
     load_forecast_dist.mean().numpy()[..., 0],
@@ -155,9 +152,10 @@ load_component_means_, load_component_stddevs_ = (
     {k.name: c.mean() for k, c in component_dists.items()},
     {k.name: c.stddev() for k, c in component_dists.items()})
 
-_ = plot_components(dates, load_component_means_, load_component_stddevs_,
+_ = plot_components(X_axis, load_component_means_, load_component_stddevs_,
                     x_locator=None, x_formatter=None)
 plt.show()
+
 
 # Calculate the errors
 print("-"*200)
