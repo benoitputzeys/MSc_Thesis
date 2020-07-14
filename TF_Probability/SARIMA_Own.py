@@ -41,18 +41,24 @@ def plot_components(dates,
   fig.tight_layout()
   return fig, axes_dict
 
+X = pd.read_csv('Data_Preprocessing/For_Multi_Step_Prediction/X.csv', delimiter=',')
+X = X.iloc[8760:69277:,-1]
+
 y = pd.read_csv('Data_Preprocessing/For_Multi_Step_Prediction/y.csv', delimiter=',')
 dates = y.iloc[8760:69277,1]
 y = y.iloc[8760:69277:,-1]
-y_train = y.iloc[-48*50-48*7:-48*7]
-y_test = y.iloc[-48*7:]
 
 # Split data into train set and test set.
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=1, shuffle = False)
+dates_train = dates[:len(y_train)]
+dates_test = dates[len(y_train):]
+
+y_train = y_train.iloc[-48*50:]
+y_test = y_test.iloc[:48*7]
 
 num_forecast_steps = 48 * 7
 fig1, axs1=plt.subplots(1,1,figsize=(12,6))
-axs1.plot(dates[-48*50-48*7:-48*7], y_train, label="training data", color = "blue", linewidth = 0.5)
+axs1.plot(dates_train[-48*50:], y_train, label="training data", color = "blue", linewidth = 0.5)
 axs1.set_ylabel("Load [MW]")
 axs1.set_xlabel("Settlement Periods")
 loc = plticker.MultipleLocator(base=48*5-1) # this locator puts ticks at regular intervals
@@ -135,11 +141,11 @@ load_forecast_scale =  load_forecast_dist.stddev().numpy().reshape(-1,)
 
 # Plot the actual values, the forecast and the standard deviation.
 fig2, axs2=plt.subplots(1,1,figsize=(12,6))
-axs2.plot(dates[-48*3-48*7:-48*7], y_train[-48 * 3:]/1000, color="black", label='Training Set')
-axs2.plot(dates[-48*7:], y_test[:48 * 7]/1000, color="red", label = "Test Set")
-axs2.plot(dates[-48*7:], load_forecast_mean/1000, color="blue",label='Forecast with 2x standard deviation')
-axs2.fill_between(dates[-48*7:],(load_forecast_mean-2*load_forecast_scale)/1000,(load_forecast_mean+2*load_forecast_scale)/1000, color="blue", alpha=0.2)
-axs2.axvline(dates.iloc[-48*7], linestyle="--", color = "black")
+axs2.plot(dates_train[-48*3:], y_train[-48 * 3:]/1000, color="black", label='Training Set')
+axs2.plot(dates_test[:48*7], y_test/1000, color="red", label = "Test Set")
+axs2.plot(dates_test[:48*7], load_forecast_mean/1000, color="blue",label='Forecast with 2x standard deviation')
+axs2.fill_between(dates_test[:48*7],(load_forecast_mean-2*load_forecast_scale)/1000,(load_forecast_mean+2*load_forecast_scale)/1000, color="blue", alpha=0.2)
+axs2.axvline(dates_test[0], linestyle="--", color = "black")
 axs2.set_xlabel("Settelement Periods",size = 14)
 axs2.set_ylabel("Load [GW]",size = 14)
 axs2.legend(loc = "lower left")

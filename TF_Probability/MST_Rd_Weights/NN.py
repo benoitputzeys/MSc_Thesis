@@ -10,7 +10,7 @@ import matplotlib.ticker as plticker
 # Get the X (containing the features) and y (containing the labels) values
 X = pd.read_csv('Data_Preprocessing/For_Multi_Step_Prediction/X.csv', delimiter=',')
 X = X.drop(['Unnamed: 0'], axis=1)
-dates = X.iloc[:,-1]
+dates = X.iloc[8760:69277,-1]
 X = X.iloc[8760:69277:,:-1]
 
 y = pd.read_csv('Data_Preprocessing/For_Multi_Step_Prediction/y.csv', delimiter=',')
@@ -26,7 +26,7 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_
 # X_test = x_scaler.transform(X_test)
 # y_train = y_scaler.fit_transform(y_train)
 
-epochs = 5000
+epochs = 2500
 learning_rate = 0.001
 batches = 32
 
@@ -38,11 +38,11 @@ model.fit(X_train,y_train, epochs=epochs, batch_size=batches, verbose=False)
 model.summary()
 
 # Plot the learning progress.
-plt.plot(model.history.history["mean_absolute_error"][600:])
+plt.plot(model.history.history["mean_absolute_error"][150:])
 plt.show()
 
 # Make a single prediction on the test set and plot.
-prediction = model.predict(X_test)
+prediction = model.predict(X_test[:48*7])
 
 # #x_axis = np.linspace(1,len(prediction), len(prediction))
 # fig1, axs1=plt.subplots(1,1,figsize=(12,6))
@@ -58,14 +58,14 @@ prediction = model.predict(X_test)
 # fig1.show()
 
 # Make a 1000 predictions on the test set and calculate the errors for each prediction.
-yhats = [model.predict(X_test) for _ in range(1000)]
+yhats = [model.predict(X_test[:48*7]) for _ in range(1000)]
 predictions = np.array(yhats)
 predictions = predictions.reshape(-1,len(predictions[1]))
 
 # Calculate the stddev from the 1000 predictions.
 mean = (sum(predictions)/1000).reshape(-1,1)
-stddev = np.zeros((len(X_test),1))
-for i in range (len(X_test)):
+stddev = np.zeros((48*7,1))
+for i in range (48*7):
     stddev[i,0] = np.std(predictions[:,i])
 
 mean_plus_stddev = mean+2*stddev
@@ -74,11 +74,11 @@ mean_minus_stddev = mean-2*stddev
 
 fig2, axs2=plt.subplots(1,1,figsize=(12,6))
 axs2.plot(dates.iloc[-len(X_test)-48*3:-len(X_test)],y_train[-48*3:], label = "Training Set", alpha = 1, color = "black")
-axs2.plot(dates.iloc[-len(X_test):],mean,label = "Mean of the predictions", color = "blue")
+axs2.plot(dates.iloc[-len(X_test):-len(X_test)+48*7],mean,label = "Mean of the predictions", color = "blue")
 # Potentially include all the predictions made
 #fig2.plot(X_axis[-48*7:], predictions.T[:,:50], alpha = 0.1, color = "blue")
-axs2.fill_between(dates.iloc[-len(X_test):], mean_plus_stddev.reshape(-1,), mean_minus_stddev.reshape(-1,), alpha=0.3, color = "blue")
-axs2.plot(dates.iloc[-len(X_test):],y_test, label = "Test Set", alpha = 1, color = "red")
+axs2.fill_between(dates.iloc[-len(X_test):-len(X_test)+48*7], mean_plus_stddev.reshape(-1,), mean_minus_stddev.reshape(-1,), alpha=0.3, color = "blue")
+axs2.plot(dates.iloc[-len(X_test):-len(X_test)+48*7],y_test[:48*7], label = "Test Set", alpha = 1, color = "red")
 axs2.axvline(dates.iloc[-len(X_test)], linestyle="--", color = "black")
 axs2.set_xlabel('Settlement Periods (Test Set)')
 axs2.set_ylabel('Load [MW]')
@@ -114,12 +114,13 @@ plt.show()
 
 # Calculate the errors from the mean to the actual vaules.
 print("-"*200)
-errors = abs(load_forecast_mean.reshape(-1,1)-y_train[:48*7])
-print("The mean absolute error of the test set is %0.2f" % np.mean(predictions_vector))
-print("The mean squared error of the test set is %0.2f" % np.mean(predictions_vector**2))
-print("The root mean squared error of the test set is %0.2f" % np.sqrt(np.mean(predictions_vector**2)))
+error = np.abs(y_test[:48*7]-prediction.reshape(-1,))
+print("The mean absolute error of the test set is %0.2f" % np.mean(error))
+print("The mean squared error of the test set is %0.2f" % np.mean(error**2))
+print("The root mean squared error of the test set is %0.2f" % np.sqrt(np.mean(error**2)))
 print("-"*200)
 
+stats = np.concatenate((mean, stddev, np.array(y_test[:48*7]).reshape(-1,1)), axis = 1)
 ########################################################################################################################
 # Save the results in a csv file.
 ########################################################################################################################
@@ -129,14 +130,11 @@ with open('TF_Probability/Results/NN_error.csv', 'w', newline='', ) as file:
     writer = csv.writer(file)
     writer.writerow(["Method","MSE","MAE","RMSE"])
     writer.writerow(["NN",
-                     str(np.mean(predictions_vector**2)),
-                     str(np.mean(predictions_vector)),
-                     str(np.sqrt(np.mean(predictions_vector**2)))
+                     str(np.mean(error**2)),
+                     str(np.mean(error)),
+                     str(np.sqrt(np.mean(error**2)))
                      ])
-with open('TF_Probability/Results/NN_prediction.csv', 'w', newline='', ) as file:
-    writer = csv.writer(file)
-    writer.writerow(["Method","Mean","Stddev"])
-    writer.writerow(["NN",
-                     str(mean),
-                     str(stddev),
-                     ])
+
+stats = pd.DataFrame(stats)
+stats.columns = ["Mean", "Stddev", "Test_Set"]
+stats.to_csv("TF_Probability/Results/NN_prediction.csv", index = False)
