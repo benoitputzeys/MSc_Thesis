@@ -6,7 +6,8 @@ import matplotlib.ticker as plticker
 
 # Read the processed data.
 y = pd.read_csv('Data_Preprocessing/For_Multi_Step_Prediction/y.csv')
-dates = y.iloc[:,1]
+X = pd.read_csv('Data_Preprocessing/For_Multi_Step_Prediction/X.csv')
+dates = X.iloc[:,-1]
 series = y.iloc[:,-1]/1000
 
 # Decompose the data into daily, weekly and annual seasonal components.
@@ -24,7 +25,6 @@ weekly_seasonality = weekly_components.seasonal
 # trend[:168] = weekly_components.trend[169]
 # trend[-168:] = weekly_components.trend.iloc[-169]
 
-X = pd.read_csv('Data_Preprocessing/For_Multi_Step_Prediction/X.csv', delimiter=',')
 settlement_period = X["Settlement Period"]+(48*X["Day of Week"])
 
 # This section might take some time but calculating the mean for each is "safer" this way.
@@ -63,7 +63,7 @@ axs[3].xaxis.set_major_locator(loc)
 axs[3].grid(True)
 fig.autofmt_xdate(rotation = 10)
 fig.show()
-
+#
 # # Plot the whole decomposition of the whole actual series.
 # fig, axs=plt.subplots(4,1,figsize=(12,10))
 # axs[0].plot(daily_seasonality, color = "blue", linewidth = 0.5)
@@ -85,7 +85,7 @@ fig.show()
 # axs[3].grid(True)
 # fig.autofmt_xdate(rotation = 15)
 # fig.show()
-
+#
 # # Christmas?
 # fig, axs=plt.subplots(4,1,figsize=(12,10))
 # axs[0].plot(dates[33500:36000],daily_seasonality[33500:36000], color = "blue")

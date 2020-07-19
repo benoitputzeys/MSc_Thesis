@@ -67,7 +67,7 @@ dataframe = dataframe.loc[~dataframe.index.duplicated(keep='first')]
 
 # Save the data in a new dataframe.
 load_and_transmission = pd.DataFrame(data = {"Load": load["Load"], "Transmission": dataframe["Total"]})
-load_and_transmission.fillna(method='ffill')
+load_and_transmission = load_and_transmission.fillna(method='ffill')
 
 load_and_transmission.to_csv("Data_Preprocessing/Load_and_Transmission_Data.csv")
 
@@ -76,10 +76,10 @@ load_and_transmission.to_csv("Data_Preprocessing/Load_and_Transmission_Data.csv"
 #
 # truevals["Timestamp"] = [dt.datetime.strptime(truevals.iloc[i,0][0:16], '%Y-%m-%d %H:%M') for i in range(len(truevals))]
 # truevals = truevals.set_index(["Timestamp"])
-
+#
 # import matplotlib.pyplot as plt
-# fig, ax = plt.subplots(1,1,figsize=(10,10))
-# ax.plot(load_and_transmission.iloc[:,1], color = "blue", linewidth = 0.5)
-# #ax[1].plot(load_and_transmission.iloc[:,0]-truevals.iloc[:,0], color = "red", linewidth = 1)
+# fig, ax = plt.subplots(2,1,figsize=(10,10))
+# ax[0].plot(load_and_transmission.iloc[:,1], color = "blue", linewidth = 0.5)
+# ax[1].plot(load_and_transmission.iloc[:,0]-truevals.iloc[:,0], color = "red", linewidth = 1)
 # fig.show()
 
