@@ -82,3 +82,24 @@ axs2[1].xaxis.set_major_locator(loc)
 fig2.autofmt_xdate(rotation=10)
 axs2[1].legend()
 fig2.show()
+
+# Calculate the errors from the mean to the actual vaules.
+print("-"*200)
+print("The mean absolute error of the test set is %0.2f" % np.mean(error[-336:]))
+print("The mean squared error of the test set is %0.2f" % np.mean(error[-336:]**2))
+print("The root mean squared error of the test set is %0.2f" % np.sqrt(np.mean(error[-336:]**2)))
+print("-"*200)
+
+########################################################################################################################
+# Save the results in a csv file.
+########################################################################################################################
+
+import csv
+with open('TF_Probability/Results/Naive_error.csv', 'w', newline='', ) as file:
+    writer = csv.writer(file)
+    writer.writerow(["Method","MSE","MAE","RMSE"])
+    writer.writerow(["Naive",
+                     str(np.mean(error[-336:]**2)),
+                     str(np.mean(error[-336:])),
+                     str(np.sqrt(np.mean(error[-336:]**2)))
+                     ])
