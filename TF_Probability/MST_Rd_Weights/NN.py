@@ -10,12 +10,12 @@ import matplotlib.ticker as plticker
 # Get the X (containing the features) and y (containing the labels) values
 X = pd.read_csv('Data_Preprocessing/For_Multi_Step_Prediction/X.csv', delimiter=',')
 X = X.drop(['Unnamed: 0'], axis=1)
-dates = X.iloc[8760:69277,-1]
-X = X.iloc[8760:69277:,:-1]
+dates = X.iloc[:,-1]
+X = X.iloc[:,:-1]
 
 y = pd.read_csv('Data_Preprocessing/For_Multi_Step_Prediction/y.csv', delimiter=',')
 y = y.drop(['Unnamed: 0'], axis=1)
-y = y.iloc[8760:69277:,-1]
+y = y.iloc[:,-1]
 
 # Split data into train set and test set.
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=1, shuffle = False)
@@ -74,11 +74,11 @@ mean_minus_stddev = mean-2*stddev
 
 fig2, axs2=plt.subplots(1,1,figsize=(12,6))
 axs2.plot(dates.iloc[-len(X_test)-48*3:-len(X_test)],y_train[-48*3:], label = "Training Set", alpha = 1, color = "black")
-axs2.plot(dates.iloc[-len(X_test):-len(X_test)+48*7],mean,label = "Mean of the predictions", color = "blue")
+axs2.plot(dates.iloc[-len(X_test):-len(X_test)+48*7], mean, label = "Mean of the predictions", color = "orange")
 # Potentially include all the predictions made
-#fig2.plot(X_axis[-48*7:], predictions.T[:,:50], alpha = 0.1, color = "blue")
-axs2.fill_between(dates.iloc[-len(X_test):-len(X_test)+48*7], mean_plus_stddev.reshape(-1,), mean_minus_stddev.reshape(-1,), alpha=0.3, color = "blue")
-axs2.plot(dates.iloc[-len(X_test):-len(X_test)+48*7],y_test[:48*7], label = "Test Set", alpha = 1, color = "red")
+#fig2.plot(X_axis[-48*7:], predictions.T[:,:50], alpha = 0.1, color = "orange")
+axs2.fill_between(dates.iloc[-len(X_test):-len(X_test)+48*7], mean_plus_stddev.reshape(-1,), mean_minus_stddev.reshape(-1,), alpha=0.3, color = "orange")
+axs2.plot(dates.iloc[-len(X_test):-len(X_test)+48*7],y_test[:48*7], label = "Test Set", alpha = 1, color = "blue")
 axs2.axvline(dates.iloc[-len(X_test)], linestyle="--", color = "black")
 axs2.set_xlabel('Settlement Periods (Test Set)')
 axs2.set_ylabel('Load [MW]')
@@ -121,6 +121,7 @@ print("The root mean squared error of the test set is %0.2f" % np.sqrt(np.mean(e
 print("-"*200)
 
 stats = np.concatenate((mean, stddev, np.array(y_test[:48*7]).reshape(-1,1)), axis = 1)
+
 ########################################################################################################################
 # Save the results in a csv file.
 ########################################################################################################################

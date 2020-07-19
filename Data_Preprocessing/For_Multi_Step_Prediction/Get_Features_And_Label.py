@@ -11,11 +11,11 @@ df = df.rename(columns={"Unnamed: 0": "Timestamp", "0": "Load"}, errors="raise")
 df["Timestamp"] = [dt.datetime.strptime(df.iloc[i,0][0:16], '%Y-%m-%d %H:%M') for i in range(len(df))]
 
 fig1, axs1=plt.subplots(1,1,figsize=(12,6))
-axs1.plot(df.iloc[:,0], df.iloc[:,1])
+axs1.plot(df.iloc[:,0], df.iloc[:,1], color = "blue", linewidth = 0.5)
 axs1.set_ylabel("Load in UK [MW]")
 axs1.set_xlabel("Date")
 axs1.grid(True)
-fig1.suptitle("Electricity Load in the UK from January 2016 to July 2020",fontsize=15)
+#fig1.suptitle("Electricity Load in the UK from January 2016 to July 2020",fontsize=15)
 fig1.show()
 
 # Determine the Features.
@@ -53,6 +53,7 @@ y = df
 
 X.to_csv("Data_Preprocessing/For_Multi_Step_Prediction/X.csv")
 y.to_csv("Data_Preprocessing/For_Multi_Step_Prediction/y.csv")
+
 #
 # plt.plot(X[:,0], label='Electricity Generation 2 SP ago', linewidth=0.5 )
 # plt.xlabel("Actual Settlement Period")
