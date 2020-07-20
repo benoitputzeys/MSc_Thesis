@@ -12,7 +12,7 @@ def plot_the_loss_curve(x_value,metric,string):
     plt.xlabel("Epoch")
     plt.ylabel(string)
 
-    plt.plot(x_value,metric, label="Loss")
+    plt.plot(x_value,metric, label="Loss", color = "blue")
     plt.legend()
     plt.show()
 
@@ -49,31 +49,32 @@ def train_model(model, xvalues, yvalues, epochs, batch):
 def plot_total_generation(x_values, y_values, string):
 
     y_values_dates = create_dates(x_values,y_values)
-    plt.plot(y_values_dates, linewidth=0.5)
-    plt.xlabel("Settlement Periods")
+    plt.plot(y_values_dates, linewidth=0.5, color ="blue")
+    plt.xlabel("Settlement Periods", size = 14)
     plt.ylabel(string)
     plt.show()
 
 def plot_actual_generation(ax, x_values, y_values, string):
 
     y_values_dates = create_dates(x_values,y_values)
-    ax[0].plot(y_values_dates, linewidth=0.5)
-    ax[0].set_xlabel("Settlement Periods")
+    ax[0].plot(y_values_dates, color = "blue")
     ax[0].set_ylabel(string)
+    ax[0].grid(True)
 
 def plot_predicted_generation(ax, x_values, y_values, string):
 
     y_values_dates = create_dates(x_values,y_values)
-    ax[1].plot(y_values_dates, linewidth=0.5)
-    ax[1].set_xlabel("Settlement Periods")
+    ax[1].plot(y_values_dates, color = "black")
     ax[1].set_ylabel(string)
+    ax[1].grid(True)
 
 def plot_error(ax,x_values, error, string):
 
     y_values_dates = create_dates(x_values,error)
-    ax[2].plot(y_values_dates, linewidth=0.5)
-    ax[2].set_xlabel("Settlement Periods")
+    ax[2].plot(y_values_dates, color = "red")
     ax[2].set_ylabel(string)
+    ax[2].set_xlabel("Settlement Periods")
+    ax[2].grid(True)
 
 def plot_prediction_zoomed_in(x_values, y_values, string1):
 
@@ -81,7 +82,8 @@ def plot_prediction_zoomed_in(x_values, y_values, string1):
     plt.suptitle('Prediction Zoomed In', fontsize=16)
     plt.xlabel("Settlement Periods")
     plt.ylabel("Predicted Generation")
-    plt.plot(y_values_dates, label=string1)
+    plt.plot(y_values_dates, label=string1, color = "blue")
+    plt.grid(True)
     plt.legend()
 
 def create_dates(features_df, y_values):
@@ -89,8 +91,8 @@ def create_dates(features_df, y_values):
     date_list = [datetime.datetime(year=int(round(features_df[i, -1])),
                                    month=int(round(features_df[i, -2])),
                                    day=int(round(features_df[i, -3])),
-                                   hour=int((round(features_df[i, -4]) - 1) / 2),
-                                   minute=int(((round(features_df[i, -4]) - 1) % 2) * 30)) for i in range(len(features_df))]
+                                   hour=int((round(features_df[i, -5]) - 1) / 2),
+                                   minute=int(((round(features_df[i, -5]) - 1) % 2) * 30)) for i in range(len(features_df))]
 
     df_dates = DataFrame(date_list, columns=['Date'])
     df_dates = df_dates.set_index(['Date'])
