@@ -17,21 +17,10 @@ from pandas import DataFrame
 # Get the X (containing the features) and y (containing the labels) values
 X = pd.read_csv('Data_Preprocessing/For_Multi_Step_Prediction/X.csv', delimiter=',')
 X = X.set_index("Time")
-X = X.drop(columns = ["Transmission_Past"])
-#dates = X.iloc[:,-1]
 X = X.iloc[:,:-1]
 
 y = pd.read_csv('Data_Preprocessing/For_Multi_Step_Prediction/y.csv', delimiter=',')
 y = y.set_index("Time")
-
-# # Get the X (containing the features) and y (containing the labels) values
-# X = genfromtxt('Data_Preprocessing/For_Multi_Step_Prediction/X.csv', delimiter=',')
-# X = X[1:,1:-1]
-# #dates = X.iloc[:,-1]
-# #X = X.iloc[:,:-1]
-#
-# y = genfromtxt('Data_Preprocessing/For_Multi_Step_Prediction/y.csv', delimiter=',')
-# y = y[1:,1:]
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state = 0, shuffle = False)
 
@@ -177,10 +166,10 @@ fig4.show()
 
 
 import csv
-with open('Electricity_Generation_Prediction\ANN\Result_Features_Length\All_Features_25_Length.csv', 'w', newline='',) as file:
+with open('Electricity_Generation_Prediction\ANN\Training_Set_Size_Analysis\AF_14L.csv', 'w', newline='',) as file:
     writer = csv.writer(file)
     writer.writerow(["Method","MSE","MAE","RMSE"])
-    writer.writerow(["AF_25_L",
+    writer.writerow(["1/4 L",
                      str(mean_squared_error(y_test,result_test)),
                      str(mean_absolute_error(y_test,result_test)),
                      str(np.sqrt(mean_squared_error(y_test,result_test)))

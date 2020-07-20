@@ -8,7 +8,7 @@ AF_35_L = pd.read_csv("Electricity_Generation_Prediction/ANN/Training_Set_Size_A
 AF_34_L = pd.read_csv("Electricity_Generation_Prediction/ANN/Training_Set_Size_Analysis/AF_34L.csv")
 AF_25_L = pd.read_csv("Electricity_Generation_Prediction/ANN/Training_Set_Size_Analysis/AF_25L.csv")
 
-frames = ([AF_ML,AF_34_L,AF_25_L, AF_HL, AF_35_L, AF_Quarter_L])
+frames = ([AF_ML,AF_34_L,AF_35_L, AF_HL, AF_25_L, AF_Quarter_L])
 df = pd.concat(frames, axis = 0)
 
 # Create bars and choose color
