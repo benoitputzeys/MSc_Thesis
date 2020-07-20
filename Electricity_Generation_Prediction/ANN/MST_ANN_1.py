@@ -17,7 +17,8 @@ from pandas import DataFrame
 # Get the X (containing the features) and y (containing the labels) values
 X = pd.read_csv('Data_Preprocessing/For_Multi_Step_Prediction/X.csv', delimiter=',')
 X = X.set_index("Time")
-dates = X.iloc[:,-1]
+X = X.drop(columns = ["Transmission_Past"])
+#dates = X.iloc[:,-1]
 X = X.iloc[:,:-1]
 
 y = pd.read_csv('Data_Preprocessing/For_Multi_Step_Prediction/y.csv', delimiter=',')
@@ -37,6 +38,9 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, rando
 # Save the unscaled data for later for data representation.
 X_test_unscaled = X_test
 X_train_unscaled = X_train
+
+X_train = X_train[int(len(X_train)*2/5):]
+y_train = y_train[int(len(y_train)*2/5):]
 
 # Feature Scaling
 x_scaler = StandardScaler()
@@ -139,7 +143,7 @@ plt.setp(axes2[0].get_xticklabels(), visible=False)
 y_values_dates = create_dates(X_train[-48*7:],result_train[-48*7:]-y_train[-48*7:])
 axes2[1].plot(y_values_dates/1000, label = "Error", color = "red")
 axes2[1].set_xlabel("Date", size = 14)
-axes2[1].set_ylabel("Electricity Load [GW]")
+axes2[1].set_ylabel("Error [GW]")
 axes2[1].legend()
 axes2[1].grid(True)
 fig2.show()
@@ -173,10 +177,10 @@ fig4.show()
 
 
 import csv
-with open('Electricity_Generation_Prediction/ANN/Result_Features_Length/All_Features_Max_Length.csv', 'w', newline='',) as file:
+with open('Electricity_Generation_Prediction\ANN\Result_Features_Length\All_Features_25_Length.csv', 'w', newline='',) as file:
     writer = csv.writer(file)
     writer.writerow(["Method","MSE","MAE","RMSE"])
-    writer.writerow(["ANN",
+    writer.writerow(["AF_25_L",
                      str(mean_squared_error(y_test,result_test)),
                      str(mean_absolute_error(y_test,result_test)),
                      str(np.sqrt(mean_squared_error(y_test,result_test)))
