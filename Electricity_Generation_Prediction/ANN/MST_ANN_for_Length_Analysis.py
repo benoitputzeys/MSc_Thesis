@@ -39,8 +39,8 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, rando
 X_test_unscaled = X_test
 X_train_unscaled = X_train
 
-X_train = X_train[int(len(X_train)*2/5):]
-y_train = y_train[int(len(y_train)*2/5):]
+X_train = X_train[int(len(X_train)*3/4):]
+y_train = y_train[int(len(y_train)*3/4):]
 
 # Feature Scaling
 x_scaler = StandardScaler()
