@@ -31,6 +31,7 @@ shifted_raw = load_GB_processed.shift(+1)
 not_shifted = not_shifted_raw[1:]
 shifted_raw = shifted_raw[1:]
 
+# Plot the difference in electricity load from one SP to the next.
 fig21, axs21=plt.subplots(1,1,figsize=(12,6))
 axs21.plot((shifted_raw-not_shifted)/1000, color = "blue", linewidth = 0.5)
 axs21.set_ylabel("Load in GB [GW]",size = 18)
