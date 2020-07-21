@@ -15,11 +15,12 @@ from pandas import DataFrame
 ########################################################################################################################
 
 # Get the X (containing the features) and y (containing the labels) values
-X = pd.read_csv('Data_Preprocessing/For_Multi_Step_Prediction/X.csv', delimiter=',')
+X = pd.read_csv('Data_Preprocessing/For_Single_Step_Prediction/X.csv', delimiter=',')
 X = X.set_index("Time")
 X = X.iloc[:,:-1]
+X = X.iloc[:,:-5]
 
-y = pd.read_csv('Data_Preprocessing/For_Multi_Step_Prediction/y.csv', delimiter=',')
+y = pd.read_csv('Data_Preprocessing/For_Single_Step_Prediction/y.csv', delimiter=',')
 y = y.set_index("Time")
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state = 0, shuffle = False)
@@ -165,10 +166,10 @@ fig4.show()
 ########################################################################################################################
 
 import csv
-with open('Electricity_Generation_Prediction/ANN/Feature_Analysis/AF_SP_DoW_D_M_Y.csv', 'w', newline='',) as file:
+with open('Electricity_Generation_Prediction/ANN/Feature_Analysis/F6_Single_Step.csv', 'w', newline='',) as file:
     writer = csv.writer(file)
     writer.writerow(["Method","MSE","MAE","RMSE"])
-    writer.writerow(["AF SP DoW D M Y",
+    writer.writerow(["F6 Single Step",
                      str(mean_squared_error(y_test,result_test)),
                      str(mean_absolute_error(y_test,result_test)),
                      str(np.sqrt(mean_squared_error(y_test,result_test)))

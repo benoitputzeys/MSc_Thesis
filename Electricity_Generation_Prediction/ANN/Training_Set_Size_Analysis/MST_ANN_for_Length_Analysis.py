@@ -29,7 +29,7 @@ X_test_unscaled = X_test
 X_train_unscaled = X_train
 
 X_train = X_train[int(len(X_train)*1/2):]
-y_train = y_train[int(len(y_train)*3/4):]
+y_train = y_train[int(len(y_train)*1/2):]
 
 # Feature Scaling
 x_scaler = StandardScaler()
