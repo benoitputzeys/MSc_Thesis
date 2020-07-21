@@ -30,10 +30,10 @@ rolling_mean_50 = df_features["Load_Past"].rolling(window=50).mean()
 exp_20 = df_features["Load_Past"].ewm(span=20, adjust=False).mean()
 exp_50 = df_features["Load_Past"].ewm(span=50, adjust=False).mean()
 
-df_features["Simple_Moving_Average_10_D"] = rolling_mean_10
-df_features["Simple_Moving_Average_50_D"] = rolling_mean_50
-df_features["Exp_Moving_Average_20_D"] = exp_20
-df_features["Exp_Moving_Average_50_D"] = exp_50
+df_features["Simple_Moving_Average_10_SP"] = rolling_mean_10
+df_features["Simple_Moving_Average_50_SP"] = rolling_mean_50
+df_features["Exp_Moving_Average_20_SP"] = exp_20
+df_features["Exp_Moving_Average_50_SP"] = exp_50
 
 # Create date relevant features.
 df_features["Settlement Period"] = df['Timestamp'].dt.hour*2+1+df['Timestamp'].dt.minute/30
