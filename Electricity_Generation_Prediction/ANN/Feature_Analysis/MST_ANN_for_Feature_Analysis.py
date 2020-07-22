@@ -64,11 +64,10 @@ for train_index, test_index in tscv.split(X_train):
 
 # Plot the loss per epoch.
 metric = "mean_absolute_error"
-
 plot_the_loss_curve(np.linspace(1,len(hist_list), len(hist_list) ), hist_list[metric], metric)
-my_model.save("my_model_MST_2.h5")
 
-#my_model = keras.models.load_model("Electricity_Generation_Prediction/ANN/my_model_MST_2.h5")
+my_model.save("Electricity_Generation_Prediction/ANN/Reature_Analysis/SMST_ANN_model.h5")
+#my_model = keras.models.load_model("Electricity_Generation_Prediction/ANN/Reature_Analysis/SST_ANN_model.h5")
 
 ########################################################################################################################
 # Predicting the generation.
@@ -175,4 +174,3 @@ with open('Electricity_Generation_Prediction/ANN/Feature_Analysis/F6_Single_Step
                      str(np.sqrt(mean_squared_error(y_test,result_test)))
                      ])
 
-#my_model.save("my_model.h5")

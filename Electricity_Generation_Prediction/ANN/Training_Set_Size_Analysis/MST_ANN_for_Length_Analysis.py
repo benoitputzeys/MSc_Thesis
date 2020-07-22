@@ -5,10 +5,6 @@ from sklearn.model_selection import train_test_split, TimeSeriesSplit
 from sklearn.preprocessing import StandardScaler
 import pandas as pd
 from sklearn.metrics import mean_absolute_error, mean_squared_error
-import keras
-from scipy.ndimage.interpolation import shift
-import datetime
-from pandas import DataFrame
 
 ########################################################################################################################
 # Get data and data preprocessing.
@@ -63,11 +59,10 @@ for train_index, test_index in tscv.split(X_train):
 
 # Plot the loss per epoch.
 metric = "mean_absolute_error"
-
 plot_the_loss_curve(np.linspace(1,len(hist_list), len(hist_list) ), hist_list[metric], metric)
-my_model.save("my_model_MST_2.h5")
 
-#my_model = keras.models.load_model("Electricity_Generation_Prediction/ANN/my_model_MST_2.h5")
+my_model.save("Electricity_Generation_Prediction/ANN/Training_Set_Size_Analysis/SMST_ANN_model.h5")
+#my_model = keras.models.load_model("Electricity_Generation_Prediction/ANN/Training_Set_Size_Analysis/SST_ANN_model.h5")
 
 ########################################################################################################################
 # Predicting the generation.
@@ -166,13 +161,11 @@ fig4.show()
 
 
 import csv
-with open('Electricity_Generation_Prediction\ANN\Training_Set_Size_Analysis\AF_14L.csv', 'w', newline='',) as file:
+with open('Electricity_Generation_Prediction\ANN\Training_Set_Size_Analysis\AF_12L.csv', 'w', newline='',) as file:
     writer = csv.writer(file)
     writer.writerow(["Method","MSE","MAE","RMSE"])
-    writer.writerow(["1/4 L",
+    writer.writerow(["1/2 L",
                      str(mean_squared_error(y_test,result_test)),
                      str(mean_absolute_error(y_test,result_test)),
                      str(np.sqrt(mean_squared_error(y_test,result_test)))
                      ])
-
-#my_model.save("my_model.h5")

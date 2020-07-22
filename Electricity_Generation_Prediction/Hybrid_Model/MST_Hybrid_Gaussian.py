@@ -72,8 +72,6 @@ x_scaler = StandardScaler()
 x_train = x_scaler.fit_transform(np.atleast_2d(np.linspace(1, len(y_train), len(y_train))).T)
 x_test = x_scaler.transform(np.atleast_2d(np.linspace(len(y_train), len(y_train)+ len(y_test), len(y_test))).T)
 
-#my_model = keras.models.load_model("my_model.h5")
-
 kernel = RBF(length_scale=48)*Exp(length_scale=48, periodicity=48*7)
 gp = GaussianProcessRegressor(kernel=kernel, n_restarts_optimizer=10)  #Choose your amount of optimizer restarts.
 gp.fit(x_train, all_predictions_train)

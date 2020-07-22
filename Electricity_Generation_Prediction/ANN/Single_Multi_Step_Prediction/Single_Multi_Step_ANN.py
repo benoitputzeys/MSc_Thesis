@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split, TimeSeriesSplit
-from Electricity_Generation_Prediction.LSTM.Functions_LSTM import plot_the_loss_curve, train_model, create_model, plot_generation, plot_prediction_zoomed_in
+from Electricity_Generation_Prediction.ANN.Functions_ANN import plot_the_loss_curve, train_model, create_model, plot_prediction_zoomed_in
 from sklearn.preprocessing import StandardScaler
 import pandas as pd
 from sklearn.metrics import mean_absolute_error, mean_squared_error
@@ -12,12 +12,12 @@ import keras
 ########################################################################################################################
 
 # Get the X (containing the features) and y (containing the labels) values
-X = pd.read_csv('Data_Preprocessing/For_Single_Step_Prediction/X.csv', delimiter=',')
+X = pd.read_csv('Data_Preprocessing/For_Multi_Step_Prediction/X.csv', delimiter=',')
 X = X.set_index("Time")
 dates = X.iloc[:,-1]
 X = X.iloc[:,:-5]
 
-y = pd.read_csv('Data_Preprocessing/For_Single_Step_Prediction/y.csv', delimiter=',')
+y = pd.read_csv('Data_Preprocessing/For_Multi_Step_Prediction/y.csv', delimiter=',')
 y = y.set_index("Time")
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state = 0, shuffle = False)
@@ -43,7 +43,7 @@ number_of_epochs = 100
 batch_size = 32
 
 # Create the model.
-my_model = create_model(X_train, learning_rate)
+my_model = create_model(7, learning_rate)
 
 # Extract the loss per epoch to plot the learning progress.
 hist_list = pd.DataFrame()
@@ -52,17 +52,16 @@ tscv = TimeSeriesSplit()
 for train_index, test_index in tscv.split(X_train):
      X_train_split, X_test_split = X_train[train_index], X_train[test_index]
      y_train_split, y_test_split = y_train[train_index], y_train[test_index]
-     X_train_split = np.reshape(X_train_split, (X_train_split.shape[0],X_train_split.shape[1],1))
      hist_split = train_model(my_model, X_train_split, y_train_split, number_of_epochs, batch_size)
      hist_list = hist_list.append(hist_split)
 
-my_model.save("Electricity_Generation_Prediction/LSTM/SMST_No_Date.h5")
+my_model.save("Electricity_Generation_Prediction/ANN/Single_Multi_Step_Prediction/SMST_No_Date.h5")
 
 # Plot the loss per epoch.
 metric = "mean_absolute_error"
 plot_the_loss_curve(np.linspace(1,len(hist_list), len(hist_list) ), hist_list[metric], metric)
 
-#my_model = keras.models.load_model("SST_No_Trans_No_Date.h5")
+#my_model = keras.models.load_model("Electricity_Generation_Prediction/ANN/Single_Multi_Step_Prediction/SMST_No_Date.h5")
 
 ########################################################################################################################
 # Predicting the generation.
@@ -71,35 +70,40 @@ plot_the_loss_curve(np.linspace(1,len(hist_list), len(hist_list) ), hist_list[me
 pred_train = y_scaler.inverse_transform(my_model.predict(X_train))
 pred_test = y_scaler.inverse_transform(my_model.predict(X_test))
 
+X_train = x_scaler.inverse_transform(X_train)
+X_test = x_scaler.inverse_transform(X_test)
+y_train = y_scaler.inverse_transform(y_train)
+
 ########################################################################################################################
 # Data processing for plotting curves and printing the errors.
 ########################################################################################################################
 
 # Compute the error between the Actual Generation and the prediction from the NN
-
 print("-"*200)
-error_train = abs(pred_train[:,0] - y[:len(X_train),0])
-print("The mean absolute error of the training set is %0.2f" % mean_absolute_error(y_scaler.inverse_transform(y_train),result_train))
-print("The mean squared error of the training set is %0.2f" % mean_squared_error(y_scaler.inverse_transform(y_train),result_train))
-print("The root mean squared error of the training set is %0.2f" % np.sqrt(mean_squared_error(y_scaler.inverse_transform(y_train),result_train)))
-
+error_train = abs(pred_train - y_train)
+print("The mean absolute error of the train set is %0.2f" % mean_absolute_error(y_train,pred_train))
+print("The mean squared error of the train set is %0.2f" % mean_squared_error(y_train,pred_train))
+print("The root mean squared error of the train set is %0.2f" % np.sqrt(mean_squared_error(y_train,pred_train)))
 print("-"*200)
-error_test = abs(pred_test[:,0] - y[-len(X_test):,0])
-print("The mean absolute error of the training set is %0.2f" % mean_absolute_error(y_scaler.inverse_transform(y_test),result_test))
-print("The mean squared error of the training set is %0.2f" % mean_squared_error(y_scaler.inverse_transform(y_test),result_test))
-print("The root mean squared error of the training set is %0.2f" % np.sqrt(mean_squared_error(y_scaler.inverse_transform(y_test),result_test)))
+
+error_test = abs(pred_test - y_test)
+print("The mean absolute error of the test set is %0.2f" % mean_absolute_error(y_test,pred_test))
+print("The mean squared error of the test set is %0.2f" % mean_squared_error(y_test,pred_test))
+print("The root mean squared error of the test set is %0.2f" % np.sqrt(mean_squared_error(y_test,pred_test)))
 print("-"*200)
 
 ########################################################################################################################
 # Plotting curves.
 ########################################################################################################################
 
+error_test_plot = np.zeros((48*3+48*7,1))
+error_test_plot[-336:] = error_test[:48*7]
 # Plot the result with the truth in red and the predictions in blue.
 fig2, axs2=plt.subplots(2,1,figsize=(12,6))
 axs2[0].grid(True)
-axs2[0].plot(dates.iloc[-len(X_test)-48*3:-len(X_test)],y_train.iloc[-48*3:,0]/1000, label = "Training Set", alpha = 1, color = "black")
-axs2[0].plot(dates.iloc[-len(X_test):-len(X_test)+48*7], pred_test/1000, label = "LSTM Prediction", color = "orange")
-axs2[0].plot(dates.iloc[-len(X_test):-len(X_test)+48*7],y_test.iloc[:48*7,0]/1000, label = "Test Set", alpha = 1, color = "blue")
+axs2[0].plot(dates.iloc[-len(X_test)-48*3:-len(X_test)],y_train[-48*3:,0]/1000, label = "Training Set (True Values)", alpha = 1, color = "black")
+axs2[0].plot(dates.iloc[-len(X_test):-len(X_test)+48*7],pred_test[:48*7,0]/1000, label = "ANN Prediction", color = "orange")
+axs2[0].plot(dates.iloc[-len(X_test):-len(X_test)+48*7],y_test[:48*7]/1000, label = "Test Set (True Values)", alpha = 1, color = "blue")
 axs2[0].axvline(dates.iloc[-len(X_test)], linestyle="--", color = "black")
 axs2[0].set_ylabel('Load [GW]',size = 14)
 loc = plticker.MultipleLocator(base=47) # this locator puts ticks at regular intervals
@@ -107,7 +111,7 @@ axs2[0].xaxis.set_major_locator(loc)
 axs2[0].legend()
 
 axs2[1].grid(True)
-axs2[1].plot(dates.iloc[-len(X_test)-48*3:-len(X_test)+48*7],error_test/1000, label = "Error naive method", alpha = 1, color = "red")
+axs2[1].plot(dates.iloc[-len(X_test)-48*3:-len(X_test)+48*7], error_test_plot/1000, label = "Absolute Error", alpha = 1, color = "red")
 axs2[1].axvline(dates.iloc[-len(X_test)], linestyle="--", color = "black")
 axs2[1].set_xlabel('Date',size = 14)
 axs2[1].set_ylabel('Absolute Error [GW]',size = 14)
@@ -115,6 +119,10 @@ loc = plticker.MultipleLocator(base=47) # this locator puts ticks at regular int
 axs2[1].xaxis.set_major_locator(loc)
 fig2.autofmt_xdate(rotation=10)
 axs2[1].legend()
+
+axs2[1].legend(loc=(1.04,0.9))
+axs2[0].legend(loc=(1.04,0.7))
+
 fig2.show()
 
 ########################################################################################################################
@@ -122,12 +130,12 @@ fig2.show()
 ########################################################################################################################
 
 import csv
-with open('Compare_Models/SST_results/LSTM_result.csv', 'w', newline='', ) as file:
+with open('Compare_Models/Single_Multi_Step_results/ANN.csv', 'w', newline='', ) as file:
     writer = csv.writer(file)
     writer.writerow(["Method","MSE","MAE","RMSE"])
-    writer.writerow(["LSTM",
-                     str(mean_squared_error(y_scaler.inverse_transform(y_test),result_test)),
-                     str(mean_absolute_error(y_scaler.inverse_transform(y_test),result_test)),
-                     str(np.sqrt(mean_squared_error(y_scaler.inverse_transform(y_test),result_test)))
+    writer.writerow(["ANN",
+                     str(mean_squared_error(y_test,pred_test)),
+                     str(mean_absolute_error(y_test,pred_test)),
+                     str(np.sqrt(mean_squared_error(y_test,pred_test)))
                      ])
 

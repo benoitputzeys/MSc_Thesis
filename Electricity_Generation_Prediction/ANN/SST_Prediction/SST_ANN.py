@@ -35,32 +35,32 @@ y_test = y_scaler.transform(y_test)
 ########################################################################################################################
 # Create the model.
 ########################################################################################################################
-#
-## Define the hyperparameters.
-#learning_rate = 0.001
-#number_of_epochs = 50
-#batch_size = 32
-#
-## Create the model.
-#my_model = create_model(len(X_train[1]), learning_rate)
-#
-## Extract the loss per epoch to plot the learning progress.
-#
-#hist_list = pd.DataFrame()
-#
-#tscv = TimeSeriesSplit()
-#for train_index, test_index in tscv.split(X_train):
-#      X_train_split, X_test_split = X_train[train_index], X_train[test_index]
-#      y_train_split, y_test_split = y_train[train_index], y_train[test_index]
-#      hist_split = train_model(my_model, X_train_split, y_train_split, number_of_epochs, batch_size)
-#      hist_list = hist_list.append(hist_split)
-#
-## Plot the loss per epoch.
-#metric = "mean_absolute_error"
-#plot_the_loss_curve(np.linspace(1,len(hist_list), len(hist_list) ), hist_list[metric],metric)
-#my_model.save("my_model.h5")
 
-my_model = keras.models.load_model("my_model.h5")
+# Define the hyperparameters.
+learning_rate = 0.001
+number_of_epochs = 50
+batch_size = 32
+
+# Create the model.
+my_model = create_model(len(X_train[1]), learning_rate)
+
+# Extract the loss per epoch to plot the learning progress.
+
+hist_list = pd.DataFrame()
+
+tscv = TimeSeriesSplit()
+for train_index, test_index in tscv.split(X_train):
+     X_train_split, X_test_split = X_train[train_index], X_train[test_index]
+     y_train_split, y_test_split = y_train[train_index], y_train[test_index]
+     hist_split = train_model(my_model, X_train_split, y_train_split, number_of_epochs, batch_size)
+     hist_list = hist_list.append(hist_split)
+
+# Plot the loss per epoch.
+metric = "mean_absolute_error"
+plot_the_loss_curve(np.linspace(1,len(hist_list), len(hist_list) ), hist_list[metric],metric)
+
+my_model.save("Electricity_Generation_Prediction/ANN/Single_Step_Prediction/SST_ANN_model.h5")
+#my_model = keras.models.load_model("Electricity_Generation_Prediction/ANN/Single_Step_Prediction/SST_ANN_model.h5")
 
 ########################################################################################################################
 # Predicting the generation.

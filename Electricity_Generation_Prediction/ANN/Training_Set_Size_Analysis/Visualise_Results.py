@@ -1,14 +1,16 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 
-AF_ML = pd.read_csv("Electricity_Generation_Prediction/ANN/Training_Set_Size_Analysis/AF_1L.csv")
-AF_HL = pd.read_csv("Electricity_Generation_Prediction/ANN/Training_Set_Size_Analysis/AF_12L.csv")
-AF_Quarter_L = pd.read_csv("Electricity_Generation_Prediction/ANN/Training_Set_Size_Analysis/AF_14L.csv")
+# Load the results in respective variables. 12 mean 1/2 length, 14 is 1/4 length etc.
+AF_1_L = pd.read_csv("Electricity_Generation_Prediction/ANN/Training_Set_Size_Analysis/AF_1L.csv")
+AF_12_L = pd.read_csv("Electricity_Generation_Prediction/ANN/Training_Set_Size_Analysis/AF_12L.csv")
+AF_14_L = pd.read_csv("Electricity_Generation_Prediction/ANN/Training_Set_Size_Analysis/AF_14L.csv")
 AF_35_L = pd.read_csv("Electricity_Generation_Prediction/ANN/Training_Set_Size_Analysis/AF_35L.csv")
 AF_34_L = pd.read_csv("Electricity_Generation_Prediction/ANN/Training_Set_Size_Analysis/AF_34L.csv")
 AF_25_L = pd.read_csv("Electricity_Generation_Prediction/ANN/Training_Set_Size_Analysis/AF_25L.csv")
 
-frames = ([AF_ML,AF_34_L,AF_35_L, AF_HL, AF_25_L, AF_Quarter_L])
+# Load the results in a dataframe.
+frames = ([AF_1_L,AF_34_L,AF_35_L, AF_12_L, AF_25_L, AF_14_L])
 df = pd.concat(frames, axis = 0)
 
 # Create bars and choose color

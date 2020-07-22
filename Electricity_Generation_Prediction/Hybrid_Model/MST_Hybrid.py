@@ -90,28 +90,28 @@ y_train_2 = y_scaler.fit_transform(y_train_2)
 # Create the model.
 ########################################################################################################################
 
-# # Define the hyperparameters.
-# learning_rate = 0.001
-# number_of_epochs = 125
-# batch_size = 32
-#
-# # Create the model.
-# my_model = create_model(5, learning_rate)
-#
-# # Extract the loss per epoch to plot the learning progress.
-#
-# hist_list = pd.DataFrame()
-#
-# hist_split = train_model(my_model, all_predictions_train, y_train_2, number_of_epochs, batch_size)
-# hist_list = hist_list.append(hist_split)
-#
-# # Plot the loss per epoch.
-# metric = "mean_absolute_error"
-# plot_the_loss_curve(np.linspace(1,len(hist_list), len(hist_list) ), hist_list[metric], metric)
-#
-# my_model.save("my_model.h5")
+# Define the hyperparameters.
+learning_rate = 0.001
+number_of_epochs = 125
+batch_size = 32
 
-my_model = keras.models.load_model("Electricity_Generation_Prediction/Hybrid_Model/my_model.h5")
+# Create the model.
+my_model = create_model(5, learning_rate)
+
+# Extract the loss per epoch to plot the learning progress.
+
+hist_list = pd.DataFrame()
+
+hist_split = train_model(my_model, all_predictions_train, y_train_2, number_of_epochs, batch_size)
+hist_list = hist_list.append(hist_split)
+
+# Plot the loss per epoch.
+metric = "mean_absolute_error"
+plot_the_loss_curve(np.linspace(1,len(hist_list), len(hist_list) ), hist_list[metric], metric)
+
+my_model.save("Electricity_Generation_Prediction/Hybrid_Model/Hybrid_ANN.h5")
+
+#my_model = keras.models.load_model("Electricity_Generation_Prediction/Hybrid_Model/Hybrid_ANN.h5")
 
 ########################################################################################################################
 # Make predictions and compute the errors.

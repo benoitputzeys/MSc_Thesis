@@ -62,9 +62,9 @@ def train_model(model, xvalues, yvalues, epochs, batch):
 def plot_the_loss_curve(epochs, difference,string):
 
     plt.figure(1)
-    plt.xlabel("Epoch")
-    plt.ylabel(string)
-    plt.plot(epochs, difference)
+    plt.xlabel("Epoch", size = 14)
+    plt.ylabel("Mean Absolute Error", size = 14)
+    plt.plot(epochs, difference, color = "blue")
     plt.legend()
     plt.show()
 

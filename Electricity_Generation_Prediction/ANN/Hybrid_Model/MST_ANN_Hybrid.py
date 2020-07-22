@@ -61,11 +61,10 @@ for train_index, test_index in tscv.split(X_train_1):
 
 # Plot the loss per epoch.
 metric = "mean_absolute_error"
-
 plot_the_loss_curve(np.linspace(1,len(hist_list), len(hist_list) ), hist_list[metric], metric)
-my_model.save("my_model_MST_2.h5")
 
-my_model = keras.models.load_model("Electricity_Generation_Prediction/ANN/my_model_MST_2.h5")
+my_model.save("Electricity_Generation_Prediction/Hybrid/Hybrid_ANN.h5")
+##my_model = keras.models.load_model("Electricity_Generation_Prediction/Hybrid/Hybrid_ANN.h5")
 
 ########################################################################################################################
 # Predicting the generation.
@@ -103,6 +102,7 @@ print("The mean absolute error of the test set is %0.2f" % mean_absolute_error(y
 print("The mean squared error of the test set is %0.2f" % mean_squared_error(y_test,result_test))
 print("The root mean squared error of the test set is %0.2f" % np.sqrt(mean_squared_error(y_test,result_test)))
 print("-"*200)
+
 ########################################################################################################################
 # Plotting curves.
 ########################################################################################################################
@@ -195,4 +195,3 @@ with open('Compare_Models/MST2_results/ANN_result.csv', 'w', newline='',) as fil
                      str(np.sqrt(mean_squared_error(y_test,result_test)))
                      ])
 
-#my_model.save("my_model.h5")
