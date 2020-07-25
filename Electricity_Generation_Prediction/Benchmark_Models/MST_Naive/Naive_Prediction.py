@@ -21,7 +21,7 @@ fig1, axs1=plt.subplots(1,1,figsize=(12,6))
 axs1.grid(True)
 error = (X.iloc[:,0]- y.iloc[:,0])/1000
 axs1.hist(error, bins = 50, color = "blue")
-axs1.set_xlabel("Error between X and y in GW", size = 14)
+axs1.set_xlabel("Error between the prediction (X) and the true values (y) in GW", size = 14)
 axs1.set_ylabel("Count", size = 14)
 fig1.show()
 
@@ -29,18 +29,18 @@ mean = np.mean((X.iloc[:,0]- y.iloc[:,0]))
 stddev = np.std((X.iloc[:,0]- y.iloc[:,0]))
 
 # Print their mean and standard deviation
-print("The mean of the error is %.2f" %mean, "MW and the standard deviation is %.2f" % stddev,"MW." )
+print("The mean of the errors is %.2f" %mean, "MW and the standard deviation is %.2f" % stddev,"MW." )
 
 # Plot the histograms
 fig3, axs3=plt.subplots(1,2,figsize=(12,6))
 axs3[0].grid(True)
 axs3[0].hist((X_train.iloc[:,0]- y_train.iloc[:,0])/1000, bins = 30, color = "blue")
-axs3[0].set_xlabel("Error between X_train and y_train in GW", size = 14)
+axs3[0].set_xlabel("Error between the prediction (X_train)\nand the true values (y_train) in GW", size = 14)
 axs3[0].set_ylabel("Count", size = 14)
 
 axs3[1].grid(True)
 axs3[1].hist((X_test.iloc[:,0]- y_test.iloc[:,0])/1000, bins = 30, color = "blue")
-axs3[1].set_xlabel("Error between X_test and y_test in GW", size = 14)
+axs3[1].set_xlabel("Error between the prediction (X_test)\nand the true values (y_test) in GW", size = 14)
 axs3[1].set_ylabel("Count", size = 14)
 fig3.show()
 
@@ -62,17 +62,28 @@ error[-336:,0] = np.abs(X_test.iloc[:48*7,0]-y_test.iloc[:48*7,0])
 # Plot the result with the truth in red and the predictions in blue.
 fig2, axs2=plt.subplots(2,1,figsize=(12,6))
 axs2[0].grid(True)
-axs2[0].plot(dates.iloc[-len(X_test)-48*3:-len(X_test)],y_train.iloc[-48*3:,0]/1000, label = "Training Set (True Values)", alpha = 1, color = "black")
-axs2[0].plot(dates.iloc[-len(X_test):-len(X_test)+48*7], pred/1000, label = "Naive Prediction", color = "orange")
-axs2[0].fill_between(dates.iloc[-len(X_test):-len(X_test)+48*7], (pred+stddev_train)/1000, (pred-stddev_train)/1000, alpha=0.3, color = "orange", label = "+-1x Standard Deviation")
-axs2[0].plot(dates.iloc[-len(X_test):-len(X_test)+48*7],y_test.iloc[:48*7,0]/1000, label = "Test Set (True Values)", alpha = 1, color = "blue")
+axs2[0].plot(dates.iloc[-len(X_test)-48*3:-len(X_test)],
+             y_train.iloc[-48*3:,0]/1000,
+             label = "Training Set (True Values)", alpha = 1, color = "blue")
+axs2[0].plot(dates.iloc[-len(X_test):-len(X_test)+48*7],
+             pred/1000,
+             label = "Naive Prediction", color = "orange")
+axs2[0].fill_between(dates.iloc[-len(X_test):-len(X_test)+48*7],
+                     (pred+stddev_train)/1000,
+                     (pred-stddev_train)/1000,
+                     alpha=0.3, color = "orange", label = "+-1x Standard Deviation")
+axs2[0].plot(dates.iloc[-len(X_test):-len(X_test)+48*7],
+             y_test.iloc[:48*7,0]/1000,
+             label = "Test Set (True Values)", alpha = 1, color = "black")
 axs2[0].axvline(dates.iloc[-len(X_test)], linestyle="--", color = "black")
 axs2[0].set_ylabel('Load [GW]',size = 14)
 loc = plticker.MultipleLocator(base=47) # this locator puts ticks at regular intervals
 axs2[0].xaxis.set_major_locator(loc)
 
 axs2[1].grid(True)
-axs2[1].plot(dates.iloc[-len(X_test)-48*3:-len(X_test)+48*7],error/1000, label = "Absolute Error", alpha = 1, color = "red")
+axs2[1].plot(dates.iloc[-len(X_test)-48*3:-len(X_test)+48*7],
+             error/1000,
+             label = "Absolute Error", alpha = 1, color = "red")
 axs2[1].axvline(dates.iloc[-len(X_test)], linestyle="--", color = "black")
 axs2[1].set_xlabel('Date',size = 14)
 axs2[1].set_ylabel('Absolute Error [GW]',size = 14)

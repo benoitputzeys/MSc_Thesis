@@ -6,7 +6,10 @@ import matplotlib.ticker as plticker
 
 # Read the processed data.
 y = pd.read_csv('Data_Preprocessing/For_Multi_Step_Prediction/y.csv')
+y = y.set_index("Time")
+
 X = pd.read_csv('Data_Preprocessing/For_Multi_Step_Prediction/X.csv')
+X = X.set_index("Time")
 dates = X.iloc[:,-1]
 series = y.iloc[:,-1]/1000
 
@@ -155,50 +158,71 @@ axs2[2].grid(True)
 fig2.autofmt_xdate(rotation = 15)
 fig2.show()
 
-X = pd.read_csv('Data_Preprocessing/For_Multi_Step_Prediction/X.csv', delimiter=',')
 settlement_period = X["Settlement Period"]+(48*X["Day of Week"])
 
 # Create a dataframe that contains the correct indices (1-336) and the load values.
 modified_recons = pd.DataFrame({'SP':settlement_period, 'Load':modified_recons.values})
 
 # Plot the projected loads onto a single week to see the variation in the timeseries.
-fig3, axs3=plt.subplots(1,1,figsize=(12,6))
-axs3.scatter(modified_recons["SP"], modified_recons["Load"], alpha=0.05, label = "Projected Loads", color = "blue")
+fig3, axs3=plt.subplots(2,1,figsize=(12,10))
+axs3[0].plot(dates.iloc[-48*7*4:-48*7+1],
+             modified_recons.iloc[-48*7*4:-48*7+1,-1],
+             label = "True Values", alpha = 1, color = "blue")
+axs3[0].set_ylabel('Load [GW]',size = 14)
+axs3[0].set_xlabel('Date',size = 14)
+loc = plticker.MultipleLocator(base=48*7) # Puts ticks at regular intervals
+axs3[0].xaxis.set_major_locator(loc)
+axs3[0].grid(True)
+axs3[0].legend()
+
+axs3[1].scatter(modified_recons["SP"], modified_recons["Load"], alpha=0.05, label = "Projected Loads", color = "blue")
 #axs3.plot(settlement_period[-48*7:], series[-48*7:]/1000, color = "red", label = "Load from week in question")
-axs3.set_ylabel("Load [GW]", size = 14)
-axs3.set_xlabel("Settlement Period", size = 14)
-axs3.grid(True)
-axs3.legend()
+axs3[1].set_ylabel("Load [GW]", size = 14)
+axs3[1].set_xlabel("Settlement Period / Weekday", size = 14)
+axs3[1].grid(True)
+loc = plticker.MultipleLocator(base=48) # Puts ticks at regular intervals
+plt.xticks(np.arange(1,385, 48), ["1 / Monday", "49 / Tuesday", "97 / Wednesday", "145 / Thursday", "193 / Friday", "241 / Saturday", "289 / Sunday",""])
+axs3[1].legend()
 fig3.show()
 
 # Compute the mean and variation for each x.
 df_stats = pd.DataFrame({'Index':np.linspace(1,336,336), 'Mean':np.linspace(1,336,336), 'Stddev':np.linspace(1,336,336)})
 
-for i in range(337):
+for i in range(1,337):
     df_stats.iloc[i-1,1]=np.mean(modified_recons[modified_recons["SP"]==i].iloc[:,-1])
     df_stats.iloc[i-1,2]=np.std(modified_recons[modified_recons["SP"]==i].iloc[:,-1])
 
 # Plot the mean and variation for each x.
 fig4, axs4=plt.subplots(1,1,figsize=(12,6))
 axs4.plot(df_stats.iloc[:,0], df_stats.iloc[:,1], color = "blue", label = "Mean of all projected loads")
-axs4.fill_between(df_stats.iloc[:,0],  (df_stats.iloc[:,1]-df_stats.iloc[:,2]),  (df_stats.iloc[:,1]+df_stats.iloc[:,2]),alpha=0.2, color = "blue", label = "Stddev")
+axs4.fill_between(df_stats.iloc[:,0],
+                  (df_stats.iloc[:,1]-df_stats.iloc[:,2]),
+                  (df_stats.iloc[:,1]+df_stats.iloc[:,2]),
+                  alpha=0.2, color = "blue", label = "+- 1 x Standard Deviation")
 axs4.set_ylabel("Load [GW]", size = 14)
-axs4.set_xlabel("Settlement Period", size = 14)
+axs4.set_xlabel("Settlement Period / Weekday", size = 14)
+loc = plticker.MultipleLocator(base=48) # Puts ticks at regular intervals
+plt.xticks(np.arange(1,385, 48), ["1 / Monday", "49 / Tuesday", "97 / Wednesday", "145 / Thursday", "193 / Friday", "241 / Saturday", "289 / Sunday",""])
 axs4.legend()
 axs4.grid(True)
 fig4.show()
 
 # Use the "template" above and add the mean of the week in question to it.
 fig5, axs5=plt.subplots(1,1,figsize=(12,6))
-axs5.plot(settlement_period[-336:], (df_stats.iloc[:,1]+mean_each_week.iloc[-336:].values), color = "blue", label = "Mean of all projected loads")
-axs5.plot(settlement_period[-336:], series[-48*7:], color = "red", label = "Actual Load of most recent week")
+axs5.plot(settlement_period[-336:],
+          (df_stats.iloc[:,1]+mean_each_week.iloc[-336:].values),
+          color = "blue", label = "Mean of all projected past loads")
+axs5.plot(series[-48*7-1:], color = "black", label = "Actual Load")
 axs5.fill_between(df_stats.iloc[:,0],
                   ((df_stats.iloc[:,1]-df_stats.iloc[:,2])+mean_each_week.iloc[-336:].values),
                   ((df_stats.iloc[:,1]+df_stats.iloc[:,2])+mean_each_week.iloc[-336:].values),
-                  alpha=0.2, color = "blue", label = "Stddev")
+                  alpha=0.2, color = "blue", label = "+- 1x Standard Deviation")
 axs5.set_ylabel("Load [GW]", size = 14)
-axs5.set_xlabel("Settlement Period", size = 14)
+axs5.set_xlabel("Date", size = 14)
+loc = plticker.MultipleLocator(base=48) # this locator puts ticks at regular intervals
+axs5.xaxis.set_major_locator(loc)
 axs5.legend()
+fig5.autofmt_xdate(rotation = 8)
 axs5.grid(True)
 fig5.show()
 
@@ -207,11 +231,11 @@ fig5.show()
 fig6, axs6=plt.subplots(1,1,figsize=(12,6))
 axs6.plot(df_stats.iloc[:,0], df_stats.iloc[:,1], color = "blue", label = "Mean of all projected loads")
 axs6.fill_between(df_stats.iloc[:,0],  (df_stats.iloc[:,1]-df_stats.iloc[:,2]),  (df_stats.iloc[:,1]+df_stats.iloc[:,2]),alpha=0.2, color = "blue", label = "Stddev")
-axs6.axvline(df_stats.iloc[120,0], linestyle="--", color = "green", label = "Example 1", linewidth = 2)
-axs6.axvline(df_stats.iloc[235,0], linestyle="--", color = "orange", label = "Example 2", linewidth = 2)
+axs6.axvline(df_stats.iloc[120,0], linestyle="--", color = "green", label = "Example 1 @ SP 120", linewidth = 2)
+axs6.axvline(df_stats.iloc[235,0], linestyle="--", color = "orange", label = "Example 2 @ SP 235", linewidth = 2)
 axs6.set_ylabel("Load [GW]", size = 14)
-axs6.set_xlabel("Settlement Period", size = 14)
-axs6.set_xticks([0,50,100,120,150,200,235,250,300,350])
+axs6.set_xlabel("Settlement Period / Weekday", size = 14)
+plt.xticks(np.arange(1,385, 48), ["1 / Monday", "49 / Tuesday", "97 / Wednesday", "145 / Thursday", "193 / Friday","241 / Saturday", "289 / Sunday",""])
 axs6.legend()
 axs6.grid(True)
 fig6.show()

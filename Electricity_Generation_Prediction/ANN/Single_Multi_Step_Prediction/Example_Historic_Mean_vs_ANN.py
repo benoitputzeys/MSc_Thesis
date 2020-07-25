@@ -57,22 +57,24 @@ for i in range(337):
 ANN_pred = pd.read_csv('Electricity_Generation_Prediction/ANN/Single_Multi_Step_Prediction/Pred_Test.csv')
 ANN_pred = ANN_pred/1000
 
-fig1, axs1=plt.subplots(2,1,figsize=(12,6))
-axs1[0].plot(dates[-15619:-15283], series[-15619:-15283], color = "blue", label = "Actual Load (True Values)")
-axs1[0].plot(dates[-15619:-15283], ANN_pred[:336], color = "orange", label = "ANN Pred")
-axs1[0].plot(dates[-15619:-15456], (df_stats.iloc[173:,1]+mean_each_week.iloc[-15619:-15456].values), color = "black", label = "Mean of past loads")
-axs1[0].plot(dates[-15456:-15283], (df_stats.iloc[:173,1]+mean_each_week.iloc[-15456:-15283].values), color = "black")
+fig1, axs1=plt.subplots(2,1,figsize=(12,8))
+axs1[0].plot(dates[-15619:-15283], series[-15619:-15283], color = "black", label = "Actual Load (True Values)")
+axs1[0].plot(dates[-15619:-15283], ANN_pred[:336], color = "orange", label = "ANN Prediction")
+axs1[0].plot(dates[-15619:-15456], (df_stats.iloc[173:,1]+mean_each_week.iloc[-15619:-15456].values), color = "blue", label = "Mean of past loads")
+axs1[0].plot(dates[-15456:-15283], (df_stats.iloc[:173,1]+mean_each_week.iloc[-15456:-15283].values), color = "blue")
 axs1[0].fill_between(dates[-15619:-15456],
                   ((df_stats.iloc[173:,1]-df_stats.iloc[173:,2])+mean_each_week.iloc[-15619:-15456].values),
                   ((df_stats.iloc[173:,1]+df_stats.iloc[173:,2])+mean_each_week.iloc[-15619:-15456].values),
-                  alpha=0.2, color = "black")
+                  alpha=0.2, color = "blue")
 axs1[0].fill_between(dates[-15456:-15283],
                   ((df_stats.iloc[:173,1]-df_stats.iloc[:173,2])+mean_each_week.iloc[-15456:-15283].values),
                   ((df_stats.iloc[:173,1]+df_stats.iloc[:173,2])+mean_each_week.iloc[-15456:-15283].values),
-                  alpha=0.2, color = "black", label = "+- 1x Stddev")
+                  alpha=0.2, color = "blue", label = "+- 1x Standard Deviation")
 axs1[0].set_ylabel("Load [GW]", size = 14)
 
-axs1[1].plot(dates[-15619:-15283], abs(ANN_pred.iloc[:336,0].values-series.iloc[-15619:-15283].values), label = "Absolute Error", alpha = 1, color = "red")
+axs1[1].plot(dates[-15619:-15283],
+             abs(ANN_pred.iloc[:336,0].values-series.iloc[-15619:-15283].values),
+             label = "Absolute Error", alpha = 1, color = "red")
 axs1[1].set_xlabel('Date',size = 14)
 axs1[1].set_ylabel('Absolute Error [GW]',size = 14)
 
@@ -82,7 +84,7 @@ axs1[0].xaxis.set_major_locator(loc)
 fig1.autofmt_xdate(rotation=10)
 
 axs1[1].legend(loc=(1.04,0.9))
-axs1[0].legend(loc=(1.04,0.6))
+axs1[0].legend(loc=(1.04,0.7))
 
 axs1[0].grid(True)
 axs1[1].grid(True)
@@ -91,17 +93,17 @@ fig1.show()
 
 # For more clarity, only show the first week in the test set with the historic mean and stddec.
 fig2, axs2=plt.subplots(1,1,figsize=(12,6))
-axs2.plot(dates[-15619:-15283], series[-15619:-15283], color = "blue", label = "Test Set (True Values)")
-axs2.plot(dates[-15619:-15456], (df_stats.iloc[173:,1]+mean_each_week.iloc[-15619:-15456].values), color = "black", label = "Mean of past loads")
-axs2.plot(dates[-15456:-15283], (df_stats.iloc[:173,1]+mean_each_week.iloc[-15456:-15283].values), color = "black")
+axs2.plot(dates[-15619:-15283], series[-15619:-15283], color = "black", label = "Test Set (True Values)")
+axs2.plot(dates[-15619:-15456], (df_stats.iloc[173:,1]+mean_each_week.iloc[-15619:-15456].values), color = "blue", label = "Mean of past loads")
+axs2.plot(dates[-15456:-15283], (df_stats.iloc[:173,1]+mean_each_week.iloc[-15456:-15283].values), color = "blue")
 axs2.fill_between(dates[-15619:-15456],
                   ((df_stats.iloc[173:,1]-df_stats.iloc[173:,2])+mean_each_week.iloc[-15619:-15456].values),
                   ((df_stats.iloc[173:,1]+df_stats.iloc[173:,2])+mean_each_week.iloc[-15619:-15456].values),
-                  alpha=0.2, color = "black")
+                  alpha=0.2, color = "blue")
 axs2.fill_between(dates[-15456:-15283],
                   ((df_stats.iloc[:173,1]-df_stats.iloc[:173,2])+mean_each_week.iloc[-15456:-15283].values),
                   ((df_stats.iloc[:173,1]+df_stats.iloc[:173,2])+mean_each_week.iloc[-15456:-15283].values),
-                  alpha=0.2, color = "black", label = "+- 1x Stddev")
+                  alpha=0.2, color = "blue", label = "+- 1x Standard Deviation")
 axs2.set_ylabel("Load [GW]", size = 14)
 axs2.set_xlabel("Date", size = 14)
 
