@@ -83,16 +83,24 @@ error_test_plot[-336:] = error_test[:48*7]
 # Plot the result with the truth in red and the predictions in blue.
 fig2, axs2=plt.subplots(2,1,figsize=(12,6))
 axs2[0].grid(True)
-axs2[0].plot(dates.iloc[-len(X_test)-48*3:-len(X_test)],y_train[-48*3:,0]/1000, label = "Training Set (True Values)", alpha = 1, color = "black")
-axs2[0].plot(dates.iloc[-len(X_test):-len(X_test)+48*7],pred_test[:48*7]/1000, label = "Decision Tree Pred.", color = "orange")
-axs2[0].plot(dates.iloc[-len(X_test):-len(X_test)+48*7],y_test[:48*7]/1000, label = "Test Set (True Values)", alpha = 1, color = "blue")
+axs2[0].plot(dates.iloc[-len(X_test)-48*3:-len(X_test)],
+             y_train[-48*3:,0]/1000,
+             label = "Training Set (True Values)", alpha = 1, color = "blue")
+axs2[0].plot(dates.iloc[-len(X_test):-len(X_test)+48*7],
+             pred_test[:48*7]/1000,
+             label = "Decision Tree Pred.", color = "orange")
+axs2[0].plot(dates.iloc[-len(X_test):-len(X_test)+48*7],
+             y_test[:48*7]/1000,
+             label = "Test Set (True Values)", alpha = 1, color = "black")
 axs2[0].axvline(dates.iloc[-len(X_test)], linestyle="--", color = "black")
 axs2[0].set_ylabel('Load [GW]',size = 14)
 loc = plticker.MultipleLocator(base=47) # this locator puts ticks at regular intervals
 axs2[0].xaxis.set_major_locator(loc)
 
 axs2[1].grid(True)
-axs2[1].plot(dates.iloc[-len(X_test)-48*3:-len(X_test)+48*7], error_test_plot/1000, label = "Absolute error", alpha = 1, color = "red")
+axs2[1].plot(dates.iloc[-len(X_test)-48*3:-len(X_test)+48*7],
+             error_test_plot/1000,
+             label = "Absolute error", alpha = 1, color = "red")
 axs2[1].axvline(dates.iloc[-len(X_test)], linestyle="--", color = "black")
 axs2[1].set_xlabel('Date',size = 14)
 axs2[1].set_ylabel('Absolute Error [GW]',size = 14)
