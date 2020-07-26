@@ -50,8 +50,10 @@ model.fit(X_train,y_train, epochs=epochs, batch_size=batches, verbose=2)
 model.summary()
 
 # Plot the learning progress.
-fig1, axs1=plt.subplots(1,1,figsize=(6,6))
-axs1.plot(model.history.history["mean_absolute_error"][1000:], color = "blue")
+fig1, axs1=plt.subplots(1,1,figsize=(4,6))
+axs1.plot(model.history.history["mean_absolute_error"], color = "blue")
+axs1.set_ylabel('Loss')
+axs1.set_xlabel('Epochs')
 fig1.show()
 
 # Save or load the model
@@ -85,7 +87,6 @@ y_test = np.array(y_test.iloc[:,-1]/1000).reshape(-1,)
 # Data processing for plotting curves and printing the errors.
 ########################################################################################################################
 
-
 # Calculate the stddev from the 350 predictions.
 mean_train = (sum(predictions_train)/350).reshape(-1,1)
 stddev_train = np.zeros((len(mean_train),1))
@@ -112,7 +113,7 @@ axs2[0].fill_between(dates.iloc[-len(X_test)-48*7*2:-len(X_test)-48*7+1],
                   (mean_train - stddev_train)[-48*7*2:-48*7+1].reshape(-1,),
                   label = "+- 1x Standard Deviation",
                   alpha=0.2, color = "orange")
-axs2[0].set_ylabel('Load [GW]')
+axs2[0].set_ylabel('Load [GW]', size = 14)
 
 axs2[1].plot(dates.iloc[-len(X_test)-48*7*2:-len(X_test)-48*7+1],
              error_train_plot,
@@ -161,7 +162,7 @@ axs3[0].fill_between(dates.iloc[-len(X_test):-len(X_test)+48*7+1],
 axs3[0].plot(dates.iloc[-len(X_test):-len(X_test)+48*7+1],
           y_test[:48*7+1],
           label = "Test Set (True Values)", color = "black")
-axs3[0].set_ylabel('Load [GW]')
+axs3[0].set_ylabel('Load [GW]', size = 14)
 axs3[0].axvline(dates.iloc[-len(X_test)], linestyle="--", color = "black")
 
 axs3[1].plot(dates.iloc[-len(X_test)-48*3:-len(X_test)+48*7+1],
@@ -257,20 +258,20 @@ stats.to_csv("TF_Probability/Results/NN_prediction.csv", index = False)
 ########################################################################################################################
 
 settlement_period_train = X["Settlement Period"][-len(X_test)-len(X_train):-len(X_test)].values+(48*DoW[-len(X_test)-len(X_train):-len(X_test)]).values
-long_column = np.array([settlement_period_train]).reshape(-1,)
+long_column = np.array([settlement_period_train]*350).reshape(-1,)
 # Create a dataframe that contains the SPs (1-336) and the load values.
 error_train = pd.DataFrame({'SP':long_column, 'Error_Train': error_column_train[:len(long_column)]})
 
 # Plot the projected errors onto a single week to see the variation in the timeseries.
-fig3, axs3=plt.subplots(1,1,figsize=(12,6))
-axs3.scatter(error_train["SP"],
+fig4, axs4=plt.subplots(2,1,figsize=(12,10))
+axs4[0].scatter(error_train["SP"],
              error_train["Error_Train"],
              alpha=0.05, label = "Projected Errors (Training Set)", color = "red")
-axs3.set_ylabel("Error during training [GW]", size = 14)
-axs3.set_xlabel("Settlement Period", size = 14)
-axs3.grid(True)
-axs3.legend()
-fig3.show()
+axs4[0].set_ylabel("Error during training [GW]", size = 14)
+axs4[0].set_xticks(np.arange(1,385, 48))
+axs4[0].set_xticklabels(["1 / Monday", "49 / Tuesday", "97 / Wednesday", "145 / Thursday", "193 / Friday","241 / Saturday", "289 / Sunday",""])
+axs4[0].grid(True)
+axs4[0].legend()
 
 # Compute the mean and variation for each x.
 training_stats = pd.DataFrame({'Index':np.linspace(1,336,336),
@@ -282,20 +283,19 @@ for i in range(1,337):
     training_stats.iloc[i-1,2]=np.std(error_train[error_train["SP"]==i].iloc[:,-1])
 
 # Plot the mean and standard deviation of the errors that are made on the training set.
-fig4, axs4=plt.subplots(1,1,figsize=(12,6))
-axs4.plot(training_stats.iloc[:,0],
+axs4[1].plot(training_stats.iloc[:,0],
           training_stats.iloc[:,1],
           color = "orange", label = "Mean of all projected errors  (Training Set)")
-axs4.fill_between(training_stats.iloc[:,0],
+axs4[1].fill_between(training_stats.iloc[:,0],
                   (training_stats.iloc[:,1]-training_stats.iloc[:,2]),
                   (training_stats.iloc[:,1]+training_stats.iloc[:,2]),
                   alpha=0.2, color = "orange", label = "+- 1x Standard Deviation")
-axs4.set_ylabel("Error during training [GW]", size = 14)
-axs4.set_xlabel("Settlement Period / Weekday", size = 14)
-loc = plticker.MultipleLocator(base=47) # Puts ticks at regular intervals
-plt.xticks(np.arange(1,385, 48), ["1 / Monday", "49 / Tuesday", "97 / Wednesday", "145 / Thursday", "193 / Friday","241 / Saturday", "289 / Sunday",""])
-axs4.legend()
-axs4.grid(True)
+axs4[1].set_ylabel("Error during training [GW]", size = 14)
+axs4[1].set_xlabel("Settlement Period / Weekday", size = 14)
+axs4[1].set_xticks(np.arange(1,385, 48))
+axs4[1].set_xticklabels(["1 / Monday", "49 / Tuesday", "97 / Wednesday", "145 / Thursday", "193 / Friday","241 / Saturday", "289 / Sunday",""])
+axs4[1].legend()
+axs4[1].grid(True)
 fig4.show()
 
 ########################################################################################################################
@@ -305,18 +305,18 @@ fig4.show()
 settlement_period_test = X["Settlement Period"][-len(X_test):].values+(48*DoW[-len(X_test):]).values
 long_column = np.array([settlement_period_test]*350).reshape(-1,)
 # Create a dataframe that contains the SPs (1-336) and the load values.
-error_test = pd.DataFrame({'SP':long_column, 'Error_Test': error_column_test})
+error_test = pd.DataFrame({'SP':long_column, 'Error_Test': error_column_test[:len(long_column)]})
 
 # Plot the projected errors onto a single week to see the variation in the timeseries.
-fig3, axs3=plt.subplots(1,1,figsize=(12,6))
-axs3.scatter(error_test["SP"],
+fig5, axs5=plt.subplots(2,1,figsize=(12,10))
+axs5[0].scatter(error_test["SP"],
              error_test["Error_Test"],
              alpha=0.05, label = "Projected Errors (Test Set)", color = "red")
-axs3.set_ylabel("Error during test [GW]", size = 14)
-axs3.set_xlabel("Settlement Period", size = 14)
-axs3.grid(True)
-axs3.legend()
-fig3.show()
+axs5[0].set_ylabel("Error during test [GW]", size = 14)
+axs5[0].set_xticks(np.arange(1,385, 48))
+axs5[0].set_xticklabels(["1 / Monday", "49 / Tuesday", "97 / Wednesday", "145 / Thursday", "193 / Friday","241 / Saturday", "289 / Sunday",""])
+axs5[0].grid(True)
+axs5[0].legend()
 
 # Compute the mean and variation for each x.
 test_stats = pd.DataFrame({'Index':np.linspace(1,336,336),
@@ -328,18 +328,17 @@ for i in range(1,337):
     test_stats.iloc[i-1,2]=np.std(error_test[error_test["SP"]==i].iloc[:,-1])
 
 # Plot the mean and standard deviation of the errors that are made on the test set.
-fig4, axs4=plt.subplots(1,1,figsize=(12,6))
-axs4.plot(test_stats.iloc[:,0],
+axs5[1].plot(test_stats.iloc[:,0],
           test_stats.iloc[:,1],
           color = "orange", label = "Mean of all projected errors (Test Set)")
-axs4.fill_between(test_stats.iloc[:,0],
+axs5[1].fill_between(test_stats.iloc[:,0],
                   (test_stats.iloc[:,1]-test_stats.iloc[:,2]),
                   (test_stats.iloc[:,1]+test_stats.iloc[:,2]),
                   alpha=0.2, color = "orange", label = "+- 1x Standard Deviation")
-axs4.set_ylabel("Error during test [GW]", size = 14)
-axs4.set_xlabel("Settlement Period / Weekday", size = 14)
-loc = plticker.MultipleLocator(base=47) # Puts ticks at regular intervals
-plt.xticks(np.arange(1,385, 48), ["1 / Monday", "49 / Tuesday", "97 / Wednesday", "145 / Thursday", "193 / Friday","241 / Saturday", "289 / Sunday",""])
-axs4.legend()
-axs4.grid(True)
-fig4.show()
+axs5[1].set_ylabel("Error during test [GW]", size = 14)
+axs5[1].set_xlabel("Settlement Period / Weekday", size = 14)
+axs5[1].set_xticks(np.arange(1,385, 48))
+axs5[1].set_xticklabels(["1 / Monday", "49 / Tuesday", "97 / Wednesday", "145 / Thursday", "193 / Friday","241 / Saturday", "289 / Sunday",""])
+axs5[1].legend()
+axs5[1].grid(True)
+fig5.show()

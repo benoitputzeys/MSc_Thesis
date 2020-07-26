@@ -41,32 +41,39 @@ def plot_components(dates,
   fig.tight_layout()
   return fig, axes_dict
 
+# Get the X (containing the features) and y (containing the labels) values
 X = pd.read_csv('Data_Preprocessing/For_Multi_Step_Prediction/X.csv', delimiter=',')
-X = X.iloc[8760:69277:,-1]
+DoW = X["Day of Week"]
+X = X.set_index("Time")
+dates = X.iloc[:,-1]
+X = X.iloc[:,:-5]
 
 y = pd.read_csv('Data_Preprocessing/For_Multi_Step_Prediction/y.csv', delimiter=',')
-dates = y.iloc[8760:69277,1]
-y = y.iloc[8760:69277:,-1]
+y = y.set_index("Time")
 
 # Split data into train set and test set.
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=1, shuffle = False)
-dates_train = dates[:len(y_train)]
-dates_test = dates[len(y_train):]
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state = 0, shuffle = False)
 
-y_train = y_train.iloc[-48*50:]
-y_test = y_test.iloc[:48*7]
+X_train = X_train[int(len(X_train)*1/2):]
+y_train = y_train[int(len(y_train)*1/2):]
+dates = dates[-len(X_train)-len(X_test):]
+dates_train = dates[:len(X_train)]
+dates_test = dates[-len(X_test):]
 
-num_forecast_steps = 48 * 7
+#Plot the training set
 fig1, axs1=plt.subplots(1,1,figsize=(12,6))
-axs1.plot(dates_train[-48*50:], y_train, label="training data", color = "blue", linewidth = 0.5)
+axs1.plot(dates_train,
+          y_train,
+          label="training data", color = "blue", linewidth = 0.5)
 axs1.set_ylabel("Load [MW]")
 axs1.set_xlabel("Settlement Periods")
-loc = plticker.MultipleLocator(base=48*5-1) # this locator puts ticks at regular intervals
+loc = plticker.MultipleLocator(base=48*70) # this locator puts ticks at regular intervals
 axs1.xaxis.set_major_locator(loc)
 axs1.grid(True)
 fig1.autofmt_xdate(rotation = 12)
 fig1.show()
 
+#Decompose the data into daily and seasonal components
 #Does not really have an upwards trend.
 #trend = sts.LocalLinearTrend(observed_time_series=observed_time_series)
 seasonal_day = tfp.sts.Seasonal(
@@ -122,6 +129,9 @@ for param in load_model.parameters:
                               np.mean(q_samples_load_[param.name], axis=0),
                               np.std(q_samples_load_[param.name], axis=0)))
 
+#Forecast 1 week in advance.
+num_forecast_steps = 48 * 7
+
 load_forecast_dist = tfp.sts.forecast(
       load_model,
       observed_time_series=y_train,
@@ -141,10 +151,18 @@ load_forecast_scale =  load_forecast_dist.stddev().numpy().reshape(-1,)
 
 # Plot the actual values, the forecast and the standard deviation.
 fig2, axs2=plt.subplots(1,1,figsize=(12,6))
-axs2.plot(dates_train[-48*3:], y_train[-48 * 3:]/1000, color="black", label='Training Set')
-axs2.plot(dates_test[:48*7], y_test/1000, color="red", label = "Test Set")
-axs2.plot(dates_test[:48*7], load_forecast_mean/1000, color="blue",label='Forecast with 2x standard deviation')
-axs2.fill_between(dates_test[:48*7],(load_forecast_mean-2*load_forecast_scale)/1000,(load_forecast_mean+2*load_forecast_scale)/1000, color="blue", alpha=0.2)
+axs2.plot(dates_train[-48*3:],
+          y_train[-48 * 3:]/1000,
+          color="blue", label='Training Set')
+axs2.plot(dates_test[:48*7],
+          y_test/1000,
+          color="red", label = "Test Set")
+axs2.plot(dates_test[:48*7],
+          load_forecast_mean/1000,
+          color="blue",label='Forecast with 2x standard deviation')
+axs2.fill_between(dates_test[:48*7],
+                  (load_forecast_mean-load_forecast_scale)/1000,
+                  (load_forecast_mean+load_forecast_scale)/1000, color="blue", alpha=0.2)
 axs2.axvline(dates_test[0], linestyle="--", color = "black")
 axs2.set_xlabel("Settelement Periods",size = 14)
 axs2.set_ylabel("Load [GW]",size = 14)
