@@ -24,10 +24,10 @@ y = y.set_index("Time")
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state = 0, shuffle = False)
 
 X_train = X_train[int(len(X_train)*1/2):]
-X_test = X_test[:int(len(X_train)*1/2)]
+X_test = X_test[:int(len(X_test)*1/2)]
 y_train = y_train[int(len(y_train)*1/2):]
-y_test = y_test[:int(len(y_train)*1/2)]
-dates = dates[-len(X_train)-len(X_test)*2:-len(X_test)]
+y_test = y_test[:int(len(y_test)*1/2)]
+dates = dates[-len(X_test)-len(X_test)*2:-len(X_test)]
 
 # Feature Scaling
 x_scaler = StandardScaler()
@@ -88,13 +88,13 @@ y_test = np.array(y_test.iloc[:,-1]/1000).reshape(-1,)
 
 # Compute the error between the Actual Generation and the prediction from the NN
 print("-"*200)
-error_train = abs(pred_train - y_train)
+error_train = pred_train - y_train
 print("The mean absolute error of the train set is %0.2f" % mean_absolute_error(y_train,pred_train))
 print("The mean squared error of the train set is %0.2f" % mean_squared_error(y_train,pred_train))
 print("The root mean squared error of the train set is %0.2f" % np.sqrt(mean_squared_error(y_train,pred_train)))
 print("-"*200)
 
-error_test = abs(pred_test - y_test)
+error_test = pred_test - y_test
 print("The mean absolute error of the test set is %0.2f" % mean_absolute_error(y_test,pred_test))
 print("The mean squared error of the test set is %0.2f" % mean_squared_error(y_test,pred_test))
 print("The root mean squared error of the test set is %0.2f" % np.sqrt(mean_squared_error(y_test,pred_test)))
@@ -122,10 +122,10 @@ axs2[0].set_ylabel('Load [GW]',size = 14)
 
 axs2[1].plot(dates.iloc[-len(X_test)-48*3:-len(X_test)+48*7],
              error_test_plot,
-             label = "Absolute Error", alpha = 1, color = "red")
+             label = "Error", alpha = 1, color = "red")
 axs2[1].axvline(dates.iloc[-len(X_test)], linestyle="--", color = "black")
 axs2[1].set_xlabel('Date',size = 14)
-axs2[1].set_ylabel('Absolute Error [GW]',size = 14)
+axs2[1].set_ylabel('Error [GW]',size = 14)
 
 # Include additional details such as tick intervals, rotation, legend positioning and grid on.
 axs2[1].legend(loc=(1.04,0.9))
@@ -218,11 +218,11 @@ axs5[0].set_ylabel('Load [GW]',size = 14)
 # Second plot contains the errors.
 axs5[1].plot(dates.iloc[-len(X_test)-48*3:-len(X_test)+48*7],
              error_test_plot,
-             label = "Absolute error", alpha = 1, color = "red")
+             label = "Error", alpha = 1, color = "red")
 axs5[1].axvline(dates.iloc[-len(X_test)],
                 linestyle="--", color = "black")
 axs5[1].set_xlabel('Date',size = 14)
-axs5[1].set_ylabel('Absolute Error [GW]',size = 14)
+axs5[1].set_ylabel('Error [GW]',size = 14)
 
 # Include additional details such as tick intervals, rotation, legend positioning and grid on.
 axs5[1].grid(True)
@@ -238,20 +238,21 @@ fig5.show()
 # Prediction on training set.
 fig6, axs6=plt.subplots(3,1,figsize=(12,10))
 # First plot contains the prediction, the true values from the test and training set and the standard deviation.
-axs6[0].plot(dates.iloc[-len(X_test)-len(X_train)+154:-len(X_test)-len(X_train)+48*7*3+154+1],
+axs6[0].plot(dates_train[154:48*7*3+154+1],
              y_train[154:48*7*3+154+1],linewidth = 0.5,
-             label = "Training Set (True Values)", alpha = 1, color = "blue")
-axs6[0].plot(dates.iloc[-len(X_test)-len(X_train)+154:-len(X_test)-len(X_train)+48*7*3+154+1],
+             label = "Training Set \n(True Values)", alpha = 1, color = "blue")
+axs6[0].plot(dates_train[154:48*7*3+154+1],
              pred_train[154:48*7*3+154+1], linewidth = 0.5,
              label = "LSTM Pred.", color = "orange")
 axs6[0].set_ylabel('Load [GW]',size = 11)
+axs6[0].set_xlabel('Date',size = 14)
 
 # Second plot contains the errors.
-axs6[1].plot(dates.iloc[-len(X_test)-len(X_train)+154:-len(X_test)-len(X_train)+48*7*3+154+1],
+axs6[1].plot(dates_train[154:48*7*3+154+1],
              error_train.iloc[154:48*7*3+154+1,-1],linewidth = 0.5,
-             label = "Absolute error", alpha = 1, color = "red")
+             label = "Error", alpha = 1, color = "red")
 axs6[1].set_xlabel('Date',size = 14)
-axs6[1].set_ylabel('Absolute Error [GW]',size = 11)
+axs6[1].set_ylabel('Error [GW]',size = 11)
 loc1 = plticker.MultipleLocator(base=48*7) # this locator puts ticks at regular intervals
 axs6[0].xaxis.set_major_locator(loc1)
 axs6[1].xaxis.set_major_locator(loc1)
@@ -261,7 +262,9 @@ axs6[2].scatter(error_train["SP"],
              error_train["Error_Train"],linewidth = 0.01,
              alpha=0.05, label = "Projected Errors", color = "red")
 axs6[2].set_ylabel("Error during training [GW]", size = 11)
-axs6[2].set_xlabel("Settlement Period", size = 14)
+axs6[2].set_xticks(np.arange(1,385, 48))
+axs6[2].set_xticklabels(["","1 / Monday", "49 / Tuesday", "97 / Wednesday", "145 / Thursday", "193 / Friday","241 / Saturday", "289 / Sunday",""])
+axs6[2].set_xlabel("Settlement Period / Weekday", size = 14)
 
 # Include additional details such as tick intervals, rotation, legend positioning and grid on.
 axs6[2].grid(True)
@@ -290,7 +293,7 @@ with open('Compare_Models/Single_Multi_Step_results/LSTM.csv', 'w', newline='', 
                      ])
 
 import csv
-with open('Compare_Models/SMST_Probability_results/Probability_Based_on_Model/LSTM_error.csv', 'w', newline='', ) as file:
+with open('Compare_Models\SMST_Probability_results\Probability_Based_on_Training\LSTM_error.csv', 'w', newline='', ) as file:
     writer = csv.writer(file)
     writer.writerow(["Method","MSE","MAE","RMSE"])
     writer.writerow(["LSTM",
@@ -299,6 +302,6 @@ with open('Compare_Models/SMST_Probability_results/Probability_Based_on_Model/LS
                      str(np.sqrt(mean_squared_error(y_test,pred_test)))
                      ])
 
-training_stats.to_csv("Compare_Models/SMST_Probability_results/Probability_Based_on_Training/LSTM_mean_errors_stddevs.csv")
+training_stats.to_csv('Compare_Models\SMST_Probability_results\Probability_Based_on_Training\LSTM_mean_errors_stddevs.csv')
 
 

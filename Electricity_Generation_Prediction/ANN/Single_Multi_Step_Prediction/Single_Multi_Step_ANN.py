@@ -26,10 +26,10 @@ y = y.set_index("Time")
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state = 0, shuffle = False)
 
 X_train = X_train[int(len(X_train)*1/2):]
-X_test = X_test[:int(len(X_train)*1/2)]
+X_test = X_test[:int(len(X_test)*1/2)]
 y_train = y_train[int(len(y_train)*1/2):]
-y_test = y_test[:int(len(y_train)*1/2)]
-dates = dates[-len(X_train)-len(X_test)*2:-len(X_test)]
+y_test = y_test[:int(len(y_test)*1/2)]
+dates = dates[-len(X_test)-len(X_test)*2:-len(X_test)]
 
 # Feature Scaling
 x_scaler = StandardScaler()
@@ -90,13 +90,13 @@ y_test = np.array(y_test.iloc[:,-1]/1000).reshape(-1,)
 
 # Compute the error between the Actual Generation and the prediction from the NN
 print("-"*200)
-error_train = abs(pred_train - y_train)
+error_train = pred_train - y_train
 print("The mean absolute error of the train set is %0.2f" % mean_absolute_error(y_train,pred_train))
 print("The mean squared error of the train set is %0.2f" % mean_squared_error(y_train,pred_train))
 print("The root mean squared error of the train set is %0.2f" % np.sqrt(mean_squared_error(y_train,pred_train)))
 print("-"*200)
 
-error_test = abs(pred_test - y_test)
+error_test = pred_test - y_test
 print("The mean absolute error of the test set is %0.2f" % mean_absolute_error(y_test,pred_test))
 print("The mean squared error of the test set is %0.2f" % mean_squared_error(y_test,pred_test))
 print("The root mean squared error of the test set is %0.2f" % np.sqrt(mean_squared_error(y_test,pred_test)))
@@ -123,10 +123,10 @@ axs2[0].set_ylabel('Load [GW]',size = 14)
 
 axs2[1].plot(dates.iloc[-len(X_test)-48*3:-len(X_test)+48*7],
              error_test_plot,
-             label = "Absolute Error", alpha = 1, color = "red")
+             label = "Error", alpha = 1, color = "red")
 axs2[1].axvline(dates.iloc[-len(X_test)], linestyle="--", color = "black")
 axs2[1].set_xlabel('Date',size = 14)
-axs2[1].set_ylabel('Absolute Error [GW]',size = 14)
+axs2[1].set_ylabel('Error [GW]',size = 14)
 
 # Include additional details such as tick intervals, rotation, legend positioning and grid on.
 axs2[1].grid(True)
@@ -222,12 +222,11 @@ axs5[0].set_ylabel('Load [GW]',size = 14)
 # Second plot contains the errors.
 axs5[1].plot(dates.iloc[-len(X_test)-48*3:-len(X_test)+48*7],
              error_test_plot,
-             label = "Absolute error", alpha = 1, color = "red")
+             label = "Error", alpha = 1, color = "red")
 axs5[1].axvline(dates.iloc[-len(X_test)],
                 linestyle="--", color = "black")
 axs5[1].set_xlabel('Date',size = 14)
-axs5[1].set_ylabel('Absolute Error [GW]',size = 14)
-axs5[1].set_ylabel('Absolute Error [GW]',size = 14)
+axs5[1].set_ylabel('Error [GW]',size = 14)
 
 # Include additional details such as tick intervals, rotation, legend positioning and grid on.
 axs5[1].grid(True)
@@ -256,7 +255,7 @@ with open('Compare_Models/Single_Multi_Step_results/ANN.csv', 'w', newline='', )
                      ])
 
 import csv
-with open('Compare_Models/SMST_Probability_results/Probability_Based_on_Model/NN_error.csv', 'w', newline='', ) as file:
+with open('Compare_Models/SMST_Probability_results/Probability_Based_on_Training/NN_error.csv', 'w', newline='', ) as file:
     writer = csv.writer(file)
     writer.writerow(["Method","MSE","MAE","RMSE"])
     writer.writerow(["NN",
