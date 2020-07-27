@@ -1,0 +1,5 @@
+Method,MSE,MAE,RMSE
+SARIMA,"Load    6.226853e+07
+dtype: float64","Load    6415.418411
+dtype: float64","Load    7891.04135
+dtype: float64"

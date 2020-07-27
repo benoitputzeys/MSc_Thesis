@@ -6,6 +6,7 @@ from TF_Probability.MST_Rd_Weights.Functions import build_model
 from sklearn.preprocessing import StandardScaler
 import pandas as pd
 import matplotlib.ticker as plticker
+import keras
 
 ########################################################################################################################
 # Get data and data preprocessing.
@@ -57,8 +58,8 @@ axs1.set_xlabel('Epochs')
 fig1.show()
 
 # Save or load the model
-#model.save("TF_Probability/MST_Rd_Weights/SMST_No_Date.h5")
-#model = keras.models.load_model("Electricity_Generation_Prediction/ANN/Single_Multi_Step_Prediction/SMST_No_Date.h5")
+model.save("TF_Probability/MST_Rd_Weights/SMST_No_Date.h5")
+#model = keras.models.load_model("TF_Probability/MST_Rd_Weights/SMST_No_Date.h5")
 
 ########################################################################################################################
 # Predicting the generation.
@@ -342,3 +343,28 @@ axs5[1].set_xticklabels(["1 / Monday", "49 / Tuesday", "97 / Wednesday", "145 / 
 axs5[1].legend()
 axs5[1].grid(True)
 fig5.show()
+
+# Calculate the errors from the mean to the actual vaules.
+print("-"*200)
+errors = abs(test_stats.iloc[:48*7,1])
+print("The mean absolute error of the test set is %0.2f" % np.mean(errors))
+print("The mean squared error of the test set is %0.2f" % np.mean(errors**2))
+print("The root mean squared error of the test set is %0.2f" % np.sqrt(np.mean(errors**2)))
+print("-"*200)
+
+########################################################################################################################
+# Save the results in a csv file.
+########################################################################################################################
+
+import csv
+with open('Compare_Models/SMST_Probability_results/Probability_Based_on_Model/NN_error.csv', 'w', newline='', ) as file:
+    writer = csv.writer(file)
+    writer.writerow(["Method","MSE","MAE","RMSE"])
+    writer.writerow(["NN",
+                     str(np.mean(errors**2)),
+                     str(np.mean(errors)),
+                     str(np.sqrt(np.mean(errors**2)))
+                     ])
+
+stats = test_stats.iloc[:48*7,:]
+stats.to_csv("Compare_Models/SMST_Probability_results/Probability_Based_on_Model/NN_mean_errors_stddevs.csv")
