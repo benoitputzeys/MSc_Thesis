@@ -149,7 +149,7 @@ error_test_plot = np.array((load_forecast_mean-y_test.iloc[:,0])/1000).reshape(-
 #error_test_plot[-336:] = np.array((load_forecast_mean[-48*7:]-y_test.iloc[-48*7:,0])/1000).reshape(-1,1)
 
 # Plot the actual values, the forecast and the standard deviation.
-fig2, axs2=plt.subplots(2,1,figsize=(12,6))
+fig2, axs2=plt.subplots(2,1,figsize=(12,10))
 #axs2[0].plot(dates_train[-48*3:],
 #          y_train[-48 * 3:]/1000,
 #          color="blue", label='Training Set')
@@ -158,7 +158,7 @@ axs2[0].plot(dates_test,
           color="black", label = "Last Week Test Set \n(True Values)")
 axs2[0].plot(dates_test,
           load_forecast_mean/1000,
-          color="orange",label='SARIMA Forecast with \n +- 1 x Standard Deviation')
+          color="orange",label='SARIMA Forecast with \n+- 1 x Standard Deviation')
 axs2[0].fill_between(dates_test,
                   (load_forecast_mean-load_forecast_scale)/1000,
                   (load_forecast_mean+load_forecast_scale)/1000, color="orange", alpha=0.2)
@@ -171,8 +171,8 @@ axs2[1].set_ylabel("Error [GW]",size = 14)
 
 #axs2[0].axvline(dates_train[-1], linestyle="--", color = "black")
 #axs2[1].axvline(dates_train[-1], linestyle="--", color = "black")
-axs2[0].legend(loc = (1.04, 0.6))
-axs2[1].legend(loc = (1.04, 0.9))
+axs2[0].legend()
+axs2[1].legend()
 loc = plticker.MultipleLocator(base=48*25) # this locator puts ticks at regular intervals
 axs2[0].xaxis.set_major_locator(loc)
 axs2[1].xaxis.set_major_locator(loc)
@@ -226,7 +226,7 @@ axs5.fill_between(test_stats.iloc[:,0],
                   (test_stats.iloc[:,1]-test_stats.iloc[:,2]),
                   (test_stats.iloc[:,1]+test_stats.iloc[:,2]),
                   alpha=0.2, color = "orange", label = "+- 1x Standard Deviation")
-axs5.set_ylabel("Error during test [GW]", size = 14)
+axs5.set_ylabel("Error Test Set [GW]", size = 14)
 axs5.set_xlabel("Settlement Period / Weekday", size = 14)
 axs5.set_xticks(np.arange(1,385, 48))
 axs5.set_xticklabels(["1 / Monday", "49 / Tuesday", "97 / Wednesday", "145 / Thursday", "193 / Friday","241 / Saturday", "289 / Sunday",""])
