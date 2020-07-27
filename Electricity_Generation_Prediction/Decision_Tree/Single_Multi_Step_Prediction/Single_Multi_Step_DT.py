@@ -24,8 +24,10 @@ y = y.set_index("Time")
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state = 0, shuffle = False)
 
 X_train = X_train[int(len(X_train)*1/2):]
+X_test = X_test[:int(len(X_test)*1/2)]
 y_train = y_train[int(len(y_train)*1/2):]
-dates = dates[-len(X_train)-len(X_test):]
+y_test = y_test[:int(len(y_test)*1/2)]
+dates = dates[-len(X_train)-len(X_test)*2:-len(X_test)]
 
 X_train_unscaled = X_train
 X_test_unscaled = X_test

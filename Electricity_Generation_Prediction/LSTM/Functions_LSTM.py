@@ -51,7 +51,7 @@ def create_model(input_variable, learning_rate):
 def train_model(model, xvalues, yvalues, epochs, batch):
 
     # Fitting the model to the Training set
-    history = model.fit(xvalues, yvalues, epochs=epochs, batch_size=batch)
+    history = model.fit(xvalues, yvalues, epochs=epochs, batch_size=batch, verbose = 2)
 
     # To track the progression of training, gather a snapshot
     # of the model's mean squared error at each epoch.

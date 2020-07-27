@@ -7,6 +7,7 @@ import pandas as pd
 from sklearn.metrics import mean_absolute_error, mean_squared_error
 import matplotlib.ticker as plticker
 import keras
+
 ########################################################################################################################
 # Get data and data preprocessing.
 ########################################################################################################################
@@ -23,8 +24,10 @@ y = y.set_index("Time")
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state = 0, shuffle = False)
 
 X_train = X_train[int(len(X_train)*1/2):]
+X_test = X_test[:int(len(X_train)*1/2)]
 y_train = y_train[int(len(y_train)*1/2):]
-dates = dates[-len(X_train)-len(X_test):]
+y_test = y_test[:int(len(y_train)*1/2)]
+dates = dates[-len(X_train)-len(X_test)*2:-len(X_test)]
 
 # Feature Scaling
 x_scaler = StandardScaler()
@@ -37,31 +40,31 @@ y_train = y_scaler.fit_transform(y_train)
 # Create the model.
 ########################################################################################################################
 
-# # Define the hyperparameters.
-# learning_rate = 0.001
-# number_of_epochs = 100
-# batch_size = 32
-#
-# # Create the model.
-# my_model = create_model(X_train, learning_rate)
-#
-# # Extract the loss per epoch to plot the learning progress.
-# hist_list = pd.DataFrame()
-#
-# tscv = TimeSeriesSplit()
-# for train_index, test_index in tscv.split(X_train):
-#      X_train_split, X_test_split = X_train[train_index], X_train[test_index]
-#      y_train_split, y_test_split = y_train[train_index], y_train[test_index]
-#      X_train_split = np.reshape(X_train_split, (X_train_split.shape[0],X_train_split.shape[1],1))
-#      hist_split = train_model(my_model, X_train_split, y_train_split, number_of_epochs, batch_size)
-#      hist_list = hist_list.append(hist_split)
-#
-# # Plot the loss per epoch.
-# metric = "mean_absolute_error"
-# plot_the_loss_curve(np.linspace(1,len(hist_list), len(hist_list) ), hist_list[metric], metric)
-#
+# Define the hyperparameters.
+learning_rate = 0.001
+number_of_epochs = 100
+batch_size = 32
+
+# Create the model.
+my_model = create_model(X_train, learning_rate)
+
+# Extract the loss per epoch to plot the learning progress.
+hist_list = pd.DataFrame()
+
+tscv = TimeSeriesSplit()
+for train_index, test_index in tscv.split(X_train):
+     X_train_split, X_test_split = X_train[train_index], X_train[test_index]
+     y_train_split, y_test_split = y_train[train_index], y_train[test_index]
+     X_train_split = np.reshape(X_train_split, (X_train_split.shape[0],X_train_split.shape[1],1))
+     hist_split = train_model(my_model, X_train_split, y_train_split, number_of_epochs, batch_size)
+     hist_list = hist_list.append(hist_split)
+
+# Plot the loss per epoch.
+metric = "mean_absolute_error"
+plot_the_loss_curve(np.linspace(1,len(hist_list), len(hist_list) ), hist_list[metric], metric)
+
 # my_model.save("Electricity_Generation_Prediction/LSTM/Single_Multi_Step_Prediction/SMST_No_Date.h5")
-my_model = keras.models.load_model("Electricity_Generation_Prediction/LSTM/Single_Multi_Step_Prediction/SMST_No_Date.h5")
+#my_model = keras.models.load_model("Electricity_Generation_Prediction/LSTM/Single_Multi_Step_Prediction/SMST_No_Date.h5")
 
 ########################################################################################################################
 # Predicting the generation.
@@ -137,20 +140,6 @@ axs2[1].grid(True)
 fig2.show()
 
 ########################################################################################################################
-# Save the results in a csv file.
-########################################################################################################################
-
-import csv
-with open('Compare_Models/Single_Multi_Step_results/LSTM.csv', 'w', newline='', ) as file:
-    writer = csv.writer(file)
-    writer.writerow(["Method","MSE","MAE","RMSE"])
-    writer.writerow(["LSTM",
-                     str(mean_squared_error(y_test,pred_test)),
-                     str(mean_absolute_error(y_test,pred_test)),
-                     str(np.sqrt(mean_squared_error(y_test,pred_test)))
-                     ])
-
-########################################################################################################################
 # Compute the standard deviation of the errors from the training set.
 ########################################################################################################################
 
@@ -160,7 +149,7 @@ settlement_period_week = X["Settlement Period"]+(48*X["Day of Week"])
 dates_train = dates.iloc[:len(X_train)]
 dates_test = dates.iloc[-len(X_test):]
 train_set = y_train
-settlement_period_train = settlement_period_week[-len(X_test)-len(X_train):-len(X_test)]
+settlement_period_train = settlement_period_week[-len(X_test)*2-len(X_train):-len(X_test)*2]
 
 # Create a dataframe that contains the SPs (1-336) and the load values.
 error_train = pd.DataFrame({'SP':settlement_period_train, 'Error_Train': (pred_train-train_set)})
@@ -244,7 +233,6 @@ axs5[1].xaxis.set_major_locator(loc)
 fig5.autofmt_xdate(rotation=15)
 axs5[1].legend(loc=(1.04,0.9))
 axs5[0].legend(loc=(1.04,0.6))
-
 fig5.show()
 
 # Prediction on training set.
@@ -286,4 +274,31 @@ axs6[1].legend(loc=(1.04,0.9))
 axs6[0].legend(loc=(1.04,0.8))
 
 fig6.show()
+
+########################################################################################################################
+# Save the results in a csv file.
+########################################################################################################################
+
+import csv
+with open('Compare_Models/Single_Multi_Step_results/LSTM.csv', 'w', newline='', ) as file:
+    writer = csv.writer(file)
+    writer.writerow(["Method","MSE","MAE","RMSE"])
+    writer.writerow(["LSTM",
+                     str(mean_squared_error(y_test,pred_test)),
+                     str(mean_absolute_error(y_test,pred_test)),
+                     str(np.sqrt(mean_squared_error(y_test,pred_test)))
+                     ])
+
+import csv
+with open('Compare_Models/SMST_Probability_results/Probability_Based_on_Model/LSTM_error.csv', 'w', newline='', ) as file:
+    writer = csv.writer(file)
+    writer.writerow(["Method","MSE","MAE","RMSE"])
+    writer.writerow(["LSTM",
+                     str(mean_squared_error(y_test,pred_test)),
+                     str(mean_absolute_error(y_test,pred_test)),
+                     str(np.sqrt(mean_squared_error(y_test,pred_test)))
+                     ])
+
+training_stats.to_csv("Compare_Models/SMST_Probability_results/Probability_Based_on_Training/LSTM_mean_errors_stddevs.csv")
+
 

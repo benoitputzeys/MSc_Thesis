@@ -67,6 +67,17 @@ axs[3].grid(True)
 fig.autofmt_xdate(rotation = 10)
 fig.show()
 #
+# # Plot the weekly average
+# fig, axs=plt.subplots(1,1,figsize=(15,6))
+# axs.plot(dates,mean_each_week, color = "blue", linewidth = 1)
+# axs.set_ylabel("Weekly Average [GW]", size = 18)
+# axs.set_xlabel("Date", size = 18)
+# loc = plticker.MultipleLocator(base=48*130) # this locator puts ticks at regular intervals
+# axs.grid(True)
+# axs.xaxis.set_major_locator(loc)
+# fig.autofmt_xdate(rotation = 13)
+# fig.show()
+
 # # Plot the whole decomposition of the whole actual series.
 # fig, axs=plt.subplots(4,1,figsize=(12,10))
 # axs[0].plot(daily_seasonality, color = "blue", linewidth = 0.5)
