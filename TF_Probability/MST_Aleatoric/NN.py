@@ -117,7 +117,7 @@ print("-"*200)
 ########################################################################################################################
 
 import csv
-with open('TF_Probability/Results/NN_error.csv', 'w', newline='', ) as file:
+with open('TF_Probability/Results/NN_mean_error.csv', 'w', newline='', ) as file:
     writer = csv.writer(file)
     writer.writerow(["Method","MSE","MAE","RMSE"])
     writer.writerow(["NN",

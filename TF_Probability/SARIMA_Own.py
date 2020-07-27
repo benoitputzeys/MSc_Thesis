@@ -56,7 +56,9 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, rando
 
 X_train = X_train[int(len(X_train)*1/2):]
 y_train = y_train[int(len(y_train)*1/2):]
-dates = dates[-len(X_train)-len(X_test):]
+X_test = X_test[:int(len(X_test)*1/2)]
+y_test = y_test[:int(len(y_test)*1/2)]
+dates = dates[-len(X_train)-len(X_test)*2:-len(X_test)]
 dates_train = dates[:len(X_train)]
 dates_test = dates[-len(X_test):]
 
@@ -78,31 +80,31 @@ fig1.show()
 #trend = sts.LocalLinearTrend(observed_time_series=observed_time_series)
 seasonal_day = tfp.sts.Seasonal(
     num_seasons=48,
-    observed_time_series=y_train,
-    name = 'Daily_Seasonality')
+    observed_time_series=y_train[-48*7*2:],
+    name = 'seasonal_day')
 seasonal_week = tfp.sts.Seasonal(
     num_seasons=7,
     num_steps_per_season=48,
-    observed_time_series=y_train,
-    name = 'Weekly_Seasonality')
+    observed_time_series=y_train[-48*7*2:],
+    name = 'seasonal_week')
 load_model = sts.Sum([seasonal_day,
                  seasonal_week],
-                observed_time_series=y_train)
+                observed_time_series=y_train[-48*7*2:])
 
 # Build the variational surrogate posteriors `qs`.
 variational_posteriors = tfp.sts.build_factored_surrogate_posterior(model=load_model)
 
 # Allow external control of optimization to reduce test runtimes.
-num_variational_steps = 100 # @param { isTemplate: true}
+num_variational_steps = 200 # @param { isTemplate: true}
 num_variational_steps = int(num_variational_steps)
 
-optimizer = tf.optimizers.Adam(learning_rate=.1)
+optimizer = tf.optimizers.Adam(learning_rate=0.1)
 # Using fit_surrogate_posterior to build and optimize the variational loss function.
 @tf.function(experimental_compile=True)
 
 def train():
   elbo_loss_curve = tfp.vi.fit_surrogate_posterior(
-    target_log_prob_fn=load_model.joint_log_prob(observed_time_series=y_train),
+    target_log_prob_fn=load_model.joint_log_prob(observed_time_series=y_train[-48*7*2:]),
     surrogate_posterior=variational_posteriors,
     optimizer=optimizer,
     num_steps=num_variational_steps)
@@ -120,21 +122,14 @@ axs3.grid(True)
 fig3.show()
 
 # Draw samples from the variational posterior.
-q_samples_load_ = variational_posteriors.sample(100)
+q_samples_load_ = variational_posteriors.sample(50)
 
-# Necessary ??
-print("Inferred parameters:")
-for param in load_model.parameters:
-  print("{}: {} +- {}".format(param.name,
-                              np.mean(q_samples_load_[param.name], axis=0),
-                              np.std(q_samples_load_[param.name], axis=0)))
-
-#Forecast 1 week in advance.
-num_forecast_steps = 48 * 7
+#Forecast the test set in advance.
+num_forecast_steps = len(y_test)
 
 load_forecast_dist = tfp.sts.forecast(
       load_model,
-      observed_time_series=y_train,
+      observed_time_series=y_train[-48*7*2:],
       parameter_samples=q_samples_load_,
       num_steps_forecast=num_forecast_steps)
 
@@ -149,27 +144,40 @@ load_forecast_scale =  load_forecast_dist.stddev().numpy().reshape(-1,)
 # for i in range(336):
 #     mean_recons[i,0] = np.mean(load_forecast_samples[:,i])
 
+error_test_plot = np.zeros((len(X_test),1))
+error_test_plot = np.array((load_forecast_mean-y_test.iloc[:,0])/1000).reshape(-1,1)
+#error_test_plot[-336:] = np.array((load_forecast_mean[-48*7:]-y_test.iloc[-48*7:,0])/1000).reshape(-1,1)
+
 # Plot the actual values, the forecast and the standard deviation.
-fig2, axs2=plt.subplots(1,1,figsize=(12,6))
-axs2.plot(dates_train[-48*3:],
-          y_train[-48 * 3:]/1000,
-          color="blue", label='Training Set')
-axs2.plot(dates_test[:48*7],
+fig2, axs2=plt.subplots(2,1,figsize=(12,6))
+#axs2[0].plot(dates_train[-48*3:],
+#          y_train[-48 * 3:]/1000,
+#          color="blue", label='Training Set')
+axs2[0].plot(dates_test,
           y_test/1000,
-          color="red", label = "Test Set")
-axs2.plot(dates_test[:48*7],
+          color="black", label = "Last Week Test Set \n(True Values)")
+axs2[0].plot(dates_test,
           load_forecast_mean/1000,
-          color="blue",label='Forecast with 2x standard deviation')
-axs2.fill_between(dates_test[:48*7],
+          color="orange",label='SARIMA Forecast with \n +- 1 x Standard Deviation')
+axs2[0].fill_between(dates_test,
                   (load_forecast_mean-load_forecast_scale)/1000,
-                  (load_forecast_mean+load_forecast_scale)/1000, color="blue", alpha=0.2)
-axs2.axvline(dates_test[0], linestyle="--", color = "black")
-axs2.set_xlabel("Settelement Periods",size = 14)
-axs2.set_ylabel("Load [GW]",size = 14)
-axs2.legend(loc = "lower left")
-loc = plticker.MultipleLocator(base=47) # this locator puts ticks at regular intervals
-axs2.xaxis.set_major_locator(loc)
-axs2.grid(True)
+                  (load_forecast_mean+load_forecast_scale)/1000, color="orange", alpha=0.2)
+axs2[0].set_xlabel("Dates",size = 14)
+axs2[0].set_ylabel("Load [GW]",size = 14)
+
+axs2[1].plot(dates_test,error_test_plot, color="red", label='Training Set')
+axs2[1].set_xlabel("Dates",size = 14)
+axs2[1].set_ylabel("Error [GW]",size = 14)
+
+#axs2[0].axvline(dates_train[-1], linestyle="--", color = "black")
+#axs2[1].axvline(dates_train[-1], linestyle="--", color = "black")
+axs2[0].legend(loc = (1.04, 0.6))
+axs2[1].legend(loc = (1.04, 0.9))
+loc = plticker.MultipleLocator(base=48*25) # this locator puts ticks at regular intervals
+axs2[0].xaxis.set_major_locator(loc)
+axs2[1].xaxis.set_major_locator(loc)
+axs2[0].grid(True)
+axs2[1].grid(True)
 fig2.autofmt_xdate(rotation = 12)
 fig2.show()
 
@@ -189,12 +197,49 @@ fig2.show()
 #                     x_locator=None, x_formatter=None)
 # plt.show()
 
+########################################################################################################################
+# Save the results in a csv file.
+########################################################################################################################
+
+settlement_period_test = X["Settlement Period"][-len(X_test)*2:-len(X_test)].values+(48*DoW[-len(X_test)*2:-len(X_test)]).values
+long_column = np.array([settlement_period_test]).reshape(-1,)
+# Create a dataframe that contains the SPs (1-336) and the load values.
+mean_errors = load_forecast_mean - y_test.values[:,0]
+error_test = pd.DataFrame({'SP':long_column, 'Means': mean_errors/1000,'Stddev': load_forecast_scale/1000 })
+
+# Compute the mean and variation for each x.
+test_stats = pd.DataFrame({'Index':np.linspace(1,336,336),
+                               'Mean':np.linspace(1,336,336),
+                               'Stddev':np.linspace(1,336,336)})
+
+for i in range(1,337):
+    test_stats.iloc[i-1,1]=np.mean(error_test[error_test["SP"]==i].iloc[:,1])
+    test_stats.iloc[i-1,2]=np.mean(error_test[error_test["SP"]==i].iloc[:,2])
+
+# Plot the projected errors onto a single week to see the variation in the timeseries.
+fig5, axs5=plt.subplots(1,1,figsize=(12,6))
+# Plot the mean and standard deviation of the errors that are made on the test set.
+axs5.plot(test_stats.iloc[:,0],
+          test_stats.iloc[:,1],
+          color = "orange", label = "Mean of all projected errors (Test Set)")
+axs5.fill_between(test_stats.iloc[:,0],
+                  (test_stats.iloc[:,1]-test_stats.iloc[:,2]),
+                  (test_stats.iloc[:,1]+test_stats.iloc[:,2]),
+                  alpha=0.2, color = "orange", label = "+- 1x Standard Deviation")
+axs5.set_ylabel("Error during test [GW]", size = 14)
+axs5.set_xlabel("Settlement Period / Weekday", size = 14)
+axs5.set_xticks(np.arange(1,385, 48))
+axs5.set_xticklabels(["1 / Monday", "49 / Tuesday", "97 / Wednesday", "145 / Thursday", "193 / Friday","241 / Saturday", "289 / Sunday",""])
+axs5.legend()
+axs5.grid(True)
+fig5.show()
+
 # Calculate the errors from the mean to the actual vaules.
 print("-"*200)
-errors = abs(load_forecast_mean.reshape(-1,1)-y_train[:48*7])
-print("The mean absolute error of the test set is %0.2f" % np.mean(errors))
-print("The mean squared error of the test set is %0.2f" % np.mean(errors**2))
-print("The root mean squared error of the test set is %0.2f" % np.sqrt(np.mean(errors**2)))
+errors = abs(mean_errors)/1000
+print("The mean absolute error of the test set is %0.2f [GW]" % np.mean(errors))
+print("The mean squared error of the test set is %0.2f [GW]" % np.mean(errors**2))
+print("The root mean squared error of the test set is %0.2f [GW]" % np.sqrt(np.mean(errors**2)))
 print("-"*200)
 
 ########################################################################################################################
@@ -202,7 +247,7 @@ print("-"*200)
 ########################################################################################################################
 
 import csv
-with open('TF_Probability/Results/SARIMA_error.csv', 'w', newline='', ) as file:
+with open('Compare_Models/SMST_Probability_results/Probability_Based_on_Model/SARIMA_error.csv', 'w', newline='', ) as file:
     writer = csv.writer(file)
     writer.writerow(["Method","MSE","MAE","RMSE"])
     writer.writerow(["SARIMA",
@@ -210,10 +255,4 @@ with open('TF_Probability/Results/SARIMA_error.csv', 'w', newline='', ) as file:
                      str(np.mean(errors)),
                      str(np.sqrt(np.mean(errors**2)))
                      ])
-with open('TF_Probability/Results/SARIMA_prediction.csv', 'w', newline='', ) as file:
-    writer = csv.writer(file)
-    writer.writerow(["Method","Mean","Stddev"])
-    writer.writerow(["SARIMA",
-                     str(load_forecast_mean),
-                     str(load_forecast_scale),
-                     ])
+test_stats.to_csv("Compare_Models/SMST_Probability_results/Probability_Based_on_Model/SARIMA_mean_errors_stddevs.csv")

@@ -26,7 +26,9 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, rando
 
 X_train = X_train[int(len(X_train)*1/2):]
 y_train = y_train[int(len(y_train)*1/2):]
-dates = dates[-len(X_train)-len(X_test):]
+X_test = X_test[:int(len(X_test)*1/2)]
+y_test = y_test[:int(len(y_test)*1/2)]
+dates = dates[-len(X_train)-len(X_test)*2:-len(X_test)]
 
 # Feature Scaling
 x_scaler = StandardScaler()
@@ -51,21 +53,21 @@ model.fit(X_train,y_train, epochs=epochs, batch_size=batches, verbose=2)
 model.summary()
 
 # Plot the learning progress.
-fig1, axs1=plt.subplots(1,1,figsize=(4,6))
+fig1, axs1=plt.subplots(1,1,figsize=(4,4))
 axs1.plot(model.history.history["mean_absolute_error"], color = "blue")
 axs1.set_ylabel('Loss')
 axs1.set_xlabel('Epochs')
 fig1.show()
 
 # Save or load the model
-model.save("TF_Probability/MST_Rd_Weights/SMST_No_Date.h5")
+#model.save("TF_Probability/MST_Rd_Weights/SMST_No_Date.h5")
 #model = keras.models.load_model("TF_Probability/MST_Rd_Weights/SMST_No_Date.h5")
 
 ########################################################################################################################
 # Predicting the generation.
 ########################################################################################################################
 
-# Make a 350 predictions on the test set and calculate the errors for each prediction.
+# Make 350 predictions on the test set and calculate the errors for each prediction.
 yhats_test = [model.predict(X_test) for _ in range(350)]
 predictions_test = np.array(yhats_test)
 predictions_test = predictions_test.reshape(-1,len(predictions_test[1]))
@@ -215,7 +217,7 @@ error_column_train = predictions_and_errors_train[:,1]
 #     error_column = np.delete(error_column,np.argmax(error_column),0)
 #     #error_column = np.delete(error_column,np.argmin(error_column),0)
 
-# Plot the histograms of the 2 SPs.
+# Plot the histograms of the 2 sets.
 fig3, axs3=plt.subplots(1,2,figsize=(12,6))
 axs3[1].hist(error_column_test, bins = 50, color = "blue")
 axs3[1].set_xlabel("Prediction Error on Test Set [GW]", size = 14)
@@ -226,39 +228,11 @@ axs3[0].set_xlabel("Prediction Error on Training Set [GW]", size = 14)
 axs3[0].set_ylabel("Count", size = 14)
 fig3.show()
 
-# Calculate the errors from the mean to the actual vaules.
-print("-"*200)
-error = np.abs(y_test-mean_test)
-print("The mean absolute error of the test set is %0.2f" % np.mean(error))
-print("The mean squared error of the test set is %0.2f" % np.mean(error**2))
-print("The root mean squared error of the test set is %0.2f" % np.sqrt(np.mean(error**2)))
-print("-"*200)
-
-stats = np.concatenate((mean_test, stddev_test, y_test.reshape(-1,1)), axis = 1)
-
-########################################################################################################################
-# Save the results in a csv file.
-########################################################################################################################
-
-import csv
-with open('TF_Probability/Results/NN_mean_error.csv', 'w', newline='', ) as file:
-    writer = csv.writer(file)
-    writer.writerow(["Method","MSE","MAE","RMSE"])
-    writer.writerow(["NN",
-                     str(np.mean(error**2)),
-                     str(np.mean(error)),
-                     str(np.sqrt(np.mean(error**2)))
-                     ])
-
-stats = pd.DataFrame(stats)
-stats.columns = ["Mean", "Stddev", "Test_Set"]
-stats.to_csv("TF_Probability/Results/NN_prediction.csv", index = False)
-
 ########################################################################################################################
 # Plot the mean and standard deviation per week for the training set.
 ########################################################################################################################
 
-settlement_period_train = X["Settlement Period"][-len(X_test)-len(X_train):-len(X_test)].values+(48*DoW[-len(X_test)-len(X_train):-len(X_test)]).values
+settlement_period_train = X["Settlement Period"][-len(X_test)*2-len(X_train):-len(X_test)*2].values+(48*DoW[-len(X_test)*2-len(X_train):-len(X_test)*2]).values
 long_column = np.array([settlement_period_train]*350).reshape(-1,)
 # Create a dataframe that contains the SPs (1-336) and the load values.
 error_train = pd.DataFrame({'SP':long_column, 'Error_Train': error_column_train[:len(long_column)]})
@@ -303,7 +277,7 @@ fig4.show()
 # Plot the mean and standard deviation per week for the test set.
 ########################################################################################################################
 
-settlement_period_test = X["Settlement Period"][-len(X_test):].values+(48*DoW[-len(X_test):]).values
+settlement_period_test = X["Settlement Period"][-len(X_test)*2:-len(X_test)].values+(48*DoW[-len(X_test)*2:-len(X_test)]).values
 long_column = np.array([settlement_period_test]*350).reshape(-1,)
 # Create a dataframe that contains the SPs (1-336) and the load values.
 error_test = pd.DataFrame({'SP':long_column, 'Error_Test': error_column_test[:len(long_column)]})
@@ -344,27 +318,25 @@ axs5[1].legend()
 axs5[1].grid(True)
 fig5.show()
 
-# Calculate the errors from the mean to the actual vaules.
-print("-"*200)
-errors = abs(test_stats.iloc[:48*7,1])
-print("The mean absolute error of the test set is %0.2f" % np.mean(errors))
-print("The mean squared error of the test set is %0.2f" % np.mean(errors**2))
-print("The root mean squared error of the test set is %0.2f" % np.sqrt(np.mean(errors**2)))
-print("-"*200)
-
 ########################################################################################################################
 # Save the results in a csv file.
 ########################################################################################################################
+
+# Calculate the errors from the mean to the actual vaules.
+print("-"*200)
+print("The mean absolute error of the test set is %0.2f [GW]." % np.mean(abs(error_test.iloc[:,-1])))
+print("The mean squared error of the test set is %0.2f [GW]." % np.mean(error_test.iloc[:,-1]**2))
+print("The root mean squared error of the test set is %0.2f [GW]." % np.sqrt(np.mean(error_test.iloc[:,-1]**2)))
+print("-"*200)
 
 import csv
 with open('Compare_Models/SMST_Probability_results/Probability_Based_on_Model/NN_error.csv', 'w', newline='', ) as file:
     writer = csv.writer(file)
     writer.writerow(["Method","MSE","MAE","RMSE"])
     writer.writerow(["NN",
-                     str(np.mean(errors**2)),
-                     str(np.mean(errors)),
-                     str(np.sqrt(np.mean(errors**2)))
+                     str(np.mean(error_test.iloc[:,-1]**2)),
+                     str(np.mean(abs(error_test.iloc[:,-1]))),
+                     str(np.sqrt(np.mean(error_test.iloc[:,-1]**2)))
                      ])
 
-stats = test_stats.iloc[:48*7,:]
-stats.to_csv("Compare_Models/SMST_Probability_results/Probability_Based_on_Model/NN_mean_errors_stddevs.csv")
+test_stats.to_csv("Compare_Models/SMST_Probability_results/Probability_Based_on_Model/NN_mean_errors_stddevs.csv")
