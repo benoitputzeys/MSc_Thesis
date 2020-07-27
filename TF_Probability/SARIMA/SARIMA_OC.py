@@ -203,10 +203,19 @@ load_forecast_mean, load_forecast_scale, load_forecast_samples = (
 dates = np.linspace(1,len(X),len(X))
 
 fig2, axs2=plt.subplots(1,1,figsize=(12,6))
-axs2.plot(dates[len(y_train)-48*3:len(y_train)], y_train[-48 * 3:]/1000, color="black", label='Training Set')
-axs2.plot(dates[len(y_train):len(y_train)+48*7], y_test[:48 * 7]/1000, color="red", label = "Test Set")
-axs2.plot(dates[len(y_train):48*7+len(y_train)], load_forecast_mean/1000, color="blue",label='Forecast with 2x standard deviation')
-axs2.fill_between(dates[len(y_train):len(y_train)+48*7],(load_forecast_mean-2*load_forecast_scale)/1000,(load_forecast_mean+2*load_forecast_scale)/1000, color="blue", alpha=0.2)
+axs2.plot(dates[len(y_train)-48*3:len(y_train)],
+          y_train[-48 * 3:]/1000,
+          label='Training Set', color="blue")
+axs2.plot(dates[len(y_train):len(y_train)+48*7],
+          y_test[:48 * 7]/1000,
+          label = "Test Set",color="black")
+axs2.plot(dates[len(y_train):48*7+len(y_train)],
+          load_forecast_mean/1000,
+          label='Prediction', color="orange")
+axs2.fill_between(dates[len(y_train):len(y_train)+48*7],
+                  (load_forecast_mean-load_forecast_scale)/1000,
+                  (load_forecast_mean+load_forecast_scale)/1000,
+                  label = "+- 1 x Standard Deviation",color="orange", alpha=0.2)
 axs2.axvline(dates[len(y_train)], linestyle="--", color = "black")
 axs2.set_xlabel("Settelement Periods")
 axs2.set_ylabel("Load [GW]")

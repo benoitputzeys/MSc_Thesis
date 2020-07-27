@@ -9,7 +9,7 @@ import datetime
 from pandas import DataFrame
 from sklearn.model_selection import train_test_split
 from statsmodels.tsa.stattools import adfuller
-from sklearn.metrics import mean_absolute_error, mean_squared_error
+import matplotlib.ticker as plticker
 import warnings
 warnings.filterwarnings("ignore")
 
@@ -32,18 +32,24 @@ def create_dates(features_df, y_values):
 # Importing the data.
 ########################################################################################################################
 
-from numpy import genfromtxt
-
 # Get the X (containing the features) and y (containing the labels) values
-X = genfromtxt('/Users/benoitputzeys/PycharmProjects/MSc_Thesis/Data_Entsoe/Data_Preprocessing/For_Multi_Step_Prediction/X.csv', delimiter=',')
-y = genfromtxt('/Users/benoitputzeys/PycharmProjects/MSc_Thesis/Data_Entsoe/Data_Preprocessing/For_Multi_Step_Prediction/y.csv', delimiter=',')
-y = np.reshape(y, (len(y), 1))
+X = pd.read_csv('Data_Preprocessing/For_Multi_Step_Prediction/X.csv', delimiter=',')
+DoW = X["Day of Week"]
+X = X.set_index("Time")
+dates = X.iloc[:,-1]
+X = X.iloc[:,:-5]
 
+y = pd.read_csv('Data_Preprocessing/For_Multi_Step_Prediction/y.csv', delimiter=',')
+y = y.set_index("Time")
+
+# Split data into train set and test set.
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state = 0, shuffle = False)
-X_train_1, X_train_2, y_train_1, y_train_2 = train_test_split(X_train, y_train, test_size = 0.2, random_state = 0, shuffle = False)
 
-ex_variable_train_1 = X_train_1[:,5:]
-ex_variable_train_2 = X_train_2[:,5:]
+X_train = X_train[int(len(X_train)*1/2):]
+y_train = y_train[int(len(y_train)*1/2):]
+dates = dates[-len(X_train)-len(X_test):]
+dates_train = dates[:len(X_train)]
+dates_test = dates[-len(X_test):]
 
 ########################################################################################################################
 # Check for stationarity
@@ -95,96 +101,89 @@ ex_variable_train_2 = X_train_2[:,5:]
 # Set the hyperparameters and fit the model.
 ########################################################################################################################
 
-# my_order = (0,1,1)
-# my_seasonal_order = (0, 1, 1, 48)
-# model = SARIMAX(y_train_1, order=my_order, seasonal_order=my_seasonal_order, exog=ex_variable_train_1)
-# #model = SARIMAX(y_train_1, order=my_order, seasonal_order=my_seasonal_order)
-# model_fit = model.fit()
-#
-# # Summary of the model
-# print(model_fit.summary())
+my_order = (0,1,1)
+my_seasonal_order = (0, 1, 1, 48)
+model = SARIMAX(y_train[-48*7*2:], order = my_order, seasonal_order = my_seasonal_order)
+#model = SARIMAX(y_train_1, order=my_order, seasonal_order=my_seasonal_order)
+model_fit = model.fit()
+
+# Summary of the model
+print(model_fit.summary())
 
 ########################################################################################################################
 # Decompose the data into seasonal component, trend and residual error of the 2.
 ########################################################################################################################
 
 # Decompose the data.
-ts_decompose = sm.tsa.seasonal_decompose(y_train[:48*7*2], model='additive', period = 48)
+ts_decompose = sm.tsa.seasonal_decompose(y_train[-48*7*2:], model='additive', period = 48)
 ts_decompose.plot()
-plt.show
+plt.show()
 
-# Get the prediction and its residual.
-# Define the lenght of the prediciton.
 
-#predictions_train_2 = model_fit.predict(len(X_train_2), exog=X_train_2[:,1])
-predictions_train_1 = model_fit.predict(start = 1, end = len(X_train_1), exog=ex_variable_train_1)
-predictions_train_2 = model_fit.forecast(steps = len(X_train_2), exog=ex_variable_train_2 )
-predictions_train_1 = np.reshape(predictions_train_1,(-1,1))
-predictions_train_2 = np.reshape(predictions_train_2,(-1,1))
-residuals_1 = y_train_1 - predictions_train_1
-residuals_2 = y_train_2 - predictions_train_2
+predictions_train = model_fit.predict(start = 1, end = 48*7*2)
+predictions_train = np.array(predictions_train).reshape(-1,1)
+error_train = y_train[-48*7*2:] - predictions_train
+
+predictions_test = model_fit.predict(start = 48*7*2, end = 48*7*2+48*7-1)
+predictions_test = np.array(predictions_test).reshape(-1,1)
+error_test = y_test[:48*7] - predictions_test
 
 # Get the errors.
 print("-"*200)
-print("The mean absolute error of the test set is %0.2f" % np.average(abs(residuals_1)))
-print("The mean squared error of the test set is %0.2f" % np.average(abs(residuals_1)**2))
-print("The root mean squared error of the test set is %0.2f" % np.sqrt(np.mean(abs(residuals_1)**2)))
-print("The mean absolute percent error of the test set is %0.2f" % np.mean(abs((y_train_1-predictions_train_1)/y_train_1)))
+print("The mean absolute error of the train set is %0.2f" % np.average(abs(error_train)))
+print("The mean squared error of the train set is %0.2f" % np.average(abs(error_train)**2))
+print("The root mean squared error of the train  set is %0.2f" % np.sqrt(np.mean(abs(error_train)**2)))
+print("The mean absolute percent error of the train set is %0.2f" % np.mean(abs((y_train[-48*7*2:] -predictions_train)/y_train)))
 print("-"*200)
 
-print("The mean absolute error of the train set 2 is %0.2f" % np.average(abs(residuals_2)))
-print("The mean squared error of the train set 2 is %0.2f" % np.average(abs(residuals_2)**2))
-print("The root mean squared error of the train set 2 is %0.2f" % np.sqrt(np.mean(abs(residuals_2)**2)))
-print("The mean absolute percent error of the train set 2 is %0.2f" % np.mean(abs((y_train_2-predictions_train_2)/y_train_2)))
+print("The mean absolute error of the test set is %0.2f" % np.average(abs(error_test)))
+print("The mean squared error of the test set is %0.2f" % np.average(abs(error_test)**2))
+print("The root mean squared error of the test set is %0.2f" % np.sqrt(np.mean(abs(error_test)**2)))
+print("The mean absolute percent error of the test set is %0.2f" % np.mean(abs((y_test[:48*7]-predictions_test)/y_test)))
 print("-"*200)
 
 ########################################################################################################################
 # Plot the prediction on train set 1.
 ########################################################################################################################
 
-fig, ax = plt.subplots(2)
-fig.suptitle('SARIMA Model', fontsize=20)
-#y_values_dates = create_dates(X_train_2[-48*7:], y_train_2[-48*7:])
-#ax[0].plot(y_values_dates, label='Train Values')
-#y_values_dates = create_dates(X_train_2[-48*7:], y_train_2[-48*7:])
-ax[0].plot(y_train_1, label='Actual Values')
-#y_values_dates = create_dates(X_train_2[-48*7:], predictions_train_2[-48*7:])
-ax[0].plot(predictions_train_1, label='Predictions')
-ax[0].set_xlabel('Settlement Period Train Set 1')
-ax[0].set_ylabel('Electricity Load [MW]')
-ax[0].legend(loc="lower right")
+fig1, ax1 = plt.subplots(2,1,figsize=(12,6))
+ax1[0].plot(y_train[-48*7*2:] , label='Actual Values', color = "blue")
+ax1[0].plot(predictions_train, label='Predictions', color = "orange")
+ax1[0].set_ylabel('Electricity Load [MW]', size = 14)
 
-#y_values_dates = create_dates(X_train_2[-48*7:],residuals)
-ax[1].plot(residuals_1, color = 'black', label='Residuals')
-ax[1].axhline(0, linestyle='--', color='k')
-ax[1].set_xlabel('Settlement Period Train Set 1')
-ax[1].set_ylabel('Electricity Load [MW]')
-ax[1].legend(loc="lower right")
-plt.show()
+ax1[1].plot(error_train, color = 'red', label='Error Train')
+ax1[1].set_xlabel('Settlement Period Train Set', size = 14)
+ax1[1].set_ylabel('Electricity Load [MW]', size = 14)
 
-########################################################################################################################
-# Plot the prediction on the train set 2.
-########################################################################################################################
+ax1[0].legend()
+ax1[1].legend()
+ax1[0].grid(True)
+ax1[1].grid(True)
+loc = plticker.MaxNLocator() # this locator puts ticks at regular intervals
+ax1[0].xaxis.set_major_locator(loc)
+ax1[1].xaxis.set_major_locator(loc)
+fig1.autofmt_xdate(rotation = 8)
+fig1.show()
 
-fig, ax = plt.subplots(2)
-fig.suptitle('SARIMA Model', fontsize=20)
-#y_values_dates = create_dates(X_train_2[-48*7:], y_train_2[-48*7:])
-#ax[0].plot(y_values_dates, label='Train Values')
-#y_values_dates = create_dates(X_train_2[-48*7:], y_train_2[-48*7:])
-ax[0].plot(y_train_2, label='Actual Values')
-#y_values_dates = create_dates(X_train_2[-48*7:], predictions_train_2[-48*7:])
-ax[0].plot(predictions_train_2, label='Predictions')
-ax[0].set_xlabel('Settlement Period Train Set 1')
-ax[0].set_ylabel('Electricity Load [MW]')
-ax[0].legend(loc="lower right")
+fig2, ax2 = plt.subplots(2,1,figsize=(12,6))
+ax2[0].plot(y_test[:48*7], label='Actual Values', color = "black")
+ax2[0].plot(predictions_test, label='Predictions', color = "orange")
+ax2[0].set_ylabel('Electricity Load [MW]', size = 14)
 
-#y_values_dates = create_dates(X_train_2[-48*7:],residuals)
-ax[1].plot(residuals_2, color = 'black', label='Residuals')
-ax[1].axhline(0, linestyle='--', color='k')
-ax[1].set_xlabel('Settlement Period Train Set 1')
-ax[1].set_ylabel('Electricity Load [MW]')
-ax[1].legend(loc="lower right")
-plt.show()
+ax2[1].plot(error_test, color = 'red', label='Error Test')
+ax2[1].set_xlabel('Settlement Period Train Set 1', size = 14)
+ax2[1].set_ylabel('Electricity Load [MW]', size = 14)
+ax2[1].legend(loc="lower right")
+
+ax2[0].legend()
+ax2[1].legend()
+ax2[0].grid(True)
+ax2[1].grid(True)
+loc = plticker.MaxNLocator() # this locator puts ticks at regular intervals
+ax2[0].xaxis.set_major_locator(loc)
+ax2[1].xaxis.set_major_locator(loc)
+fig2.autofmt_xdate(rotation = 8)
+fig2.show()
 
 ########################################################################################################################
 # Plot info on the seasonality.
@@ -215,9 +214,9 @@ plt.show()
 ########################################################################################################################
 # Save the results in a csv file.
 ########################################################################################################################
-
-pd.DataFrame(predictions_train_2).to_csv("Electricity_Generation_Prediction/Hybrid_Model/Pred_train2_other_metrics/SARIMA_prediction.csv")
-pd.DataFrame(predictions_train_1).to_csv("Electricity_Generation_Prediction/SARIMA/SARIMA_prediction_train_1.csv")
+#
+# pd.DataFrame(predictions_train_2).to_csv("Electricity_Generation_Prediction/Hybrid_Model/Pred_train2_other_metrics/SARIMA_prediction.csv")
+# pd.DataFrame(predictions_train_1).to_csv("Electricity_Generation_Prediction/SARIMA/SARIMA_prediction_train_1.csv")
 
 # pd.DataFrame(result_test).to_csv(
 #     "/Users/benoitputzeys/PycharmProjects/MSc_Thesis/Electricity_Generation_Prediction/Hybrid_Model/Pred_test_other_metrics/SARIMA_prediction.csv")

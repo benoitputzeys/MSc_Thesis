@@ -39,7 +39,7 @@ def create_model(dim, learning_rate):
 
 def train_model(model, xvalues, yvalues, epochs, batch):
 
-    history = model.fit(xvalues, yvalues, batch_size=batch, epochs=epochs)
+    history = model.fit(xvalues, yvalues, batch_size=batch, epochs=epochs, verbose = 2)
 
     # To track the progression of training, gather a snapshot of the model's mean squared error at each epoch.
     hist = pd.DataFrame(history.history)

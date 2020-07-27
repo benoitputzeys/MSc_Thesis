@@ -24,8 +24,10 @@ y = y.set_index("Time")
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state = 0, shuffle = False)
 
 X_train = X_train[int(len(X_train)*1/2):]
+X_test = X_test[:int(len(X_test)*1/2)]
 y_train = y_train[int(len(y_train)*1/2):]
-dates = dates[-len(X_train)-len(X_test):]
+y_test = y_test[:int(len(y_test)*1/2)]
+dates = dates[-len(X_train)-len(X_test)*2:-len(X_test)]
 
 X_train_unscaled = X_train
 X_test_unscaled = X_test
@@ -120,20 +122,6 @@ axs2[0].legend(loc=(1.04,0.7))
 fig2.show()
 
 ########################################################################################################################
-# Save the results in a csv file.
-########################################################################################################################
-
-import csv
-with open('Compare_Models/Single_Multi_Step_results/SVR.csv', 'w', newline='', ) as file:
-    writer = csv.writer(file)
-    writer.writerow(["Method","MSE","MAE","RMSE"])
-    writer.writerow(["SVR",
-                     str(mean_squared_error(y_test,pred_test)),
-                     str(mean_absolute_error(y_test,pred_test)),
-                     str(np.sqrt(mean_squared_error(y_test,pred_test)))
-                     ])
-
-########################################################################################################################
 # Compute the standard deviation of the training set.
 ########################################################################################################################
 
@@ -143,7 +131,7 @@ settlement_period_week = X["Settlement Period"]+(48*X["Day of Week"])
 dates_train = dates.iloc[:len(X_train)]
 dates_test = dates.iloc[-len(X_test):]
 train_set = y_train
-settlement_period_train = settlement_period_week[-len(X_test)-len(X_train):-len(X_test)]
+settlement_period_train = settlement_period_week[-len(X_test)*2-len(X_train):-len(X_test)*2]
 
 # Create a dataframe that contains the SPs (1-336) and the load values.
 error_train = pd.DataFrame({'SP':settlement_period_train, 'Error_Train': (pred_train-train_set)})
@@ -176,7 +164,7 @@ axs4.fill_between(training_stats.iloc[:,0],
                   (training_stats.iloc[:,1]+training_stats.iloc[:,2]),
                   alpha=0.2, color = "orange", label = "+- 1x Standard Deviation")
 axs4.set_ylabel("Error during training [GW]", size = 14)
-axs6.set_xlabel("Settlement Period / Weekday", size = 14)
+axs4.set_xlabel("Settlement Period / Weekday", size = 14)
 
 # Include additional details such as tick intervals, legend positioning and grid on.
 loc = plticker.MultipleLocator(base=47)
@@ -229,3 +217,29 @@ axs5[1].legend(loc=(1.04,0.9))
 axs5[0].legend(loc=(1.04,0.6))
 
 fig5.show()
+
+########################################################################################################################
+# Save the results in a csv file.
+########################################################################################################################
+
+import csv
+with open('Compare_Models/Single_Multi_Step_results/SVR.csv', 'w', newline='', ) as file:
+    writer = csv.writer(file)
+    writer.writerow(["Method","MSE","MAE","RMSE"])
+    writer.writerow(["SVR",
+                     str(mean_squared_error(y_test,pred_test)),
+                     str(mean_absolute_error(y_test,pred_test)),
+                     str(np.sqrt(mean_squared_error(y_test,pred_test)))
+                     ])
+
+import csv
+with open('Compare_Models/SMST_Probability_results/Probability_Based_on_Model/SVR_error.csv', 'w', newline='', ) as file:
+    writer = csv.writer(file)
+    writer.writerow(["Method","MSE","MAE","RMSE"])
+    writer.writerow(["SVR",
+                     str(mean_squared_error(y_test,pred_test)),
+                     str(mean_absolute_error(y_test,pred_test)),
+                     str(np.sqrt(mean_squared_error(y_test,pred_test)))
+                     ])
+
+training_stats.to_csv("Compare_Models/SMST_Probability_results/Probability_Based_on_Training/SVR_mean_errors_stddevs.csv")
