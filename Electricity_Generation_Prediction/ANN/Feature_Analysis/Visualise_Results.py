@@ -6,17 +6,17 @@ import matplotlib.pyplot as plt
 ########################################################################################################################
 
 # Load the results in respective variables.
-F6 = pd.read_csv("Electricity_Generation_Prediction/ANN/Feature_Analysis/F6.csv")
-F6_SP = pd.read_csv("Electricity_Generation_Prediction/ANN/Feature_Analysis/F6_SP.csv")
-F6_SP_DoW = pd.read_csv("Electricity_Generation_Prediction/ANN/Feature_Analysis/F6_SP_DoW.csv")
-F6_SP_DoW_D = pd.read_csv("Electricity_Generation_Prediction/ANN/Feature_Analysis/F6_SP_DoW_D.csv")
-F6_SP_DoW_D_M = pd.read_csv("Electricity_Generation_Prediction/ANN/Feature_Analysis/F6_SP_DoW_D_M.csv")
-F6_SP_DoW_D_M_Y = pd.read_csv("Electricity_Generation_Prediction/ANN/Feature_Analysis/F6_SP_DoW_D_M_Y.csv")
+F7 = pd.read_csv("Electricity_Generation_Prediction/ANN/Feature_Analysis/F7.csv")
+F7_SP = pd.read_csv("Electricity_Generation_Prediction/ANN/Feature_Analysis/F7_SP.csv")
+F7_SP_DoW = pd.read_csv("Electricity_Generation_Prediction/ANN/Feature_Analysis/F7_SP_DoW.csv")
+F7_SP_DoW_D = pd.read_csv("Electricity_Generation_Prediction/ANN/Feature_Analysis/F7_SP_DoW_D.csv")
+F7_SP_DoW_D_M = pd.read_csv("Electricity_Generation_Prediction/ANN/Feature_Analysis/F7_SP_DoW_D_M.csv")
+F7_SP_DoW_D_M_Y = pd.read_csv("Electricity_Generation_Prediction/ANN/Feature_Analysis/F7_SP_DoW_D_M_Y.csv")
 
 # Load the results in a dataframe.
-frames = ([ F6_SP_DoW_D_M_Y, F6_SP_DoW_D_M,F6_SP_DoW_D, F6_SP_DoW,F6_SP, F6])
+frames = ([ F7_SP_DoW_D_M_Y, F7_SP_DoW_D_M,F7_SP_DoW_D, F7_SP_DoW,F7_SP, F7])
 df = pd.concat(frames, axis = 0)
-string = ['6_SP_DoW_D_M_Y', '6_SP_DoW_D_M','6_SP_DoW_D', '6_SP_DoW','6_SP', '6']
+string = ['F7_SP_DoW_D_M_Y', 'F7_SP_DoW_D_M','F7_SP_DoW_D', 'F7_SP_DoW','F7_SP', 'F7']
 
 # Create histograms for RMSE, MSE and MAE.
 fig, axes = plt.subplots(1,3,figsize=(12,6))
@@ -42,7 +42,7 @@ fig.show()
 
 # Load the results in respective variables.
 F11_Single_Step = pd.read_csv("Electricity_Generation_Prediction/ANN/Feature_Analysis/F11_Single_Step.csv")
-F6_Single_Step = pd.read_csv("Electricity_Generation_Prediction/ANN/Feature_Analysis/F6_Single_Step.csv")
+F6_Single_Step = pd.read_csv("Electricity_Generation_Prediction/ANN/Feature_Analysis/F7_Single_Step.csv")
 
 # Load the results in a dataframe.
 frames = ([ F11_Single_Step, F6_Single_Step])
@@ -66,4 +66,35 @@ axes2[2].set_ylabel('RMSE [GW]', size = 14)
 axes2[2].grid(True)
 axes2[2].set_xticklabels(rotation=90, labels = string)
 fig2.show()
+
+########################################################################################################################
+# Compare how including the transmission compares against not including it.
+########################################################################################################################
+
+# Load the results in respective variables.
+F6_No_Transmission = pd.read_csv("Electricity_Generation_Prediction/ANN/Feature_Analysis/F6_(No_Transmission).csv")
+F7 = pd.read_csv("Electricity_Generation_Prediction/ANN/Feature_Analysis/F7.csv")
+
+# Load the results in a dataframe.
+frames = ([ F6_No_Transmission, F7])
+df = pd.concat(frames, axis = 0)
+string = ['F6_(No_Transmission)', 'F7']
+
+# Create histograms for RMSE, MSE and MAE.
+fig3, axes3 = plt.subplots(1,3,figsize=(12,6))
+axes3[0].bar(df.iloc[:,0], df.iloc[:,1]/1000000, color='blue')
+axes3[0].set_ylabel('MSE [GW^2]', size = 14)
+axes3[0].set_xticklabels(rotation=0, labels = string)
+axes3[0].grid(True)
+
+axes3[1].bar(df.iloc[:,0], df.iloc[:,2]/1000, color='blue')
+axes3[1].set_ylabel('MAE [GW]', size = 14)
+axes3[1].set_xticklabels(rotation=0, labels = string)
+axes3[1].grid(True)
+
+axes3[2].bar(df.iloc[:,0], df.iloc[:,3]/1000, color='blue')
+axes3[2].set_ylabel('RMSE [GW]', size = 14)
+axes3[2].grid(True)
+axes3[2].set_xticklabels(rotation=0, labels = string)
+fig3.show()
 
