@@ -16,7 +16,7 @@ import keras
 X = pd.read_csv('Data_Preprocessing/For_Multi_Step_Prediction/X.csv', delimiter=',')
 X = X.set_index("Time")
 dates = X.iloc[:,-1]
-X = X.iloc[:,:-5]
+X = X.iloc[:,:-6]
 
 y = pd.read_csv('Data_Preprocessing/For_Multi_Step_Prediction/y.csv', delimiter=',')
 y = y.set_index("Time")
@@ -27,7 +27,7 @@ X_train = X_train[int(len(X_train)*1/2):]
 X_test = X_test[:int(len(X_test)*1/2)]
 y_train = y_train[int(len(y_train)*1/2):]
 y_test = y_test[:int(len(y_test)*1/2)]
-dates = dates[-len(X_test)-len(X_test)*2:-len(X_test)]
+dates = dates[-len(X_train)-len(X_test)*2:-len(X_test)]
 
 # Feature Scaling
 x_scaler = StandardScaler()
@@ -42,7 +42,7 @@ y_train = y_scaler.fit_transform(y_train)
 
 # Define the hyperparameters.
 learning_rate = 0.001
-number_of_epochs = 100
+number_of_epochs = 120
 batch_size = 32
 
 # Create the model.

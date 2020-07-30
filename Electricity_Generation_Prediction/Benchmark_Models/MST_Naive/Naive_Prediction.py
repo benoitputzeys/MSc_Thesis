@@ -57,7 +57,7 @@ print("The mean of the test set is %.2f" %mean_test,"MW and the standard deviati
 pred = X_test.iloc[:48*7,0]
 
 error = np.zeros((336+48*3,1))
-error[-336:,0] = np.abs(X_test.iloc[:48*7,0]-y_test.iloc[:48*7,0])
+error[-336:,0] = X_test.iloc[:48*7,0]-y_test.iloc[:48*7,0]
 
 # Plot the result with the truth in red and the predictions in blue.
 fig2, axs2=plt.subplots(2,1,figsize=(12,6))
@@ -83,10 +83,10 @@ axs2[0].xaxis.set_major_locator(loc)
 axs2[1].grid(True)
 axs2[1].plot(dates.iloc[-len(X_test)-48*3:-len(X_test)+48*7],
              error/1000,
-             label = "Absolute Error", alpha = 1, color = "red")
+             label = "Error", alpha = 1, color = "red")
 axs2[1].axvline(dates.iloc[-len(X_test)], linestyle="--", color = "black")
 axs2[1].set_xlabel('Date',size = 14)
-axs2[1].set_ylabel('Absolute Error [GW]',size = 14)
+axs2[1].set_ylabel('Error [GW]',size = 14)
 loc = plticker.MultipleLocator(base=47) # this locator puts ticks at regular intervals
 axs2[1].xaxis.set_major_locator(loc)
 fig2.autofmt_xdate(rotation=15)
@@ -97,10 +97,10 @@ axs2[0].legend(loc=(1.04,0.6))
 fig2.show()
 
 # Calculate the errors from the mean to the actual vaules.
-error_test = np.abs(X_test.iloc[:,0]-y_test.iloc[:,0])
+error_test = X_test.iloc[:,0]-y_test.iloc[:,0]
 
 print("-"*200)
-print("The mean absolute error of the entire test set is %0.2f" % np.mean(error_test))
+print("The mean absolute error of the entire test set is %0.2f" % np.mean(abs(error_test)))
 print("The mean squared error of the entire test set is %0.2f" % np.mean(error_test**2))
 print("The root mean squared error of the entire test set is %0.2f" % np.sqrt(np.mean(error_test**2)))
 print("-"*200)

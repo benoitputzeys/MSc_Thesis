@@ -8,7 +8,7 @@ import matplotlib.ticker as plticker
 X = pd.read_csv('Data_Preprocessing/For_Multi_Step_Prediction/X.csv', delimiter=',')
 X = X.set_index("Time")
 dates = X.iloc[:,-1]
-X = X.iloc[:,:-5]
+X = X.iloc[:,:-6]
 
 y = pd.read_csv('Data_Preprocessing/For_Multi_Step_Prediction/y.csv', delimiter=',')
 y = y.set_index("Time")
@@ -16,25 +16,39 @@ y = y.set_index("Time")
 # Split data into train set and test set.
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=1, shuffle = False)
 
+X_train = X_train[int(len(X_train)*1/2):]/1000
+X_test = X_test[:int(len(X_test)*1/2)]/1000
+y_train = y_train[int(len(y_train)*1/2):]/1000
+y_test = y_test[:int(len(y_test)*1/2)]/1000
+dates = dates[-len(X_train)-len(X_test)*2:-len(X_test)]
+
 # Naive prediction
 pred = X_test.iloc[:48*7,0]
 
 error = np.zeros((336+48*3,1))
-error[-336:,0] = np.abs(X_test.iloc[:48*7,0]-y_test.iloc[:48*7,0])
+error[-336:,0] = np.array(X_test.iloc[:48*7,0]-y_test.iloc[:48*7,0])
 
 # Plot the result with the truth in red and the predictions in blue.
 fig2, axs2=plt.subplots(2,1,figsize=(12,6))
 axs2[0].grid(True)
-axs2[0].plot(dates.iloc[-len(X_test)-48*3:-len(X_test)],y_train.iloc[-48*3:,0]/1000, label = "Training Set (True Values)", alpha = 1, color = "black")
-axs2[0].plot(dates.iloc[-len(X_test):-len(X_test)+48*7], pred/1000, label = "Naive Prediction", color = "orange")
-axs2[0].plot(dates.iloc[-len(X_test):-len(X_test)+48*7],y_test.iloc[:48*7,0]/1000, label = "Test Set (True Values)", alpha = 1, color = "blue")
+axs2[0].plot(dates.iloc[-len(X_test)-48*3:-len(X_test)],
+             y_train.iloc[-48*3:,0],
+             label = "Training Set (True Values)", alpha = 1, color = "black")
+axs2[0].plot(dates.iloc[-len(X_test):-len(X_test)+48*7],
+             pred,
+             label = "Naive Prediction", color = "orange")
+axs2[0].plot(dates.iloc[-len(X_test):-len(X_test)+48*7],
+             y_test.iloc[:48*7,0],
+             label = "Test Set (True Values)", alpha = 1, color = "blue")
 axs2[0].axvline(dates.iloc[-len(X_test)], linestyle="--", color = "black")
 axs2[0].set_ylabel('Load [GW]',size = 14)
 loc = plticker.MultipleLocator(base=47) # this locator puts ticks at regular intervals
 axs2[0].xaxis.set_major_locator(loc)
 
 axs2[1].grid(True)
-axs2[1].plot(dates.iloc[-len(X_test)-48*3:-len(X_test)+48*7],error/1000, label = "Absolute Error", alpha = 1, color = "red")
+axs2[1].plot(dates.iloc[-len(X_test)-48*3:-len(X_test)+48*7],
+             error,
+             label = "Absolute Error", alpha = 1, color = "red")
 axs2[1].axvline(dates.iloc[-len(X_test)], linestyle="--", color = "black")
 axs2[1].set_xlabel('Date',size = 14)
 axs2[1].set_ylabel('Absolute Error [GW]',size = 14)

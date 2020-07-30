@@ -18,7 +18,7 @@ import matplotlib.dates as mdates
 X = pd.read_csv('Data_Preprocessing/For_Multi_Step_Prediction/X.csv', delimiter=',')
 X = X.set_index("Time")
 dates = X.iloc[:,-1]
-X = X.iloc[:,:-5]
+X = X.iloc[:,:-6]
 
 y = pd.read_csv('Data_Preprocessing/For_Multi_Step_Prediction/y.csv', delimiter=',')
 y = y.set_index("Time")
@@ -29,7 +29,7 @@ X_train = X_train[int(len(X_train)*1/2):]
 X_test = X_test[:int(len(X_test)*1/2)]
 y_train = y_train[int(len(y_train)*1/2):]
 y_test = y_test[:int(len(y_test)*1/2)]
-dates = dates[-len(X_test)-len(X_test)*2:-len(X_test)]
+dates = dates[-len(X_train)-len(X_test)*2:-len(X_test)]
 
 # Feature Scaling
 x_scaler = StandardScaler()
@@ -44,8 +44,8 @@ y_train = y_scaler.fit_transform(y_train)
 
 # Define the hyperparameters.
 learning_rate = 0.001
-number_of_epochs = 100
-batch_size = 32
+number_of_epochs = 120
+batch_size = 19
 
 # Create the model.
 my_model = create_model(7, learning_rate)
@@ -115,9 +115,11 @@ axs2[0].plot(dates.iloc[-len(X_test)-48*3:-len(X_test)],
              y_train[-48*3:],
              label = "Training Set (True Values)", alpha = 1, color = "blue")
 axs2[0].plot(dates.iloc[-len(X_test):-len(X_test)+48*7],
-             pred_test[:48*7], label = "ANN Prediction", color = "orange")
+             pred_test[:48*7],
+             label = "ANN Prediction", color = "orange")
 axs2[0].plot(dates.iloc[-len(X_test):-len(X_test)+48*7],
-             y_test[:48*7], label = "Test Set (True Values)", alpha = 1, color = "black")
+             y_test[:48*7],
+             label = "Test Set (True Values)", alpha = 1, color = "black")
 axs2[0].axvline(dates.iloc[-len(X_test)], linestyle="--", color = "black")
 axs2[0].set_ylabel('Load [GW]',size = 14)
 
