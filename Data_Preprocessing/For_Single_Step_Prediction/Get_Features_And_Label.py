@@ -27,11 +27,13 @@ df_features["Transmission_Past"] = df["Transmission"].shift(+2)
 # Create artificial features.
 rolling_mean_10 = df_features["Load_Past"].rolling(window=10).mean()
 rolling_mean_50 = df_features["Load_Past"].rolling(window=50).mean()
+rolling_mean_336 = df_features["Load_Past"].rolling(window=336).mean()
 exp_20 = df_features["Load_Past"].ewm(span=20, adjust=False).mean()
 exp_50 = df_features["Load_Past"].ewm(span=50, adjust=False).mean()
 
 df_features["Simple_Moving_Average_10_SP"] = rolling_mean_10
 df_features["Simple_Moving_Average_50_SP"] = rolling_mean_50
+df_features["Simple_Moving_Average_336_SP"] = rolling_mean_336
 df_features["Exp_Moving_Average_20_SP"] = exp_20
 df_features["Exp_Moving_Average_50_SP"] = exp_50
 
