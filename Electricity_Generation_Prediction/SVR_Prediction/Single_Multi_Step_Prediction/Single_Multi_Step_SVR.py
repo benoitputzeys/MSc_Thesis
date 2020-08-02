@@ -86,7 +86,7 @@ print("-"*200)
 error_test_plot = np.zeros((48*3+48*7,1))
 error_test_plot[-336:] = error_test[:48*7].reshape(-1,1)
 
-# Plot the result with the truth in red and the predictions in blue.
+# Plot the result with the truth in black/blue and the predictions in orange.
 fig2, axs2=plt.subplots(2,1,figsize=(12,6))
 
 # First plot contains the prediction and the true values from the test and training set.
@@ -158,19 +158,27 @@ for i in range(1,337):
 fig4, axs4=plt.subplots(1,1,figsize=(12,6))
 axs4.plot(training_stats.iloc[:,0],
           training_stats.iloc[:,1],
-          color = "orange", label = "Mean of all projected errors")
+          color = "orange", label = "Mean error of the SVR prediction on the Training Set")
 axs4.fill_between(training_stats.iloc[:,0],
                   (training_stats.iloc[:,1]-training_stats.iloc[:,2]),
                   (training_stats.iloc[:,1]+training_stats.iloc[:,2]),
                   alpha=0.2, color = "orange", label = "+- 1x Standard Deviation")
 axs4.set_ylabel("Error during training [GW]", size = 14)
-axs4.set_xlabel("Settlement Period / Weekday", size = 14)
-
+axs4.set_xlabel("Hour / Weekday", size = 14)
 # Include additional details such as tick intervals, legend positioning and grid on.
-loc = plticker.MultipleLocator(base=47)
-plt.xticks(np.arange(1,385, 48), ["1 / Monday", "49 / Tuesday", "97 / Wednesday", "145 / Thursday", "193 / Friday","241 / Saturday", "289 / Sunday",""])
-axs4.legend()
-axs4.grid(True)
+axs4.minorticks_on()
+axs4.grid(b=True, which='major'), axs4.grid(b=True, which='minor',alpha = 0.2)
+axs4.set_xticks(np.arange(1,385, 24))
+axs4.set_xticklabels(["00:00\nMonday","12:00",
+                       "00:00\nTuesday","12:00",
+                       "00:00\nWednesday", "12:00",
+                       "00:00\nThursday", "12:00",
+                       "00:00\nFriday","12:00",
+                       "00:00\nSaturday", "12:00",
+                       "00:00\nSunday","12:00",
+                       "00:00"])
+axs4.legend(fontsize=14)
+axs4.tick_params(axis = "both", labelsize = 12)
 fig4.show()
 
 stddev = training_stats["Stddev"]
@@ -186,14 +194,16 @@ axs5[0].plot(dates.iloc[-len(X_test):-len(X_test)+48*7],
 axs5[0].plot(dates.iloc[-len(X_test):-len(X_test)+48*7],
              y_test[:48*7],
              label = "Test Set (True Values)", alpha = 1, color = "black")
-axs5[0].fill_between(dates.iloc[-len(X_test)+29:-len(X_test)+48*7],
-                    pred_test[29:48*7]+stddev[29:],
-                    pred_test[29:48*7]-stddev[29:],
-                    label = "+-1 x Standard Deviation", alpha = 0.2, color = "orange")
-axs5[0].fill_between(dates.iloc[-len(X_test):-len(X_test)+29],
-                    pred_test[:29]+stddev[:29],
-                    pred_test[:29]-stddev[:29],
+# Use the blue band from Thursday 14:00 to Sunday 23:30 (corresponds to an interval of 164 SPs)
+axs5[0].fill_between(dates.iloc[-len(X_test):-len(X_test)+164],
+                    pred_test[:164]+stddev[-164:],
+                    pred_test[:164]-stddev[-164:],
                     alpha = 0.2, color = "orange")
+# Use the blue band from Monday 00:00 (SP = 1) to Thursday 13:30 (SP=164)
+axs5[0].fill_between(dates.iloc[-len(X_test)+164:-len(X_test)+48*7],
+                    pred_test[164:48*7]+stddev[:172],
+                    pred_test[164:48*7]-stddev[:172],
+                    label = "+-1 x Standard Deviation", alpha = 0.2, color = "orange")
 axs5[0].axvline(dates.iloc[-len(X_test)], linestyle="--", color = "black")
 axs5[0].set_ylabel('Load [GW]',size = 14)
 
@@ -222,24 +232,14 @@ fig5.show()
 # Save the results in a csv file.
 ########################################################################################################################
 
-import csv
-with open('Compare_Models/Single_Multi_Step_results/SVR.csv', 'w', newline='', ) as file:
-    writer = csv.writer(file)
-    writer.writerow(["Method","MSE","MAE","RMSE"])
-    writer.writerow(["SVR",
-                     str(mean_squared_error(y_test,pred_test)),
-                     str(mean_absolute_error(y_test,pred_test)),
-                     str(np.sqrt(mean_squared_error(y_test,pred_test)))
-                     ])
-
-import csv
-with open('Compare_Models/SMST_Probability_results/Probability_Based_on_Training/SVR_error.csv', 'w', newline='', ) as file:
-    writer = csv.writer(file)
-    writer.writerow(["Method","MSE","MAE","RMSE"])
-    writer.writerow(["SVR",
-                     str(mean_squared_error(y_test,pred_test)),
-                     str(mean_absolute_error(y_test,pred_test)),
-                     str(np.sqrt(mean_squared_error(y_test,pred_test)))
-                     ])
+df_errors = pd.DataFrame({"MSE_Train": [mean_squared_error(y_train,pred_train)],
+                          "MAE_Train": [mean_absolute_error(y_train,pred_train)],
+                          "RMSE_Train": [np.sqrt(mean_squared_error(y_train,pred_train))],
+                          "MSE_Test": [mean_squared_error(y_test, pred_test)],
+                          "MAE_Test": [mean_absolute_error(y_test, pred_test)],
+                          "RMSE_Test": [np.sqrt(mean_squared_error(y_test, pred_test))],
+                          })
+df_errors.to_csv("Compare_Models/SMST_Probability_results/Probability_Based_on_Training/SVR_error.csv")
+df_errors.to_csv("Compare_Models/Single_Multi_Step_results/SVR.csv")
 
 training_stats.to_csv("Compare_Models/SMST_Probability_results/Probability_Based_on_Training/SVR_mean_errors_stddevs.csv")

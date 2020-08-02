@@ -63,6 +63,7 @@ fig2.show()
 
 # Calculate the errors from the mean to the actual vaules.
 error_test = np.abs(X_test.iloc[:,0]-y_test.iloc[:,0])
+error_train = np.abs(X_train.iloc[:,0]-y_train.iloc[:,0])
 
 print("-"*200)
 print("The mean absolute error of the entire test set is %0.2f" % np.mean(error_test))
@@ -74,12 +75,14 @@ print("-"*200)
 # Save the results in a csv file.
 ########################################################################################################################
 
-import csv
-with open('Compare_Models/Single_Multi_Step_results/Naive.csv', 'w', newline='', ) as file:
-    writer = csv.writer(file)
-    writer.writerow(["Method","MSE","MAE","RMSE"])
-    writer.writerow(["Naive",
-                     str(np.mean(error_test**2)),
-                     str(np.mean(error_test)),
-                     str(np.sqrt(np.mean(error_test**2)))
-                     ])
+df_errors = pd.DataFrame({"MSE_Train": [np.mean(error_train**2)],
+                              "MAE_Train": [np.mean(error_train)],
+                              "RMSE_Train": [np.sqrt(np.mean(error_train**2))],
+                              "MSE_Test": [np.mean(error_test**2)],
+                              "MAE_Test": [np.mean(error_test)],
+                              "RMSE_Test": [np.sqrt(np.mean(error_test**2))],
+                              })
+df_errors.to_csv("Compare_Models/SMST_Probability_results/Probability_Based_on_Training/Naive_error.csv")
+df_errors.to_csv("Compare_Models/Single_Multi_Step_results/Naive.csv")
+
+

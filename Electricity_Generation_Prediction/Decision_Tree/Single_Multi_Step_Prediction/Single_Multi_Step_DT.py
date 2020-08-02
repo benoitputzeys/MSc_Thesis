@@ -120,12 +120,13 @@ fig2.show()
 # Save the results in a csv file.
 ########################################################################################################################
 
-import csv
-with open('Compare_Models/Single_Multi_Step_results/DT.csv', 'w', newline='', ) as file:
-    writer = csv.writer(file)
-    writer.writerow(["Method","MSE","MAE","RMSE"])
-    writer.writerow(["DT",
-                     str(mean_squared_error(y_test,pred_test)),
-                     str(mean_absolute_error(y_test,pred_test)),
-                     str(np.sqrt(mean_squared_error(y_test,pred_test)))
-                     ])
+df_errors = pd.DataFrame({"MSE_Train": [mean_squared_error(y_train,pred_train)],
+                          "MAE_Train": [mean_absolute_error(y_train,pred_train)],
+                          "RMSE_Train": [np.sqrt(mean_squared_error(y_train,pred_train))],
+                          "MSE_Test": [mean_squared_error(y_test, pred_test)],
+                          "MAE_Test": [mean_absolute_error(y_test, pred_test)],
+                          "RMSE_Test": [np.sqrt(mean_squared_error(y_test, pred_test))],
+                          })
+df_errors.to_csv("Compare_Models/SMST_Probability_results/Probability_Based_on_Training/DT_error.csv")
+df_errors.to_csv("Compare_Models/Single_Multi_Step_results/DT.csv")
+

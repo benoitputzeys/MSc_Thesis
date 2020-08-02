@@ -121,18 +121,9 @@ axs[3].plot(dates[33500:36020], residual[33500:36020] , color = "blue")
 axs[3].set_ylabel("Residual [GW]", size = 14)
 axs[3].set_xlabel("Date", size = 18)
 loc = plticker.MultipleLocator(base=48*10) # this locator puts ticks at regular intervals
-axs[0].xaxis.set_major_locator(loc)
-axs[0].grid(True)
-axs[1].xaxis.set_major_locator(loc)
-axs[1].grid(True)
-axs[2].xaxis.set_major_locator(loc)
-axs[2].grid(True)
-axs[3].xaxis.set_major_locator(loc)
-axs[3].grid(True)
-axs[0].tick_params(axis = "both", labelsize = 14)
-axs[1].tick_params(axis = "both", labelsize = 14)
-axs[2].tick_params(axis = "both", labelsize = 14)
-axs[3].tick_params(axis = "both", labelsize = 14)
+axs[0].xaxis.set_major_locator(loc), axs[1].xaxis.set_major_locator(loc), axs[2].xaxis.set_major_locator(loc), axs[3].xaxis.set_major_locator(loc)
+axs[0].grid(True), axs[1].grid(True), axs[2].grid(True), axs[3].grid(True)
+axs[0].tick_params(axis = "both", labelsize = 14), axs[1].tick_params(axis = "both", labelsize = 14), axs[2].tick_params(axis = "both", labelsize = 14), axs[3].tick_params(axis = "both", labelsize = 14)
 fig.autofmt_xdate(rotation = 5)
 fig.show()
 
@@ -151,15 +142,9 @@ axs1[2].plot(dates[-48*7*2:-48*7+5],(reconstruction-series)[-48*7*2:-48*7+5]/100
 axs1[2].set_ylabel("Error [GW]", size = 12)
 axs1[2].set_xlabel("Date", size = 18)
 loc = plticker.MultipleLocator(base=48) # this locator puts ticks at regular intervals
-axs1[0].xaxis.set_major_locator(loc)
-axs1[0].grid(True)
-axs1[1].xaxis.set_major_locator(loc)
-axs1[1].grid(True)
-axs1[2].xaxis.set_major_locator(loc)
-axs1[2].grid(True)
-axs1[0].tick_params(axis = "both", labelsize = 12)
-axs1[1].tick_params(axis = "both", labelsize = 12)
-axs1[2].tick_params(axis = "both", labelsize = 12)
+axs1[0].xaxis.set_major_locator(loc), axs1[1].xaxis.set_major_locator(loc), axs1[2].xaxis.set_major_locator(loc)
+axs1[0].grid(True), axs1[1].grid(True), axs1[2].grid(True)
+axs1[0].tick_params(axis = "both", labelsize = 12), axs1[1].tick_params(axis = "both", labelsize = 12), axs1[2].tick_params(axis = "both", labelsize = 12)
 fig1.autofmt_xdate(rotation = 7)
 fig1.show()
 
@@ -176,15 +161,9 @@ axs2[2].plot(dates[-48*7-500:-500+5],(modified_timeseries-series)[-48*7-500:-500
 axs2[2].set_ylabel("Error [GW]", size = 14)
 axs2[2].set_xlabel("Date", size = 18)
 loc = plticker.MultipleLocator(base=48) # this locator puts ticks at regular intervals
-axs2[0].xaxis.set_major_locator(loc)
-axs2[0].grid(True)
-axs2[1].xaxis.set_major_locator(loc)
-axs2[1].grid(True)
-axs2[2].xaxis.set_major_locator(loc)
-axs2[2].grid(True)
-axs2[0].tick_params(axis = "both", labelsize = 14)
-axs2[1].tick_params(axis = "both", labelsize = 14)
-axs2[2].tick_params(axis = "both", labelsize = 14)
+axs2[0].xaxis.set_major_locator(loc), axs2[1].xaxis.set_major_locator(loc), axs2[2].xaxis.set_major_locator(loc)
+axs2[0].grid(True), axs2[1].grid(True), axs2[2].grid(True)
+axs2[0].tick_params(axis = "both", labelsize = 14), axs2[1].tick_params(axis = "both", labelsize = 14), axs2[2].tick_params(axis = "both", labelsize = 14)
 fig2.autofmt_xdate(rotation = 9)
 fig2.show()
 
@@ -204,19 +183,27 @@ axs3[0].set_ylabel('Load [GW]',size = 14)
 axs3[0].set_xlabel('Date',size = 14)
 
 axs3[1].scatter(modified_timeseries_train["SP"], modified_timeseries_train["Load"], alpha=0.05, label = "Projected Loads", color = "blue")
-#axs3.plot(settlement_period[-48*7:], series[-48*7:]/1000, color = "red", label = "Load from week in question")
 axs3[1].set_ylabel("Load [GW]", size = 14)
 axs3[1].set_xlabel("Settlement Period / Weekday", size = 14)
 axs3[1].grid(True)
 
 loc = plticker.MultipleLocator(base=48*7) # Puts ticks at regular intervals
 axs3[0].xaxis.set_major_locator(loc)
-plt.xticks(np.arange(1,385, 48), ["1 / Monday", "49 / Tuesday", "97 / Wednesday", "145 / Thursday", "193 / Friday", "241 / Saturday", "289 / Sunday",""])
-axs3[0].grid(True)
-axs3[0].legend(fontsize = 12)
-axs3[1].legend(fontsize = 12)
-axs3[0].tick_params(axis = "both", labelsize = 12)
-axs3[1].tick_params(axis = "both", labelsize = 12)
+axs3[0].legend(loc = "upper right",fontsize = 14), axs3[1].legend(loc = "upper right",fontsize = 14)
+axs3[1].set_xlabel("Hour / Weekday", size = 14)
+loc = plticker.MultipleLocator(base=24) # Puts ticks at regular intervals
+plt.xticks(np.arange(1,385, 24), ["00:00 \nMonday", "12:00",
+                                  "00:00 \nTuesday", "12:00",
+                                  "00:00 \nWednesday", "12:00",
+                                  "00:00 \nThursday", "12:00",
+                                  "00:00 \nFriday", "12:00",
+                                  "00:00 \nSaturday", "12:00",
+                                  "00:00 \nSunday","12:00",
+                                  "00:00"])
+axs3[0].minorticks_on(),axs3[1].minorticks_on(),
+axs3[0].grid(True), axs3[1].grid(True)
+axs3[1].grid(b=True, which='major'), axs3[1].grid(b=True, which='minor',alpha = 0.2)
+axs3[0].tick_params(axis = "both", labelsize = 12), axs3[1].tick_params(axis = "both", labelsize = 12)
 fig3.show()
 
 # Compute the mean and variation for each x.
@@ -234,11 +221,19 @@ axs4.fill_between(df_stats.iloc[:,0],
                   (df_stats.iloc[:,1]+df_stats.iloc[:,2]),
                   alpha=0.2, color = "blue", label = "+- 1 x Standard Deviation")
 axs4.set_ylabel("Load [GW]", size = 14)
-axs4.set_xlabel("Settlement Period / Weekday", size = 14)
+axs4.set_xlabel("Hour / Weekday", size = 14)
 loc = plticker.MultipleLocator(base=48) # Puts ticks at regular intervals
-plt.xticks(np.arange(1,385, 48), ["1 / Monday", "49 / Tuesday", "97 / Wednesday", "145 / Thursday", "193 / Friday", "241 / Saturday", "289 / Sunday",""])
+plt.xticks(np.arange(1,385, 24), ["00:00 \nMonday", "12:00",
+                                  "00:00 \nTuesday", "12:00",
+                                  "00:00 \nWednesday", "12:00",
+                                  "00:00 \nThursday", "12:00",
+                                  "00:00 \nFriday", "12:00",
+                                  "00:00 \nSaturday", "12:00",
+                                  "00:00 \nSunday","12:00",
+                                  "00:00"])
 axs4.legend(fontsize = 12)
-axs4.legend(fontsize = 12)
+axs4.minorticks_on()
+axs4.grid(b=True, which='major'), axs4.grid(b=True, which='minor',alpha = 0.2)
 axs4.tick_params(axis = "both", labelsize = 12)
 axs4.grid(True)
 fig4.show()
@@ -261,8 +256,7 @@ plt.xticks(np.arange(1,385, 24), ["00:00 \nMonday", "12:00",
                                   "00:00 \nSaturday", "12:00",
                                   "00:00 \nSunday","12:00"])
 axs5.minorticks_on()
-axs5.grid(b=True, which='major')
-axs5.grid(b=True, which='minor',alpha = 0.2)
+axs5.grid(b=True, which='major'), axs5.grid(b=True, which='minor',alpha = 0.2)
 
 axs5.legend(fontsize = 12)
 axs5.tick_params(axis = "both", labelsize = 12)
@@ -292,12 +286,25 @@ fig6.show()
 # that will be explored in more detail.
 fig7, axs7=plt.subplots(1,1,figsize=(12,6))
 axs7.plot(df_stats.iloc[:,0], df_stats.iloc[:,1], color = "blue", label = "Mean of all projected loads")
-axs7.fill_between(df_stats.iloc[:,0],  (df_stats.iloc[:,1]-df_stats.iloc[:,2]),  (df_stats.iloc[:,1]+df_stats.iloc[:,2]),alpha=0.2, color = "blue", label = "Stddev")
+axs7.fill_between(df_stats.iloc[:,0],
+                  (df_stats.iloc[:,1]-df_stats.iloc[:,2]),
+                  (df_stats.iloc[:,1]+df_stats.iloc[:,2]),
+                  alpha=0.2, color = "blue", label = "+- 1x Standard Deviation")
 axs7.axvline(df_stats.iloc[120,0], linestyle="--", color = "green", label = "Example 1 @ SP 120", linewidth = 2)
 axs7.axvline(df_stats.iloc[235,0], linestyle="--", color = "orange", label = "Example 2 @ SP 235", linewidth = 2)
 axs7.set_ylabel("Load [GW]", size = 14)
-axs7.set_xlabel("Settlement Period / Weekday", size = 14)
-plt.xticks(np.arange(1,385, 48), ["1 / Monday", "49 / Tuesday", "97 / Wednesday", "145 / Thursday", "193 / Friday","241 / Saturday", "289 / Sunday",""])
+axs7.set_xlabel("Hour / Weekday", size = 14)
+plt.xticks(np.arange(1,385, 24), ["00:00 \nMonday", "12:00",
+                                  "00:00 \nTuesday", "12:00",
+                                  "00:00 \nWednesday", "12:00",
+                                  "00:00 \nThursday", "12:00",
+                                  "00:00 \nFriday", "12:00",
+                                  "00:00 \nSaturday", "12:00",
+                                  "00:00 \nSunday","12:00",
+                                  "00:00"])
+axs7.legend(fontsize = 12)
+axs7.minorticks_on()
+axs7.grid(b=True, which='major'), axs7.grid(b=True, which='minor',alpha = 0.2)
 axs7.legend(fontsize = 12)
 axs7.tick_params(axis = "both", labelsize = 12)
 axs7.grid(True)
