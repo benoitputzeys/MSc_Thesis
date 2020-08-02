@@ -40,28 +40,28 @@ y_train = y_scaler.fit_transform(y_train)
 ########################################################################################################################
 # Create the model.
 ########################################################################################################################
-
-epochs =8000
-learning_rate = 0.001
-batches = 32
-
-# Build the model.
-model = build_model(X_train.shape[1],learning_rate)
-# Run training session.
-model.fit(X_train,y_train, epochs=epochs, batch_size=batches, verbose=2)
-# Describe model.
-model.summary()
-
-# Plot the learning progress.
-fig1, axs1=plt.subplots(1,1,figsize=(4,4))
-axs1.plot(model.history.history["mean_absolute_error"], color = "blue")
-axs1.set_ylabel('Loss')
-axs1.set_xlabel('Epochs')
-fig1.show()
+#
+# epochs =8000
+# learning_rate = 0.001
+# batches = 32
+#
+# # Build the model.
+# model = build_model(X_train.shape[1],learning_rate)
+# # Run training session.
+# model.fit(X_train,y_train, epochs=epochs, batch_size=batches, verbose=2)
+# # Describe model.
+# model.summary()
+#
+# # Plot the learning progress.
+# fig1, axs1=plt.subplots(1,1,figsize=(4,4))
+# axs1.plot(model.history.history["mean_absolute_error"], color = "blue")
+# axs1.set_ylabel('Loss')
+# axs1.set_xlabel('Epochs')
+# fig1.show()
 
 # Save or load the model
 #model.save("TF_Probability/MST_Rd_Weights/SMST_No_Date.h5")
-#model = keras.models.load_model("TF_Probability/MST_Rd_Weights/SMST_No_Date.h5")
+model = keras.models.load_model("TF_Probability/MST_Rd_Weights/SMST_No_Date.h5")
 
 ########################################################################################################################
 # Predicting the generation.
@@ -126,13 +126,10 @@ axs2[1].set_ylabel('Absolute Error [GW]',size = 14)
 
 # Include additional details such as tick intervals
 loc = plticker.MultipleLocator(base=48) # Puts ticks at regular intervals
-axs2[0].xaxis.set_major_locator(loc)
-axs2[1].xaxis.set_major_locator(loc)
-axs2[0].grid(True)
-axs2[1].grid(True)
+axs2[0].xaxis.set_major_locator(loc), axs2[1].xaxis.set_major_locator(loc)
+axs2[0].grid(True), axs2[1].grid(True)
 fig2.autofmt_xdate(rotation = 12)
-axs2[0].legend(loc = (1.04, 0.7))
-axs2[1].legend(loc = (1.04, 0.9))
+axs2[0].legend(loc = (1.04, 0.7)), axs2[1].legend(loc = (1.04, 0.9))
 fig2.show()
 
 # Calculate the stddev from the 350 predictions.
@@ -177,13 +174,10 @@ axs3[1].set_ylabel('Absolute Error [GW]',size = 14)
 
 # Include additional details such as tick intervals
 loc = plticker.MultipleLocator(base=48) # Puts ticks at regular intervals
-axs3[0].xaxis.set_major_locator(loc)
-axs3[1].xaxis.set_major_locator(loc)
-axs3[0].grid(True)
-axs3[1].grid(True)
+axs3[0].xaxis.set_major_locator(loc), axs3[1].xaxis.set_major_locator(loc)
+axs3[0].grid(True), axs3[1].grid(True)
 fig3.autofmt_xdate(rotation = 12)
-axs3[0].legend(loc = (1.04, 0.6))
-axs3[1].legend(loc = (1.04, 0.9))
+axs3[0].legend(loc = (1.04, 0.6)), axs3[1].legend(loc = (1.04, 0.9))
 fig3.show()
 
 # Make one large column vector containing all the predictions
@@ -243,10 +237,6 @@ axs4[0].scatter(error_train["SP"],
              error_train["Error_Train"],
              alpha=0.05, label = "Projected Errors (Training Set)", color = "red")
 axs4[0].set_ylabel("Error during training [GW]", size = 14)
-axs4[0].set_xticks(np.arange(1,385, 48))
-axs4[0].set_xticklabels(["1 / Monday", "49 / Tuesday", "97 / Wednesday", "145 / Thursday", "193 / Friday","241 / Saturday", "289 / Sunday",""])
-axs4[0].grid(True)
-axs4[0].legend()
 
 # Compute the mean and variation for each x.
 training_stats = pd.DataFrame({'Index':np.linspace(1,336,336),
@@ -266,11 +256,23 @@ axs4[1].fill_between(training_stats.iloc[:,0],
                   (training_stats.iloc[:,1]+training_stats.iloc[:,2]),
                   alpha=0.2, color = "orange", label = "+- 1x Standard Deviation")
 axs4[1].set_ylabel("Error during training [GW]", size = 14)
-axs4[1].set_xlabel("Settlement Period / Weekday", size = 14)
-axs4[1].set_xticks(np.arange(1,385, 48))
-axs4[1].set_xticklabels(["1 / Monday", "49 / Tuesday", "97 / Wednesday", "145 / Thursday", "193 / Friday","241 / Saturday", "289 / Sunday",""])
-axs4[1].legend()
-axs4[1].grid(True)
+axs4[1].set_xlabel("Hour / Weekday", size = 14)
+
+# Include additional details such as tick intervals, legend positioning and grid on.
+axs4[0].minorticks_on(), axs4[1].minorticks_on()
+axs4[0].grid(b=True, which='major'), axs4[0].grid(b=True, which='minor',alpha = 0.2)
+axs4[1].grid(b=True, which='major'), axs4[1].grid(b=True, which='minor',alpha = 0.2)
+axs4[0].set_xticks(np.arange(1,385, 24)), axs4[1].set_xticks(np.arange(1,385, 24))
+axs4[1].set_xticklabels(["00:00\nMonday","12:00",
+                       "00:00\nTuesday","12:00",
+                       "00:00\nWednesday", "12:00",
+                       "00:00\nThursday", "12:00",
+                       "00:00\nFriday","12:00",
+                       "00:00\nSaturday", "12:00",
+                       "00:00\nSunday","12:00",
+                       "00:00"])
+axs4[0].legend(fontsize=14), axs4[1].legend(fontsize=14)
+axs4[0].tick_params(axis = "both", labelsize = 12), axs4[1].tick_params(axis = "both", labelsize = 12)
 fig4.show()
 
 ########################################################################################################################
@@ -288,10 +290,6 @@ axs5[0].scatter(error_test["SP"],
              error_test["Error_Test"],
              alpha=0.05, label = "Projected Errors (Test Set)", color = "red")
 axs5[0].set_ylabel("Error during test [GW]", size = 14)
-axs5[0].set_xticks(np.arange(1,385, 48))
-axs5[0].set_xticklabels(["1 / Monday", "49 / Tuesday", "97 / Wednesday", "145 / Thursday", "193 / Friday","241 / Saturday", "289 / Sunday",""])
-axs5[0].grid(True)
-axs5[0].legend()
 
 # Compute the mean and variation for each x.
 test_stats = pd.DataFrame({'Index':np.linspace(1,336,336),
@@ -311,12 +309,71 @@ axs5[1].fill_between(test_stats.iloc[:,0],
                   (test_stats.iloc[:,1]+test_stats.iloc[:,2]),
                   alpha=0.2, color = "orange", label = "+- 1x Standard Deviation")
 axs5[1].set_ylabel("Error during test [GW]", size = 14)
-axs5[1].set_xlabel("Settlement Period / Weekday", size = 14)
-axs5[1].set_xticks(np.arange(1,385, 48))
-axs5[1].set_xticklabels(["1 / Monday", "49 / Tuesday", "97 / Wednesday", "145 / Thursday", "193 / Friday","241 / Saturday", "289 / Sunday",""])
-axs5[1].legend()
-axs5[1].grid(True)
+axs5[1].set_xlabel("Hour / Weekday", size = 14)
+
+# Include additional details such as tick intervals, legend positioning and grid on.
+axs5[0].minorticks_on(), axs5[1].minorticks_on()
+axs5[0].grid(b=True, which='major'), axs5[0].grid(b=True, which='minor',alpha = 0.2)
+axs5[1].grid(b=True, which='major'), axs5[1].grid(b=True, which='minor',alpha = 0.2)
+axs5[0].set_xticks(np.arange(1,385, 24)), axs5[1].set_xticks(np.arange(1,385, 24))
+axs5[1].set_xticklabels(["00:00\nMonday","12:00",
+                       "00:00\nTuesday","12:00",
+                       "00:00\nWednesday", "12:00",
+                       "00:00\nThursday", "12:00",
+                       "00:00\nFriday","12:00",
+                       "00:00\nSaturday", "12:00",
+                       "00:00\nSunday","12:00",
+                       "00:00"])
+axs5[0].legend(fontsize=14), axs4[1].legend(fontsize=14)
+axs5[0].tick_params(axis = "both", labelsize = 12), axs5[1].tick_params(axis = "both", labelsize = 12)
 fig5.show()
+
+# This section might take some time but calculating the mean for each is "safer" this way.
+# (If a value is missing in the original data, that is not a problem in computing the mean per week.)
+mean_each_week = pred_train_vector.copy()
+counter = 0
+for i in range(len(X)-1):
+    mean_each_week[i-counter:i+1] = np.mean(pred_train_vector[i-counter:i+1])
+    counter = counter + 1
+    if (pred_train_vector["SP"][i] == 336) & (pred_train_vector["SP"][i+1]==0):
+        counter = 0
+mean_each_week.iloc[-1]=mean_each_week.iloc[-2]
+
+pred_train_no_mean =  pd.DataFrame({'SP':long_column, 'Projection': (pred_train_vector-mean_each_week)})
+
+pred_train_projected = pd.DataFrame({'SP':np.linspace(1,336,336),
+                                    'Mean':np.linspace(1,336,336),
+                                    'Stddev': np.linspace(1,336,336)})
+for i in range(1,337):
+    pred_train_projected.iloc[i-1,1]=np.mean(pred_train_no_mean[pred_train_no_mean["SP"]==i].iloc[:,-1])
+    pred_train_projected.iloc[i-1,2]=np.std(pred_train_no_mean[pred_train_no_mean["SP"]==i].iloc[:,-1])
+
+# Plot the mean and standard deviation of the errors that are made on the training set.
+fig6, axs6=plt.subplots(1,1,figsize=(12,6))
+axs6.plot(pred_train_projected.iloc[:,0],
+          pred_train_projected.iloc[:,1],
+          color = "orange", label = "Mean of all projected errors")
+axs6.fill_between(pred_train_projected.iloc[:,0],
+                  (pred_train_projected.iloc[:,1]-pred_train_projected.iloc[:,2]),
+                  (pred_train_projected.iloc[:,1]+pred_train_projected.iloc[:,2]),
+                  alpha=0.2, color = "orange", label = "+- 1x Standard Deviation")
+axs6.set_xlabel("Hour / Weekday", size = 14)
+axs6.set_ylabel("Prediction Variability of the [GW]", size = 14)
+# Include additional details such as tick intervals, legend positioning and grid on.
+axs6.minorticks_on()
+axs6.grid(b=True, which='major'), axs6.grid(b=True, which='minor',alpha = 0.2)
+axs6.set_xticks(np.arange(1,385, 24))
+axs6.set_xticklabels(["00:00\nMonday","12:00",
+                       "00:00\nTuesday","12:00",
+                       "00:00\nWednesday", "12:00",
+                       "00:00\nThursday", "12:00",
+                       "00:00\nFriday","12:00",
+                       "00:00\nSaturday", "12:00",
+                       "00:00\nSunday","12:00",
+                       "00:00"])
+axs6.legend(fontsize=14)
+axs6.tick_params(axis = "both", labelsize = 12)
+fig6.show()
 
 ########################################################################################################################
 # Save the results in a csv file.
@@ -324,19 +381,23 @@ fig5.show()
 
 # Calculate the errors from the mean to the actual vaules.
 print("-"*200)
+print("The mean absolute error of the training set is %0.2f [GW]." % np.mean(abs(error_train.iloc[:,-1])))
+print("The mean squared error of the training set is %0.2f [GW]." % np.mean(error_train.iloc[:,-1]**2))
+print("The root mean squared error of the training set is %0.2f [GW]." % np.sqrt(np.mean(error_train.iloc[:,-1]**2)))
+print("-"*200)
 print("The mean absolute error of the test set is %0.2f [GW]." % np.mean(abs(error_test.iloc[:,-1])))
 print("The mean squared error of the test set is %0.2f [GW]." % np.mean(error_test.iloc[:,-1]**2))
 print("The root mean squared error of the test set is %0.2f [GW]." % np.sqrt(np.mean(error_test.iloc[:,-1]**2)))
 print("-"*200)
 
-import csv
-with open('Compare_Models/SMST_Probability_results/Probability_Based_on_Model/NN_error.csv', 'w', newline='', ) as file:
-    writer = csv.writer(file)
-    writer.writerow(["Method","MSE","MAE","RMSE"])
-    writer.writerow(["NN",
-                     str(np.mean(error_test.iloc[:,-1]**2)),
-                     str(np.mean(abs(error_test.iloc[:,-1]))),
-                     str(np.sqrt(np.mean(error_test.iloc[:,-1]**2)))
-                     ])
+df_errors = pd.DataFrame({"MSE_Train": [np.mean(error_train.iloc[:,-1]**2)],
+                          "MAE_Train": [np.mean(abs(error_train.iloc[:,-1]))],
+                          "RMSE_Train": [np.sqrt(np.mean(error_train.iloc[:,-1]**2))],
+                          "MSE_Test": [np.mean(error_test.iloc[:,-1]**2)],
+                          "MAE_Test": [np.mean(abs(error_test.iloc[:,-1]))],
+                          "RMSE_Test": [np.sqrt(np.mean(error_test.iloc[:,-1]**2))],
+                          })
+df_errors.to_csv("Compare_Models/SMST_Probability_results/Probability_Based_on_Model/NN_error.csv")
 
-test_stats.to_csv("Compare_Models/SMST_Probability_results/Probability_Based_on_Model/NN_mean_errors_stddevs.csv")
+training_stats.to_csv("Compare_Models/SMST_Probability_results/Probability_Based_on_Model/NN_mean_errors_stddevs.csv")
+
