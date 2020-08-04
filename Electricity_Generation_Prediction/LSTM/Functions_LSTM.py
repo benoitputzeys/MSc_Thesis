@@ -67,6 +67,8 @@ def plot_the_loss_curve(epochs, difference,string):
     plt.plot(epochs, difference, color = "blue")
     plt.legend()
     plt.show()
+    #plt.figure(1).savefig("Electricity_Generation_Prediction/LSTM/Figures/Loss_Curve",bbox_inches='tight')
+
 
 def plot_generation(ax, x_values, y_values, string):
 

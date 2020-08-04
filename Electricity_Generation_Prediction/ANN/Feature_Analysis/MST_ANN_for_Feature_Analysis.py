@@ -12,7 +12,7 @@ import matplotlib.ticker as plticker
 ########################################################################################################################
 
 # Get the X (containing the features) and y (containing the labels) values
-X = pd.read_csv('Data_Preprocessing/For_Multi_Step_Prediction/X.csv', delimiter=',')
+X = pd.read_csv('Data_Preprocessing/For_336_SP_Step_Prediction/X.csv', delimiter=',')
 X = X.set_index("Time")
 dates = X.iloc[:,-1]
 X = X.iloc[:,:-6]
@@ -21,7 +21,7 @@ X = pd.DataFrame(X)
 X = X.drop(["Transmission_Past"], axis = 1)
 X = np.array(X)
 
-y = pd.read_csv('Data_Preprocessing/For_Multi_Step_Prediction/y.csv', delimiter=',')
+y = pd.read_csv('Data_Preprocessing/For_336_SP_Step_Prediction/y.csv', delimiter=',')
 y = y.set_index("Time")
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state = 0, shuffle = False)

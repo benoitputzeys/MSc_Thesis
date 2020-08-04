@@ -13,13 +13,13 @@ import keras
 ########################################################################################################################
 
 # Get the X (containing the features) and y (containing the labels) values
-X = pd.read_csv('Data_Preprocessing/For_Multi_Step_Prediction/X.csv', delimiter=',')
+X = pd.read_csv('Data_Preprocessing/For_336_SP_Step_Prediction/X.csv', delimiter=',')
 DoW = X["Day of Week"]
 X = X.set_index("Time")
 dates = X.iloc[:,-1]
 X = X.iloc[:,:-5]
 
-y = pd.read_csv('Data_Preprocessing/For_Multi_Step_Prediction/y.csv', delimiter=',')
+y = pd.read_csv('Data_Preprocessing/For_336_SP_Step_Prediction/y.csv', delimiter=',')
 y = y.set_index("Time")
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state = 0, shuffle = False)
@@ -131,6 +131,7 @@ axs2[0].grid(True), axs2[1].grid(True)
 fig2.autofmt_xdate(rotation = 12)
 axs2[0].legend(loc = (1.04, 0.7)), axs2[1].legend(loc = (1.04, 0.9))
 fig2.show()
+fig2.savefig("TF_Probability/MST_Rd_Weights/Figures/DMST_Train_Set_Pred.pdf", bbox_inches='tight')
 
 # Calculate the stddev from the 350 predictions.
 mean_test = (sum(predictions_test)/350).reshape(-1,1)
@@ -179,6 +180,7 @@ axs3[0].grid(True), axs3[1].grid(True)
 fig3.autofmt_xdate(rotation = 12)
 axs3[0].legend(loc = (1.04, 0.6)), axs3[1].legend(loc = (1.04, 0.9))
 fig3.show()
+fig3.savefig("TF_Probability/MST_Rd_Weights/Figures/DMST_Test_Set_Pred.pdf", bbox_inches='tight')
 
 # Make one large column vector containing all the predictions
 pred_train_vector = predictions_train.reshape(-1, 1)
@@ -213,14 +215,17 @@ error_column_train = predictions_and_errors_train[:,1]
 
 # Plot the histograms of the 2 sets.
 fig3, axs3=plt.subplots(1,2,figsize=(12,6))
-axs3[1].hist(error_column_test, bins = 50, color = "blue")
-axs3[1].set_xlabel("Prediction Error on Test Set [GW]", size = 14)
-axs3[1].set_ylabel("Count", size = 14)
-
+axs3[0].grid(True)
 axs3[0].hist(error_column_train, bins = 50, color = "blue")
 axs3[0].set_xlabel("Prediction Error on Training Set [GW]", size = 14)
 axs3[0].set_ylabel("Count", size = 14)
+
+axs3[1].grid(True)
+axs3[1].hist(error_column_test, bins = 50, color = "blue")
+axs3[1].set_xlabel("Prediction Error on Test Set [GW]", size = 14)
+axs3[1].set_ylabel("Count", size = 14)
 fig3.show()
+fig3.savefig("TF_Probability/MST_Rd_Weights/Figures/DMST_Histograms_Train_and_Test_Set_Error_Pred.pdf", bbox_inches='tight')
 
 ########################################################################################################################
 # Plot the mean and standard deviation per week for the training set.
@@ -274,6 +279,7 @@ axs4[1].set_xticklabels(["00:00\nMonday","12:00",
 axs4[0].legend(fontsize=14), axs4[1].legend(fontsize=14)
 axs4[0].tick_params(axis = "both", labelsize = 12), axs4[1].tick_params(axis = "both", labelsize = 12)
 fig4.show()
+fig4.savefig("TF_Probability/MST_Rd_Weights/Figures/DMST_Mean_and_Stddev_of_Error_Train_Set_Pred.pdf", bbox_inches='tight')
 
 ########################################################################################################################
 # Plot the mean and standard deviation per week for the test set.
@@ -327,53 +333,54 @@ axs5[1].set_xticklabels(["00:00\nMonday","12:00",
 axs5[0].legend(fontsize=14), axs4[1].legend(fontsize=14)
 axs5[0].tick_params(axis = "both", labelsize = 12), axs5[1].tick_params(axis = "both", labelsize = 12)
 fig5.show()
+fig5.savefig("TF_Probability/MST_Rd_Weights/Figures/DMST_Mean_and_Stddev_of_Error_Test_Set_Pred.pdf", bbox_inches='tight')
 
-# This section might take some time but calculating the mean for each is "safer" this way.
-# (If a value is missing in the original data, that is not a problem in computing the mean per week.)
-mean_each_week = pred_train_vector.copy()
-counter = 0
-for i in range(len(X)-1):
-    mean_each_week[i-counter:i+1] = np.mean(pred_train_vector[i-counter:i+1])
-    counter = counter + 1
-    if (pred_train_vector["SP"][i] == 336) & (pred_train_vector["SP"][i+1]==0):
-        counter = 0
-mean_each_week.iloc[-1]=mean_each_week.iloc[-2]
-
-pred_train_no_mean =  pd.DataFrame({'SP':long_column, 'Projection': (pred_train_vector-mean_each_week)})
-
-pred_train_projected = pd.DataFrame({'SP':np.linspace(1,336,336),
-                                    'Mean':np.linspace(1,336,336),
-                                    'Stddev': np.linspace(1,336,336)})
-for i in range(1,337):
-    pred_train_projected.iloc[i-1,1]=np.mean(pred_train_no_mean[pred_train_no_mean["SP"]==i].iloc[:,-1])
-    pred_train_projected.iloc[i-1,2]=np.std(pred_train_no_mean[pred_train_no_mean["SP"]==i].iloc[:,-1])
-
-# Plot the mean and standard deviation of the errors that are made on the training set.
-fig6, axs6=plt.subplots(1,1,figsize=(12,6))
-axs6.plot(pred_train_projected.iloc[:,0],
-          pred_train_projected.iloc[:,1],
-          color = "orange", label = "Mean of all projected errors")
-axs6.fill_between(pred_train_projected.iloc[:,0],
-                  (pred_train_projected.iloc[:,1]-pred_train_projected.iloc[:,2]),
-                  (pred_train_projected.iloc[:,1]+pred_train_projected.iloc[:,2]),
-                  alpha=0.2, color = "orange", label = "+- 1x Standard Deviation")
-axs6.set_xlabel("Hour / Weekday", size = 14)
-axs6.set_ylabel("Prediction Variability of the [GW]", size = 14)
-# Include additional details such as tick intervals, legend positioning and grid on.
-axs6.minorticks_on()
-axs6.grid(b=True, which='major'), axs6.grid(b=True, which='minor',alpha = 0.2)
-axs6.set_xticks(np.arange(1,385, 24))
-axs6.set_xticklabels(["00:00\nMonday","12:00",
-                       "00:00\nTuesday","12:00",
-                       "00:00\nWednesday", "12:00",
-                       "00:00\nThursday", "12:00",
-                       "00:00\nFriday","12:00",
-                       "00:00\nSaturday", "12:00",
-                       "00:00\nSunday","12:00",
-                       "00:00"])
-axs6.legend(fontsize=14)
-axs6.tick_params(axis = "both", labelsize = 12)
-fig6.show()
+# # This section might take some time but calculating the mean for each is "safer" this way.
+# # (If a value is missing in the original data, that is not a problem in computing the mean per week.)
+# mean_each_week = pred_train_vector.copy()
+# counter = 0
+# for i in range(len(X)-1):
+#     mean_each_week[i-counter:i+1] = np.mean(pred_train_vector[i-counter:i+1])
+#     counter = counter + 1
+#     if (pred_train_vector["SP"][i] == 336) & (pred_train_vector["SP"][i+1]==0):
+#         counter = 0
+# mean_each_week.iloc[-1]=mean_each_week.iloc[-2]
+#
+# pred_train_no_mean =  pd.DataFrame({'SP':long_column, 'Projection': (pred_train_vector-mean_each_week)})
+#
+# pred_train_projected = pd.DataFrame({'SP':np.linspace(1,336,336),
+#                                     'Mean':np.linspace(1,336,336),
+#                                     'Stddev': np.linspace(1,336,336)})
+# for i in range(1,337):
+#     pred_train_projected.iloc[i-1,1]=np.mean(pred_train_no_mean[pred_train_no_mean["SP"]==i].iloc[:,-1])
+#     pred_train_projected.iloc[i-1,2]=np.std(pred_train_no_mean[pred_train_no_mean["SP"]==i].iloc[:,-1])
+#
+# # Plot the mean and standard deviation of the errors that are made on the training set.
+# fig6, axs6=plt.subplots(1,1,figsize=(12,6))
+# axs6.plot(pred_train_projected.iloc[:,0],
+#           pred_train_projected.iloc[:,1],
+#           color = "orange", label = "Mean of all projected errors")
+# axs6.fill_between(pred_train_projected.iloc[:,0],
+#                   (pred_train_projected.iloc[:,1]-pred_train_projected.iloc[:,2]),
+#                   (pred_train_projected.iloc[:,1]+pred_train_projected.iloc[:,2]),
+#                   alpha=0.2, color = "orange", label = "+- 1x Standard Deviation")
+# axs6.set_xlabel("Hour / Weekday", size = 14)
+# axs6.set_ylabel("Prediction Variability of the [GW]", size = 14)
+# # Include additional details such as tick intervals, legend positioning and grid on.
+# axs6.minorticks_on()
+# axs6.grid(b=True, which='major'), axs6.grid(b=True, which='minor',alpha = 0.2)
+# axs6.set_xticks(np.arange(1,385, 24))
+# axs6.set_xticklabels(["00:00\nMonday","12:00",
+#                        "00:00\nTuesday","12:00",
+#                        "00:00\nWednesday", "12:00",
+#                        "00:00\nThursday", "12:00",
+#                        "00:00\nFriday","12:00",
+#                        "00:00\nSaturday", "12:00",
+#                        "00:00\nSunday","12:00",
+#                        "00:00"])
+# axs6.legend(fontsize=14)
+# axs6.tick_params(axis = "both", labelsize = 12)
+# fig6.show()
 
 ########################################################################################################################
 # Save the results in a csv file.
@@ -397,7 +404,7 @@ df_errors = pd.DataFrame({"MSE_Train": [np.mean(error_train.iloc[:,-1]**2)],
                           "MAE_Test": [np.mean(abs(error_test.iloc[:,-1]))],
                           "RMSE_Test": [np.sqrt(np.mean(error_test.iloc[:,-1]**2))],
                           })
-df_errors.to_csv("Compare_Models/SMST_Probability_results/Probability_Based_on_Model/NN_error.csv")
+df_errors.to_csv("Compare_Models/Direct_Multi_Step_Probability_Results/Probability_Based_on_Model/NN_error.csv")
 
-training_stats.to_csv("Compare_Models/SMST_Probability_results/Probability_Based_on_Model/NN_mean_errors_stddevs.csv")
+training_stats.to_csv("Compare_Models/Direct_Multi_Step_Probability_Results/Probability_Based_on_Model/NN_mean_errors_stddevs.csv")
 

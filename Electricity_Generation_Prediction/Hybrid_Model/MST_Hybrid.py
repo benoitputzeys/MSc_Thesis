@@ -29,8 +29,8 @@ LSTM_test = genfromtxt('Electricity_Generation_Prediction/Hybrid_Model/Pred_test
 SARIMA_test = genfromtxt('Electricity_Generation_Prediction/Hybrid_Model/Pred_test_other_metrics/SARIMA_prediction.csv', delimiter=',')
 
 # Get the X (containing the features) and y (containing the labels) values
-X = genfromtxt('Data_Entsoe/Data_Preprocessing/For_Multi_Step_Prediction/X.csv', delimiter=',')
-y = genfromtxt('Data_Entsoe/Data_Preprocessing/For_Multi_Step_Prediction/y.csv', delimiter=',')
+X = genfromtxt('Data_Entsoe/Data_Preprocessing/For_336_SP_Step_Prediction/X.csv', delimiter=',')
+y = genfromtxt('Data_Entsoe/Data_Preprocessing/For_336_SP_Step_Prediction/y.csv', delimiter=',')
 y = np.reshape(y, (len(y), 1))
 
 # Save the unscaled data for later for data representation.

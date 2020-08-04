@@ -13,13 +13,13 @@ import matplotlib.ticker as plticker
 ########################################################################################################################
 
 # Get the X (containing the features) and y (containing the labels) values
-X = pd.read_csv('Data_Preprocessing/For_Single_Step_Prediction/X.csv', delimiter=',')
+X = pd.read_csv('Data_Preprocessing/For_1_SP_Step_Prediction/X.csv', delimiter=',')
 X = X.set_index("Time")
 X = X.drop(columns = "Transmission_Past")
 dates = X.iloc[:,-1]
-X = X.iloc[:,:-5]
+X = X.iloc[:,:-6]
 
-y = pd.read_csv('Data_Preprocessing/For_Single_Step_Prediction/y.csv', delimiter=',')
+y = pd.read_csv('Data_Preprocessing/For_1_SP_Step_Prediction/y.csv', delimiter=',')
 y = y.set_index("Time")
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state = 0, shuffle = False)
@@ -53,14 +53,14 @@ regressor.fit(X_train, y_train)
 ########################################################################################################################
 
 # Multi-Step prediction
-X_future_features = pd.DataFrame(data=X_train_unscaled.iloc[-335:,:].values,  columns=["0","1","2","3","4","5","6"])
+X_future_features = pd.DataFrame(data=X_train_unscaled.iloc[-335:,:].values,  columns=["0","1","2","3","4","5"])
 result_future = y_scaler.inverse_transform(y_train[-2:])
 
 for i in range(0,48*7):
 
     prev_value = result_future[-2]
-    new_row = [[prev_value[0], 0, 0, 0, 0, 0, 0]]
-    new_row = DataFrame(new_row, columns=["0","1","2","3","4","5","6"])
+    new_row = [[prev_value[0], 0, 0, 0, 0, 0]]
+    new_row = DataFrame(new_row, columns=["0","1","2","3","4","5"])
 
     X_future_features = pd.concat([X_future_features,new_row])
     rolling_mean_10 = X_future_features["0"].rolling(window=10).mean().values[-1]
@@ -75,13 +75,12 @@ for i in range(0,48*7):
                    rolling_mean_336,
                    exp_20,
                    exp_50,
-                   X_test_unscaled.iloc[i, -1]
                    ]]
 
-    update_row = DataFrame(update_row, columns=["0","1","2","3","4","5","6"])
+    update_row = DataFrame(update_row, columns=["0","1","2","3","4","5"])
     X_future_features.iloc[-1,:] = update_row.iloc[0,:]
 
-    result_future = np.append(result_future, y_scaler.inverse_transform(regressor.predict(x_scaler.transform(update_row).reshape(1,7))))
+    result_future = np.append(result_future, y_scaler.inverse_transform(regressor.predict(x_scaler.transform(update_row).reshape(1,6))))
     result_future = np.reshape(result_future,(-1,1))
 
 result_future = result_future[2:]/1000
@@ -112,9 +111,9 @@ print("-"*200)
 
 error_test_plot = np.zeros((48*3+48*7,1))
 error_test_plot[-336:] = error_test[:48*7]
+
 # Plot the result with the truth in red and the predictions in blue.
 fig2, axs2=plt.subplots(2,1,figsize=(12,6))
-axs2[0].grid(True)
 axs2[0].plot(dates.iloc[-len(X_test)-48*3:-len(X_test)],
              y_train[-48*3:,0],
              label = "Training Set (True Values)", alpha = 1, color = "blue")
@@ -126,24 +125,23 @@ axs2[0].plot(dates.iloc[-len(X_test):-len(X_test)+48*7],
              label = "Test Set (True Values)", alpha = 1, color = "black")
 axs2[0].axvline(dates.iloc[-len(X_test)], linestyle="--", color = "black")
 axs2[0].set_ylabel('Load [GW]',size = 14)
-loc = plticker.MultipleLocator(base=47) # this locator puts ticks at regular intervals
-axs2[0].xaxis.set_major_locator(loc)
 
-axs2[1].grid(True)
 axs2[1].plot(dates.iloc[-len(X_test)-48*3:-len(X_test)+48*7],
              error_test_plot,
              label = "Error", alpha = 1, color = "red")
 axs2[1].axvline(dates.iloc[-len(X_test)], linestyle="--", color = "black")
 axs2[1].set_xlabel('Date',size = 14)
 axs2[1].set_ylabel('Error [GW]',size = 14)
-loc = plticker.MultipleLocator(base=47) # this locator puts ticks at regular intervals
-axs2[1].xaxis.set_major_locator(loc)
-fig2.autofmt_xdate(rotation=15)
 
-axs2[1].legend(loc=(1.04,0.9))
-axs2[0].legend(loc=(1.04,0.7))
+# Include additional details such as tick intervals, rotation, legend positioning and grid on.
+axs2[0].grid(True), axs2[1].grid(True)
+loc = plticker.MultipleLocator(base=47) # Puts ticks at regular intervals
+axs2[0].xaxis.set_major_locator(loc), axs2[1].xaxis.set_major_locator(loc)
+fig2.autofmt_xdate(rotation=15)
+axs2[0].legend(loc=(1.04,0.9)), axs2[1].legend(loc=(1.04,0.7))
 
 fig2.show()
+fig2.savefig("Electricity_Generation_Prediction/Random_Forest/Figures/Recursive_Prediction_No_SP.pdf", bbox_inches='tight')
 
 ########################################################################################################################
 # Results for recursive prediction are not saved because in general they yield poor results.

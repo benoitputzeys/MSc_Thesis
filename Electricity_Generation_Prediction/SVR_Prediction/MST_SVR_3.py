@@ -56,7 +56,7 @@ result_train = result_train.reshape((len(result_train), 1))
 
 # Multi-Step
 X_future_features = pd.DataFrame(data=X_test_unscaled,  columns=["0","1","2","3","4","5"])
-DoW_SP = genfromtxt('Data_Entsoe/Data_Preprocessing/For_Multi_Step_Prediction/DoW_SP_2.csv',delimiter=',')
+DoW_SP = genfromtxt('Data_Entsoe/Data_Preprocessing/For_336_SP_Step_Prediction/DoW_SP_2.csv',delimiter=',')
 
 result_future = y_test
 for i in range(0,48*7):
@@ -152,7 +152,7 @@ plt.show()
 ########################################################################################################################
 
 import csv
-with open('Compare_Models/SST_results/SVR_result.csv', 'w', newline='', ) as file:
+with open('Compare_Models/Single_Step_Results/SVR_result.csv', 'w', newline='', ) as file:
     writer = csv.writer(file)
     writer.writerow(["Method","MSE","MAE","RMSE"])
     writer.writerow(["SVR",

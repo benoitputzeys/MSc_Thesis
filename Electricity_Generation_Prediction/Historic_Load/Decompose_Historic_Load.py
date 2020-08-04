@@ -5,10 +5,10 @@ import numpy as np
 import matplotlib.ticker as plticker
 
 # Read the processed data.
-y = pd.read_csv('Data_Preprocessing/For_Multi_Step_Prediction/y.csv')
+y = pd.read_csv('Data_Preprocessing/For_336_SP_Step_Prediction/y.csv')
 y = y.set_index("Time")
 
-X = pd.read_csv('Data_Preprocessing/For_Multi_Step_Prediction/X.csv')
+X = pd.read_csv('Data_Preprocessing/For_336_SP_Step_Prediction/X.csv')
 X = X.set_index("Time")
 dates = X.iloc[:,-1]
 series = y.iloc[:,-1]/1000
@@ -55,21 +55,13 @@ axs[2].set_ylabel("Weekly Average \n[GW]", size = 14)
 axs[3].plot(dates[36000:38020], residual[36000:38020] , color = "blue")
 axs[3].set_ylabel("Residual [GW]", size = 14)
 axs[3].set_xlabel("Date", size = 18)
-loc = plticker.MultipleLocator(base=48*7) # this locator puts ticks at regular intervals
-axs[0].xaxis.set_major_locator(loc)
-axs[0].grid(True)
-axs[1].xaxis.set_major_locator(loc)
-axs[1].grid(True)
-axs[2].xaxis.set_major_locator(loc)
-axs[2].grid(True)
-axs[3].xaxis.set_major_locator(loc)
-axs[3].grid(True)
+loc = plticker.MultipleLocator(base=48*7) # Puts ticks at regular intervals
+axs[0].xaxis.set_major_locator(loc), axs[1].xaxis.set_major_locator(loc), axs[2].xaxis.set_major_locator(loc), axs[3].xaxis.set_major_locator(loc)
+axs[0].grid(True), axs[1].grid(True), axs[2].grid(True), axs[3].grid(True)
 fig.autofmt_xdate(rotation = 7)
-axs[3].tick_params(axis = "both", labelsize = 14)
-axs[2].tick_params(axis = "both", labelsize = 14)
-axs[1].tick_params(axis = "both", labelsize = 14)
-axs[0].tick_params(axis = "both", labelsize = 14)
+axs[3].tick_params(axis = "both", labelsize = 14), axs[2].tick_params(axis = "both", labelsize = 14), axs[1].tick_params(axis = "both", labelsize = 14), axs[0].tick_params(axis = "both", labelsize = 14)
 fig.show()
+fig.savefig("Electricity_Generation_Prediction/Historic_Load/Figures/Decomposition_Zoomed_In.pdf", bbox_inches='tight')
 
 # Plot the weekly average
 fig, axs=plt.subplots(1,1,figsize=(15,6))
@@ -82,6 +74,7 @@ axs.xaxis.set_major_locator(loc)
 axs.tick_params(axis = "both", labelsize = 14)
 fig.autofmt_xdate(rotation = 12)
 fig.show()
+fig.savefig("Electricity_Generation_Prediction/Historic_Load/Figures/Weekly_Average.pdf", bbox_inches='tight')
 
 # # Plot the whole decomposition of the whole actual series.
 # fig, axs=plt.subplots(4,1,figsize=(12,10))
@@ -126,6 +119,7 @@ axs[0].grid(True), axs[1].grid(True), axs[2].grid(True), axs[3].grid(True)
 axs[0].tick_params(axis = "both", labelsize = 14), axs[1].tick_params(axis = "both", labelsize = 14), axs[2].tick_params(axis = "both", labelsize = 14), axs[3].tick_params(axis = "both", labelsize = 14)
 fig.autofmt_xdate(rotation = 5)
 fig.show()
+fig.savefig("Electricity_Generation_Prediction/Historic_Load/Figures/Decomposition_around_Christmas.pdf", bbox_inches='tight')
 
 # To check if the decomposition is correct, the reconstruction should give the initial series.
 # In order to calculate the trend, the decomposition requires to set a section of the first and last segment of the series to NaN
@@ -166,6 +160,7 @@ axs2[0].grid(True), axs2[1].grid(True), axs2[2].grid(True)
 axs2[0].tick_params(axis = "both", labelsize = 14), axs2[1].tick_params(axis = "both", labelsize = 14), axs2[2].tick_params(axis = "both", labelsize = 14)
 fig2.autofmt_xdate(rotation = 9)
 fig2.show()
+fig2.savefig("Electricity_Generation_Prediction/Historic_Load/Figures/Modified_Timeseries_and_Errors.pdf", bbox_inches='tight')
 
 settlement_period = X["Settlement Period"]+(48*X["Day of Week"])
 
@@ -205,6 +200,7 @@ axs3[0].grid(True), axs3[1].grid(True)
 axs3[1].grid(b=True, which='major'), axs3[1].grid(b=True, which='minor',alpha = 0.2)
 axs3[0].tick_params(axis = "both", labelsize = 12), axs3[1].tick_params(axis = "both", labelsize = 12)
 fig3.show()
+fig3.savefig("Electricity_Generation_Prediction/Historic_Load/Figures/Explained_Projected_Load.pdf", bbox_inches='tight')
 
 # Compute the mean and variation for each x.
 df_stats = pd.DataFrame({'Index':np.linspace(1,336,336), 'Mean':np.linspace(1,336,336), 'Stddev':np.linspace(1,336,336)})
@@ -237,10 +233,10 @@ axs4.grid(b=True, which='major'), axs4.grid(b=True, which='minor',alpha = 0.2)
 axs4.tick_params(axis = "both", labelsize = 12)
 axs4.grid(True)
 fig4.show()
+fig4.savefig("Electricity_Generation_Prediction/Historic_Load/Figures/Projected_Load_Mean_and_Stddev.pdf", bbox_inches='tight')
 
 # Plot the mean and variation for each x.
 fig5, axs5=plt.subplots(1,1,figsize=(12,6))
-axs5.plot(df_stats.iloc[:,0], np.zeros((336,1)),color = "blue")
 axs5.fill_between(df_stats.iloc[:,0],
                   (-df_stats.iloc[:,2]),
                   (+df_stats.iloc[:,2]),
@@ -261,6 +257,7 @@ axs5.grid(b=True, which='major'), axs5.grid(b=True, which='minor',alpha = 0.2)
 axs5.legend(fontsize = 12)
 axs5.tick_params(axis = "both", labelsize = 12)
 fig5.show()
+fig5.savefig("Electricity_Generation_Prediction/Historic_Load/Figures/Projected_Load_Stddev.pdf", bbox_inches='tight')
 
 # Use the "template" above and add the mean of the week in question to it.
 fig6, axs6=plt.subplots(1,1,figsize=(12,6))
@@ -290,8 +287,8 @@ axs7.fill_between(df_stats.iloc[:,0],
                   (df_stats.iloc[:,1]-df_stats.iloc[:,2]),
                   (df_stats.iloc[:,1]+df_stats.iloc[:,2]),
                   alpha=0.2, color = "blue", label = "+- 1x Standard Deviation")
-axs7.axvline(df_stats.iloc[120,0], linestyle="--", color = "green", label = "Example 1 @ SP 120", linewidth = 2)
-axs7.axvline(df_stats.iloc[235,0], linestyle="--", color = "orange", label = "Example 2 @ SP 235", linewidth = 2)
+axs7.axvline(df_stats.iloc[120,0], linestyle="--", color = "green", label = "Example 1", linewidth = 2)
+axs7.axvline(df_stats.iloc[235,0], linestyle="--", color = "orange", label = "Example 2", linewidth = 2)
 axs7.set_ylabel("Load [GW]", size = 14)
 axs7.set_xlabel("Hour / Weekday", size = 14)
 plt.xticks(np.arange(1,385, 24), ["00:00 \nMonday", "12:00",
@@ -309,6 +306,7 @@ axs7.legend(fontsize = 12)
 axs7.tick_params(axis = "both", labelsize = 12)
 axs7.grid(True)
 fig7.show()
+fig7.savefig("Electricity_Generation_Prediction/Historic_Load/Figures/Projected_Load_Examples_1_&_2.pdf", bbox_inches='tight')
 
 # Define the 2 examples.
 example_1 = modified_timeseries[modified_timeseries["SP"]==120]
@@ -328,6 +326,7 @@ axs8[1].grid(True)
 axs8[0].set_axisbelow(True)
 axs8[1].set_axisbelow(True)
 fig8.show()
+fig8.savefig("Electricity_Generation_Prediction/Historic_Load/Figures/Histograms_Examples_1_2.pdf", bbox_inches='tight')
 
 # Print their mean and standard deviation
 print("The mean of example 1 is %.2f" % np.mean(example_1.iloc[:,-1]),"[GW] and the standard deviation is %.2f" % np.std(example_1.iloc[:,-1]),"[GW]." )
@@ -337,6 +336,6 @@ df_stats.to_csv("TF_Probability/Results/Projected_Data")
 
 print(np.mean(df_stats.iloc[:,1]))
 
-df_stats.to_csv("Compare_Models/SMST_Probability_results/Probability_Based_on_Training/Training_mean_errors_stddevs.csv")
+df_stats.to_csv("Compare_Models/Direct_Multi_Step_Probability_Results/Probability_Based_on_Training/Training_mean_errors_stddevs.csv")
 
 

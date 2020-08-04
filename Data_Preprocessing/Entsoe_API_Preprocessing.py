@@ -23,6 +23,7 @@ axs1.axes.tick_params(labelsize = 14)
 axs1.grid(True)
 #fig1.suptitle("Unprocessed data", fontsize=18, x = 0.52, y = 0.975)
 fig1.show()
+fig1.savefig("Data_Preprocessing/Figures/Raw_Data.pdf", bbox_inches='tight')
 
 load_GB_processed = load_GB_raw.copy()
 
@@ -134,6 +135,7 @@ axs7[1].set_xlabel("Date", size = 18)
 axs7[1].axes.tick_params(labelsize = 11)
 axs7[1].grid(True)
 fig7.show()
+fig7.savefig("Data_Preprocessing/Figures/Example_Preprocessing.pdf", bbox_inches='tight')
 
 # Create plot of 2019/03/19 unprocessed load.
 fig8, axs8=plt.subplots(3,1,figsize=(12,6))
@@ -180,6 +182,7 @@ axs10.axes.tick_params(labelsize = 12)
 #fig20.suptitle("Processed data", fontsize=18, x = 0.52, y = 0.975)
 axs10.grid(True)
 fig10.show()
+fig10.savefig("Data_Preprocessing/Figures/Processed_Data.pdf", bbox_inches='tight')
 
 load_GB_processed.to_csv("Data_Preprocessing/Load_GB_Processed_Data")
 
@@ -199,4 +202,6 @@ axs21[1].set_xlabel("Date", size = 18)
 axs21[0].grid(True)
 axs21[1].grid(True)
 fig21.show()
+fig21.savefig("Data_Preprocessing/Figures/Difference_Load_Before_and_After.pdf", bbox_inches='tight')
+
 

@@ -13,12 +13,12 @@ import matplotlib.ticker as plticker
 ########################################################################################################################
 
 # Get the X (containing the features) and y (containing the labels) values
-X = pd.read_csv('Data_Preprocessing/For_Multi_Step_Prediction/X.csv', delimiter=',')
+X = pd.read_csv('Data_Preprocessing/For_336_SP_Step_Prediction/X.csv', delimiter=',')
 X = X.set_index("Time")
 dates = X.iloc[:,-1]
 X = X.iloc[:,:-6]
 
-y = pd.read_csv('Data_Preprocessing/For_Multi_Step_Prediction/y.csv', delimiter=',')
+y = pd.read_csv('Data_Preprocessing/For_336_SP_Step_Prediction/y.csv', delimiter=',')
 y = y.set_index("Time")
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state = 0, shuffle = False)
@@ -109,23 +109,21 @@ axs2[1].plot(dates.iloc[-len(X_test)-48*3:-len(X_test)+48*7],
 axs2[1].axvline(dates.iloc[-len(X_test)], linestyle="--", color = "black")
 
 # Include additional details such as tick intervals, rotation, legend positioning and grid on.
-axs2[0].grid(True)
-axs2[1].grid(True)
+axs2[0].grid(True), axs2[1].grid(True)
 axs2[1].set_xlabel('Date',size = 14)
 axs2[1].set_ylabel('Error [GW]',size = 14)
 loc = plticker.MultipleLocator(base=47) # this locator puts ticks at regular intervals
-axs2[1].xaxis.set_major_locator(loc)
-axs2[0].xaxis.set_major_locator(loc)
+axs2[1].xaxis.set_major_locator(loc), axs2[0].xaxis.set_major_locator(loc)
 fig2.autofmt_xdate(rotation=12)
-axs2[1].legend(loc=(1.04,0.9))
-axs2[0].legend(loc=(1.04,0.7))
+axs2[1].legend(loc=(1.04,0.9)), axs2[0].legend(loc=(1.04,0.7))
 fig2.show()
+fig2.savefig("Electricity_Generation_Prediction/SVR_Prediction/Figures/DMST_Prediction.pdf", bbox_inches='tight')
 
 ########################################################################################################################
 # Compute the standard deviation of the training set.
 ########################################################################################################################
 
-X = pd.read_csv('Data_Preprocessing/For_Multi_Step_Prediction/X.csv', delimiter=',')
+X = pd.read_csv('Data_Preprocessing/For_336_SP_Step_Prediction/X.csv', delimiter=',')
 settlement_period_week = X["Settlement Period"]+(48*X["Day of Week"])
 
 dates_train = dates.iloc[:len(X_train)]
@@ -146,6 +144,7 @@ axs3.set_xlabel("Settlement Period", size = 14)
 axs3.grid(True)
 axs3.legend()
 fig3.show()
+fig3.savefig("Electricity_Generation_Prediction/SVR_Prediction/Figures/DMST_Error_Scatter_Plot_Train_Set_Pred.pdf", bbox_inches='tight')
 
 # Compute the mean and variation for each x.
 training_stats = pd.DataFrame({'Index':np.linspace(1,336,336), 'Mean':np.linspace(1,336,336), 'Stddev':np.linspace(1,336,336)})
@@ -180,6 +179,7 @@ axs4.set_xticklabels(["00:00\nMonday","12:00",
 axs4.legend(fontsize=14)
 axs4.tick_params(axis = "both", labelsize = 12)
 fig4.show()
+fig4.savefig("Electricity_Generation_Prediction/SVR_Prediction/Figures/DMST_Mean_and_Stddev_of_Error_Train_Set_Pred.pdf", bbox_inches='tight')
 
 stddev = training_stats["Stddev"]
 
@@ -217,16 +217,14 @@ axs5[1].set_xlabel('Date',size = 14)
 axs5[1].set_ylabel('Error [GW]',size = 14)
 
 # Include additional details such as tick intervals, rotation, legend positioning and grid on.
-axs5[1].grid(True)
-axs5[0].grid(True)
+axs5[1].grid(True), axs5[0].grid(True)
 loc = plticker.MultipleLocator(base=47) # Put ticks at regular intervals
-axs5[0].xaxis.set_major_locator(loc)
-axs5[1].xaxis.set_major_locator(loc)
+axs5[0].xaxis.set_major_locator(loc), axs5[1].xaxis.set_major_locator(loc)
 fig5.autofmt_xdate(rotation=15)
-axs5[1].legend(loc=(1.04,0.9))
-axs5[0].legend(loc=(1.04,0.6))
+axs5[1].legend(loc=(1.04,0.9)), axs5[0].legend(loc=(1.04,0.6))
 
 fig5.show()
+fig5.savefig("Electricity_Generation_Prediction/SVR_Prediction/Figures/DMST_Pred_w_Uncertainty.pdf", bbox_inches='tight')
 
 ########################################################################################################################
 # Save the results in a csv file.
@@ -239,7 +237,9 @@ df_errors = pd.DataFrame({"MSE_Train": [mean_squared_error(y_train,pred_train)],
                           "MAE_Test": [mean_absolute_error(y_test, pred_test)],
                           "RMSE_Test": [np.sqrt(mean_squared_error(y_test, pred_test))],
                           })
-df_errors.to_csv("Compare_Models/SMST_Probability_results/Probability_Based_on_Training/SVR_error.csv")
-df_errors.to_csv("Compare_Models/Single_Multi_Step_results/SVR.csv")
+df_errors.to_csv("Compare_Models/Direct_Multi_Step_Probability_Results/Probability_Based_on_Training/SVR_error.csv")
+df_errors.to_csv("Compare_Models/Direct_Multi_Step_Results/SVR.csv")
 
-training_stats.to_csv("Compare_Models/SMST_Probability_results/Probability_Based_on_Training/SVR_mean_errors_stddevs.csv")
+df_pred_test = pd.DataFrame({"Test_Prediction":pred_test})
+df_pred_test.to_csv("Electricity_Generation_Prediction/SVR_Prediction/Direct_Multi_Step_Prediction/Pred_Test.csv")
+training_stats.to_csv("Compare_Models/Direct_Multi_Step_Probability_Results/Probability_Based_on_Training/SVR_mean_errors_stddevs.csv")

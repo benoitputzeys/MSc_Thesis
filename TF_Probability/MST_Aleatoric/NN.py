@@ -9,10 +9,10 @@ import pandas as pd
 
 
 # Get the X (containing the features) and y (containing the labels) values
-# X = genfromtxt('Data_Preprocessing/For_Multi_Step_Prediction/X.csv', delimiter=',')
+# X = genfromtxt('Data_Preprocessing/For_336_SP_Step_Prediction/X.csv', delimiter=',')
 # X = X[:48*7*5,:]
 
-y = genfromtxt('Data_Preprocessing/For_Multi_Step_Prediction/y.csv', delimiter=',')
+y = genfromtxt('Data_Preprocessing/For_336_SP_Step_Prediction/y.csv', delimiter=',')
 dates = y.iloc[8760:69277,1]
 y = y.iloc[8760:69277,1]
 

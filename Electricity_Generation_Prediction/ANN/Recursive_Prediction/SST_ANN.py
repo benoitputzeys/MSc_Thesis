@@ -12,13 +12,13 @@ import keras
 ########################################################################################################################
 
 # Get the X (containing the features) and y (containing the labels) values
-X = pd.read_csv('Data_Preprocessing/For_Single_Step_Prediction/X.csv', delimiter=',')
+X = pd.read_csv('Data_Preprocessing/For_1_SP_Step_Prediction/X.csv', delimiter=',')
 X = X.set_index("Time")
 X = X.drop(columns = "Transmission_Past")
 dates = X.iloc[:,-1]
 X = X.iloc[:,:-5]
 
-y = pd.read_csv('Data_Preprocessing/For_Single_Step_Prediction/y.csv', delimiter=',')
+y = pd.read_csv('Data_Preprocessing/For_1_SP_Step_Prediction/y.csv', delimiter=',')
 y = y.set_index("Time")
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state = 0, shuffle = False)
@@ -137,7 +137,7 @@ fig2.show()
 # ########################################################################################################################
 #
 # import csv
-# with open('Compare_Models/SST_results/ANN_result.csv', 'w', newline='', ) as file:
+# with open('Compare_Models/Single_Step_Results/ANN_result.csv', 'w', newline='', ) as file:
 #     writer = csv.writer(file)
 #     writer.writerow(["Method","MSE","MAE","RMSE"])
 #     writer.writerow(["ANN",

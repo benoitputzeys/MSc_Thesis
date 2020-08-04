@@ -110,10 +110,10 @@ def plot_one_step_predictive(dates, observed_time_series,
 from numpy import genfromtxt
 
 # Get the X (containing the features) and y (containing the labels) values
-X = genfromtxt('Data_Preprocessing/For_Multi_Step_Prediction/X.csv', delimiter=',')
+X = genfromtxt('Data_Preprocessing/For_336_SP_Step_Prediction/X.csv', delimiter=',')
 X = X[1:48*50,1:-1]
 
-y = genfromtxt('Data_Preprocessing/For_Multi_Step_Prediction/y.csv', delimiter=',')
+y = genfromtxt('Data_Preprocessing/For_336_SP_Step_Prediction/y.csv', delimiter=',')
 y = y[1:48*50,-1]
 
 # Split data into train set and test set.

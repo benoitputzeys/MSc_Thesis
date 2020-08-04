@@ -121,13 +121,13 @@ def plot_one_step_predictive(dates, observed_time_series,
   return fig, ax
 
 # Get the X (containing the features) and y (containing the labels) values
-X = pd.read_csv('Data_Preprocessing/For_Multi_Step_Prediction/X.csv')
+X = pd.read_csv('Data_Preprocessing/For_336_SP_Step_Prediction/X.csv')
 X = X.iloc[1:,1:]
 # Extract the dates and delete the respective column.
 dates = X.iloc[:,-1]
 X = X.iloc[:,:-1]
 
-y = pd.read_csv('Data_Preprocessing/For_Multi_Step_Prediction/y.csv')
+y = pd.read_csv('Data_Preprocessing/For_336_SP_Step_Prediction/y.csv')
 y = y.iloc[1:,2:]
 
 # Split data into train set and test set.

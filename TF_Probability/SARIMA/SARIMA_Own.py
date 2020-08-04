@@ -42,13 +42,13 @@ def plot_components(dates,
   return fig, axes_dict
 
 # Get the X (containing the features) and y (containing the labels) values
-X = pd.read_csv('Data_Preprocessing/For_Multi_Step_Prediction/X.csv', delimiter=',')
+X = pd.read_csv('Data_Preprocessing/For_336_SP_Step_Prediction/X.csv', delimiter=',')
 DoW = X["Day of Week"]
 X = X.set_index("Time")
 dates = X.iloc[:,-1]
 X = X.iloc[:,:-5]
 
-y = pd.read_csv('Data_Preprocessing/For_Multi_Step_Prediction/y.csv', delimiter=',')
+y = pd.read_csv('Data_Preprocessing/For_336_SP_Step_Prediction/y.csv', delimiter=',')
 y = y.set_index("Time")
 
 # Split data into train set and test set.
@@ -120,6 +120,7 @@ axs3.set_xlabel("Iterations")
 axs3.set_ylabel("Loss")
 axs3.grid(True)
 fig3.show()
+fig3.savefig("TF_Probability/SARIMA/Figures/Loss_Curve.pdf", bbox_inches='tight')
 
 # Draw samples from the variational posterior.
 q_samples_load_ = variational_posteriors.sample(50)
@@ -180,6 +181,7 @@ axs2[0].grid(True)
 axs2[1].grid(True)
 fig2.autofmt_xdate(rotation = 12)
 fig2.show()
+fig2.savefig("TF_Probability/SARIMA/Figures/Pred_Test.pdf", bbox_inches='tight')
 
 # Necessary ??
 # # Build a dict mapping components to distributions over
@@ -233,6 +235,7 @@ axs5.set_xticklabels(["1 / Monday", "49 / Tuesday", "97 / Wednesday", "145 / Thu
 axs5.legend()
 axs5.grid(True)
 fig5.show()
+fig5.savefig("TF_Probability/SARIMA/Figures/Projected_Error_Test.pdf", bbox_inches='tight')
 
 # Calculate the errors from the mean to the actual vaules.
 print("-"*200)
@@ -247,7 +250,7 @@ print("-"*200)
 ########################################################################################################################
 
 import csv
-with open('Compare_Models/SMST_Probability_results/Probability_Based_on_Model/SARIMA_error.csv', 'w', newline='', ) as file:
+with open('Compare_Models/Direct_Multi_Step_Probability_Results/Probability_Based_on_Model/SARIMA_error.csv', 'w', newline='', ) as file:
     writer = csv.writer(file)
     writer.writerow(["Method","MSE","MAE","RMSE"])
     writer.writerow(["SARIMA",
@@ -255,4 +258,4 @@ with open('Compare_Models/SMST_Probability_results/Probability_Based_on_Model/SA
                      str(np.mean(errors)),
                      str(np.sqrt(np.mean(errors**2)))
                      ])
-test_stats.to_csv("Compare_Models/SMST_Probability_results/Probability_Based_on_Model/SARIMA_mean_errors_stddevs.csv")
+test_stats.to_csv("Compare_Models/Direct_Multi_Step_Probability_Results/Probability_Based_on_Model/SARIMA_mean_errors_stddevs.csv")

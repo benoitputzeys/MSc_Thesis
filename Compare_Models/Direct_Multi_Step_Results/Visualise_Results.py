@@ -2,12 +2,12 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 # Load the results of the different models in respective variables.
-Naive = pd.read_csv("Compare_Models/Single_Multi_Step_results/Naive.csv")
-ANN = pd.read_csv("Compare_Models/Single_Multi_Step_results/ANN.csv")
-DT = pd.read_csv("Compare_Models/Single_Multi_Step_results/DT.csv")
-LSTM = pd.read_csv("Compare_Models/Single_Multi_Step_results/LSTM.csv")
-Random_Forest = pd.read_csv("Compare_Models/Single_Multi_Step_results/RF.csv")
-SVR = pd.read_csv("Compare_Models/Single_Multi_Step_results/SVR.csv")
+Naive = pd.read_csv("Compare_Models/Direct_Multi_Step_Results/Naive.csv")
+ANN = pd.read_csv("Compare_Models/Direct_Multi_Step_Results/ANN.csv")
+DT = pd.read_csv("Compare_Models/Direct_Multi_Step_Results/DT.csv")
+LSTM = pd.read_csv("Compare_Models/Direct_Multi_Step_Results/LSTM.csv")
+Random_Forest = pd.read_csv("Compare_Models/Direct_Multi_Step_Results/RF.csv")
+SVR = pd.read_csv("Compare_Models/Direct_Multi_Step_Results/SVR.csv")
 
 # Load the results of the different models in a dataframe.
 frames = ([DT,Naive, ANN, LSTM, Random_Forest, SVR])
