@@ -5,7 +5,8 @@ import numpy as np
 # Load the results of the different models in respective variables.
 # Probability based on the models
 NN_Rd_weigths_error = pd.read_csv("Compare_Models/Direct_Multi_Step_Probability_Results/Probability_Based_on_Model/NN_error.csv")
-NN_Rd_weigths_mean_stddev = pd.read_csv("Compare_Models/Direct_Multi_Step_Probability_Results/Probability_Based_on_Model/NN_mean_errors_stddevs.csv")
+NN_Rd_weigths_mean_stddev_train = pd.read_csv("Compare_Models/Direct_Multi_Step_Probability_Results/Probability_Based_on_Model/NN_mean_errors_stddevs_train.csv")
+NN_Rd_weigths_mean_stddev_test = pd.read_csv("Compare_Models/Direct_Multi_Step_Probability_Results/Probability_Based_on_Model/NN_mean_errors_stddevs_test.csv")
 SARIMA_error = pd.read_csv("Compare_Models/Direct_Multi_Step_Probability_Results/Probability_Based_on_Model/SARIMA_error.csv")
 SARIMA_mean_stddev = pd.read_csv("Compare_Models/Direct_Multi_Step_Probability_Results/Probability_Based_on_Model/SARIMA_mean_errors_stddevs.csv")
 
@@ -276,3 +277,69 @@ fig8.show()
 fig8.savefig("Compare_Models/Direct_Multi_Step_Probability_Results/Figures/SVR_Stddev_of_Error_Train.pdf", bbox_inches='tight')
 
 
+# Compare the mean and standard deviations of errors of the SVR between predictions and true values of the training set.
+fig9, axes9 = plt.subplots(1,1,figsize=(12,6))
+# axes9.plot(x_axis, SVR_mean_stddev.iloc[:,-2],
+#            label= "Mean Error of the \nSVR prediction on \nthe Training Set\n", color='orange')
+axes9.fill_between(x_axis,
+                   (+NN_Rd_weigths_mean_stddev_train.iloc[:,-1]),
+                   (-NN_Rd_weigths_mean_stddev_train.iloc[:,-1]),
+                   label= "Variation of the errors of the NN (Rd. Weights) prediction on the Training Set",
+                   alpha = 0.2, color='orange')
+axes9.fill_between(x_axis,
+                  (+Training_mean_stddev.iloc[:,-1]),
+                  (-Training_mean_stddev.iloc[:,-1]),
+                  label= "Variation in the Training Set", alpha=0.2, color = "blue")
+axes9.set_ylabel('Electricity Load [GW]', size = 14)
+axes9.set_xticks(np.arange(1,385, 24))
+axes9.set_xticklabels(["00:00\nMonday","12:00",
+                       "00:00\nTuesday","12:00",
+                       "00:00\nWednesday", "12:00",
+                       "00:00\nThursday", "12:00",
+                       "00:00\nFriday","12:00",
+                       "00:00\nSaturday", "12:00",
+                       "00:00\nSunday","12:00",
+                       "00:00"])
+axes9.set_xlabel("Hour / Weekday", size = 14)
+axes9.grid(True)
+axes9.minorticks_on()
+axes9.grid(b=True, which='major')
+axes9.grid(b=True, which='minor',alpha = 0.2)
+axes9.legend(fontsize=14)
+axes9.tick_params(axis = "both", labelsize = 11)
+fig9.show()
+fig9.savefig("Compare_Models/Direct_Multi_Step_Probability_Results/Figures/NN_Rd_Weights_Stddev_of_Error_Train.pdf", bbox_inches='tight')
+
+
+# Compare the mean and standard deviations of errors of the SVR between predictions and true values of the training set.
+fig10, axes10 = plt.subplots(1,1,figsize=(12,6))
+# axes9.plot(x_axis, SVR_mean_stddev.iloc[:,-2],
+#            label= "Mean Error of the \nSVR prediction on \nthe Training Set\n", color='orange')
+axes10.fill_between(x_axis,
+                   (+NN_Rd_weigths_mean_stddev_test.iloc[:,-1]),
+                   (-NN_Rd_weigths_mean_stddev_test.iloc[:,-1]),
+                   label= "Variation of the errors of the NN (Rd. Weights) prediction on the Test Set",
+                   alpha = 0.2, color='orange')
+axes10.fill_between(x_axis,
+                  (+Training_mean_stddev.iloc[:,-1]),
+                  (-Training_mean_stddev.iloc[:,-1]),
+                  label= "Variation in the Test Set", alpha=0.2, color = "blue")
+axes10.set_ylabel('Electricity Load [GW]', size = 14)
+axes10.set_xticks(np.arange(1,385, 24))
+axes10.set_xticklabels(["00:00\nMonday","12:00",
+                       "00:00\nTuesday","12:00",
+                       "00:00\nWednesday", "12:00",
+                       "00:00\nThursday", "12:00",
+                       "00:00\nFriday","12:00",
+                       "00:00\nSaturday", "12:00",
+                       "00:00\nSunday","12:00",
+                       "00:00"])
+axes10.set_xlabel("Hour / Weekday", size = 14)
+axes10.grid(True)
+axes10.minorticks_on()
+axes10.grid(b=True, which='major')
+axes10.grid(b=True, which='minor',alpha = 0.2)
+axes10.legend(fontsize=14)
+axes10.tick_params(axis = "both", labelsize = 11)
+fig10.show()
+fig10.savefig("Compare_Models/Direct_Multi_Step_Probability_Results/Figures/NN_Rd_Weights_Stddev_of_Error_Test.pdf", bbox_inches='tight')

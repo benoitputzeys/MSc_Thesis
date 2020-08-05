@@ -60,7 +60,7 @@ fig1.savefig("TF_Probability/MST_Rd_Weights/Figures/Loss_Epochs.pdf", bbox_inche
 
 # Save or load the model
 model.save("TF_Probability/MST_Rd_Weights/DMST_No_Date.h5")
-#model = keras.models.load_model("TF_Probability/MST_Rd_Weights/SMST_No_Date.h5")
+#model = keras.models.load_model("TF_Probability/MST_Rd_Weights/Model_1.h5")
 
 ########################################################################################################################
 # Predicting the generation.

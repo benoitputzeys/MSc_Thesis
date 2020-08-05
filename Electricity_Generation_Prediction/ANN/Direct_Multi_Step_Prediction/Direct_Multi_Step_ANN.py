@@ -60,13 +60,13 @@ y_train = y_scaler.fit_transform(y_train)
 #      hist_split = train_model(my_model, X_train_split, y_train_split, number_of_epochs, batch_size)
 #      hist_list = hist_list.append(hist_split)
 #
-# my_model.save("Electricity_Generation_Prediction/ANN/Direct_Multi_Step_Prediction/SMST_No_Date.h5")
+# my_model.save("Electricity_Generation_Prediction/ANN/Direct_Multi_Step_Prediction/Model_1.h5")
 #
 # # Plot the loss per epoch.
 # metric = "mean_absolute_error"
 # plot_the_loss_curve(np.linspace(1,len(hist_list), len(hist_list) ), hist_list[metric], metric)
 
-my_model = keras.models.load_model("Electricity_Generation_Prediction/ANN/Direct_Multi_Step_Prediction/SMST_No_Date.h5")
+my_model = keras.models.load_model("Electricity_Generation_Prediction/ANN/Direct_Multi_Step_Prediction/Model_1.h5")
 
 ########################################################################################################################
 # Predicting the generation.
