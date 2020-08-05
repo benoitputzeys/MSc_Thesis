@@ -40,8 +40,8 @@ y_train = y_scaler.fit_transform(y_train)
 ########################################################################################################################
 # Create the model.
 ########################################################################################################################
-epochs =8000
-learning_rate = 0.005
+epochs =4000
+learning_rate = 0.001
 batches = 29
 # Build the model.
 model = build_model(X_train.shape[1],learning_rate)
@@ -54,7 +54,9 @@ fig1, axs1=plt.subplots(1,1,figsize=(4,4))
 axs1.plot(model.history.history["mean_absolute_error"], color = "blue")
 axs1.set_ylabel('Loss')
 axs1.set_xlabel('Epochs')
+axs1.grid(True)
 fig1.show()
+fig1.savefig("TF_Probability/MST_Rd_Weights/Figures/Loss_Epochs.pdf", bbox_inches='tight')
 
 # Save or load the model
 model.save("TF_Probability/MST_Rd_Weights/DMST_No_Date.h5")
@@ -226,17 +228,11 @@ fig3.savefig("TF_Probability/MST_Rd_Weights/Figures/DMST_Histograms_Train_and_Te
 # Plot the mean and standard deviation per week for the training set.
 ########################################################################################################################
 
-settlement_period_train = X["Settlement Period"][-len(X_test)*2-len(X_train):-len(X_test)*2].values+(48*DoW[-len(X_test)*2-len(X_train):-len(X_test)*2]).values
-long_column = np.array([settlement_period_train]*350).reshape(-1,)
+X = pd.read_csv('Data_Preprocessing/For_336_SP_Step_Prediction/X.csv', delimiter=',')
+sp_train = X["Settlement Period"][-len(X_test)*2-len(X_train):-len(X_test)*2].values+(48*DoW[-len(X_test)*2-len(X_train):-len(X_test)*2]).values
+sp_train_column = np.array([sp_train]*350).reshape(-1,)
 # Create a dataframe that contains the SPs (1-336) and the load values.
-error_train = pd.DataFrame({'SP':long_column, 'Error_Train': error_column_train[:len(long_column)]})
-
-# Plot the projected errors onto a single week to see the variation in the timeseries.
-fig4, axs4=plt.subplots(2,1,figsize=(12,10))
-axs4[0].scatter(error_train["SP"],
-             error_train["Error_Train"],
-             alpha=0.05, label = "Projected Errors (Training Set)", color = "red")
-axs4[0].set_ylabel("Error during training [GW]", size = 14)
+error_train = pd.DataFrame({'SP':sp_train_column, 'Error_Train': error_column_train[:len(sp_train_column)]})
 
 # Compute the mean and variation for each x.
 training_stats = pd.DataFrame({'Index':np.linspace(1,336,336),
@@ -247,52 +243,12 @@ for i in range(1,337):
     training_stats.iloc[i-1,1]=np.mean(error_train[error_train["SP"]==i].iloc[:,-1])
     training_stats.iloc[i-1,2]=np.std(error_train[error_train["SP"]==i].iloc[:,-1])
 
-# Plot the mean and standard deviation of the errors that are made on the training set.
-axs4[1].plot(training_stats.iloc[:,0],
-          training_stats.iloc[:,1],
-          color = "orange", label = "Mean of all projected errors  (Training Set)")
-axs4[1].fill_between(training_stats.iloc[:,0],
-                  (training_stats.iloc[:,1]-training_stats.iloc[:,2]),
-                  (training_stats.iloc[:,1]+training_stats.iloc[:,2]),
-                  alpha=0.2, color = "orange", label = "+- 1x Standard Deviation")
-axs4[1].set_ylabel("Error during training [GW]", size = 14)
-axs4[1].set_xlabel("Hour / Weekday", size = 14)
-
-# Include additional details such as tick intervals, legend positioning and grid on.
-axs4[0].minorticks_on(), axs4[1].minorticks_on()
-axs4[0].grid(b=True, which='major'), axs4[0].grid(b=True, which='minor',alpha = 0.2)
-axs4[1].grid(b=True, which='major'), axs4[1].grid(b=True, which='minor',alpha = 0.2)
-axs4[0].set_xticks(np.arange(1,385, 24)), axs4[1].set_xticks(np.arange(1,385, 24))
-axs4[1].set_xticklabels(["00:00\nMonday","12:00",
-                       "00:00\nTuesday","12:00",
-                       "00:00\nWednesday", "12:00",
-                       "00:00\nThursday", "12:00",
-                       "00:00\nFriday","12:00",
-                       "00:00\nSaturday", "12:00",
-                       "00:00\nSunday","12:00",
-                       "00:00"])
-axs4[0].legend(fontsize=14), axs4[1].legend(fontsize=14)
-axs4[0].tick_params(axis = "both", labelsize = 12), axs4[1].tick_params(axis = "both", labelsize = 12)
-fig4.show()
-fig4.savefig("TF_Probability/MST_Rd_Weights/Figures/DMST_Mean_and_Stddev_of_Error_Train_Set_Pred.pdf", bbox_inches='tight')
-
-########################################################################################################################
-# Plot the mean and standard deviation per week for the test set.
-########################################################################################################################
-
 settlement_period_test = X["Settlement Period"][-len(X_test)*2:-len(X_test)].values+(48*DoW[-len(X_test)*2:-len(X_test)]).values
-long_column = np.array([settlement_period_test]*350).reshape(-1,)
+sp_test_column = np.array([settlement_period_test]*350).reshape(-1,)
 # Create a dataframe that contains the SPs (1-336) and the load values.
-error_test = pd.DataFrame({'SP':long_column, 'Error_Test': error_column_test[:len(long_column)]})
+error_test = pd.DataFrame({'SP':sp_test_column, 'Error_Test': error_column_test[:len(sp_test_column)]})
 
 # Plot the projected errors onto a single week to see the variation in the timeseries.
-fig5, axs5=plt.subplots(2,1,figsize=(12,10))
-axs5[0].scatter(error_test["SP"],
-             error_test["Error_Test"],
-             alpha=0.05, label = "Projected Errors (Test Set)", color = "red")
-axs5[0].set_ylabel("Error during test [GW]", size = 14)
-
-# Compute the mean and variation for each x.
 test_stats = pd.DataFrame({'Index':np.linspace(1,336,336),
                                'Mean':np.linspace(1,336,336),
                                'Stddev':np.linspace(1,336,336)})
@@ -301,23 +257,35 @@ for i in range(1,337):
     test_stats.iloc[i-1,1]=np.mean(error_test[error_test["SP"]==i].iloc[:,-1])
     test_stats.iloc[i-1,2]=np.std(error_test[error_test["SP"]==i].iloc[:,-1])
 
-# Plot the mean and standard deviation of the errors that are made on the test set.
-axs5[1].plot(test_stats.iloc[:,0],
+# Plot the projected errors onto a single week to see the variation in the timeseries.
+fig4, axs4=plt.subplots(2,1,figsize=(12,10))
+
+# Plot the mean and standard deviation of the errors that are made on the training set.
+axs4[0].plot(training_stats.iloc[:,0],
+          training_stats.iloc[:,1],
+          color = "orange", label = "Mean of all projected errors (Training Set)")
+axs4[0].fill_between(training_stats.iloc[:,0],
+                  (training_stats.iloc[:,1]-training_stats.iloc[:,2]),
+                  (training_stats.iloc[:,1]+training_stats.iloc[:,2]),
+                  alpha=0.2, color = "orange", label = "+- 1x Standard Deviation")
+axs4[0].set_ylabel("Error during training [GW]", size = 14)
+
+axs4[1].plot(test_stats.iloc[:,0],
           test_stats.iloc[:,1],
           color = "orange", label = "Mean of all projected errors (Test Set)")
-axs5[1].fill_between(test_stats.iloc[:,0],
+axs4[1].fill_between(test_stats.iloc[:,0],
                   (test_stats.iloc[:,1]-test_stats.iloc[:,2]),
                   (test_stats.iloc[:,1]+test_stats.iloc[:,2]),
                   alpha=0.2, color = "orange", label = "+- 1x Standard Deviation")
-axs5[1].set_ylabel("Error during test [GW]", size = 14)
-axs5[1].set_xlabel("Hour / Weekday", size = 14)
+axs4[1].set_ylabel("Error during test [GW]", size = 14)
+axs4[1].set_xlabel("Hour / Weekday", size = 14)
 
 # Include additional details such as tick intervals, legend positioning and grid on.
-axs5[0].minorticks_on(), axs5[1].minorticks_on()
-axs5[0].grid(b=True, which='major'), axs5[0].grid(b=True, which='minor',alpha = 0.2)
-axs5[1].grid(b=True, which='major'), axs5[1].grid(b=True, which='minor',alpha = 0.2)
-axs5[0].set_xticks(np.arange(1,385, 24)), axs5[1].set_xticks(np.arange(1,385, 24))
-axs5[1].set_xticklabels(["00:00\nMonday","12:00",
+axs4[0].minorticks_on(), axs4[1].minorticks_on()
+axs4[0].grid(b=True, which='major'), axs4[0].grid(b=True, which='minor',alpha = 0.2)
+axs4[1].grid(b=True, which='major'), axs4[1].grid(b=True, which='minor',alpha = 0.2)
+axs4[0].set_xticks(np.arange(1,385, 24)), axs4[1].set_xticks(np.arange(1,385, 24))
+axs4[0].set_xticklabels(["00:00\nMonday","12:00",
                        "00:00\nTuesday","12:00",
                        "00:00\nWednesday", "12:00",
                        "00:00\nThursday", "12:00",
@@ -325,8 +293,43 @@ axs5[1].set_xticklabels(["00:00\nMonday","12:00",
                        "00:00\nSaturday", "12:00",
                        "00:00\nSunday","12:00",
                        "00:00"])
-axs5[0].legend(fontsize=14), axs4[1].legend(fontsize=14)
-axs5[0].tick_params(axis = "both", labelsize = 12), axs5[1].tick_params(axis = "both", labelsize = 12)
+axs4[1].set_xticklabels(["00:00\nMonday","12:00",
+                       "00:00\nTuesday","12:00",
+                       "00:00\nWednesday", "12:00",
+                       "00:00\nThursday", "12:00",
+                       "00:00\nFriday","12:00",
+                       "00:00\nSaturday", "12:00",
+                       "00:00\nSunday","12:00",
+                       "00:00"])
+
+axs4[0].legend(fontsize=10), axs4[1].legend(fontsize=10)
+axs4[0].tick_params(axis = "both", labelsize = 14), axs4[1].tick_params(axis = "both", labelsize = 14)
+fig4.show()
+fig4.savefig("TF_Probability/MST_Rd_Weights/Figures/DMST_Mean_and_Stddev_of_Error_Train_and_Test_Set_Pred.pdf", bbox_inches='tight')
+
+########################################################################################################################
+# Plot the mean and standard deviation per week for the test set.
+########################################################################################################################
+
+fig5, axs5=plt.subplots(1,1,figsize=(12,6))
+# Compute the mean and variation for each x.
+# Plot the mean and standard deviation of the errors that are made on the test set.
+
+# Include additional details such as tick intervals, legend positioning and grid on.
+axs5.minorticks_on()
+axs5.grid(b=True, which='major'), axs5.grid(b=True, which='minor',alpha = 0.2)
+axs5.set_xticks(np.arange(1,385, 24))
+axs5.set_xticklabels(["00:00\nMonday","12:00",
+                       "00:00\nTuesday","12:00",
+                       "00:00\nWednesday", "12:00",
+                       "00:00\nThursday", "12:00",
+                       "00:00\nFriday","12:00",
+                       "00:00\nSaturday", "12:00",
+                       "00:00\nSunday","12:00",
+                       "00:00"])
+
+axs5.legend(fontsize=14)
+axs5.tick_params(axis = "both", labelsize = 12)
 fig5.show()
 fig5.savefig("TF_Probability/MST_Rd_Weights/Figures/DMST_Mean_and_Stddev_of_Error_Test_Set_Pred.pdf", bbox_inches='tight')
 
@@ -377,6 +380,48 @@ fig5.savefig("TF_Probability/MST_Rd_Weights/Figures/DMST_Mean_and_Stddev_of_Erro
 # axs6.tick_params(axis = "both", labelsize = 12)
 # fig6.show()
 
+fig7, axs7=plt.subplots(2,1,figsize=(12,10))
+axs7[0].fill_between(training_stats.iloc[:,0],
+                  (-training_stats.iloc[:,2]),
+                  (+training_stats.iloc[:,2]),
+                  alpha=0.2, color = "orange", label = "+- 1x Standard Deviation of the Error during Training")
+axs7[0].set_ylabel("Load [GW]", size = 14)
+
+axs7[1].fill_between(test_stats.iloc[:,0],
+                  (-test_stats.iloc[:,2]),
+                  (+test_stats.iloc[:,2]),
+                  alpha=0.2, color = "orange", label = "+- 1x Standard Deviation of the Error during Testing")
+axs7[1].set_ylabel("Load [GW]", size = 14)
+axs7[1].set_xlabel("Hour / Weekday", size = 14)
+
+# Include additional details such as tick intervals, legend positioning and grid on.
+axs7[0].minorticks_on(), axs7[1].minorticks_on()
+axs7[0].grid(b=True, which='major'), axs7[0].grid(b=True, which='minor',alpha = 0.2)
+axs7[1].grid(b=True, which='major'), axs7[1].grid(b=True, which='minor',alpha = 0.2)
+axs7[0].set_xticks(np.arange(1,385, 24)), axs7[1].set_xticks(np.arange(1,385, 24))
+axs7[1].set_xticklabels(["00:00\nMonday","12:00",
+                       "00:00\nTuesday","12:00",
+                       "00:00\nWednesday", "12:00",
+                       "00:00\nThursday", "12:00",
+                       "00:00\nFriday","12:00",
+                       "00:00\nSaturday", "12:00",
+                       "00:00\nSunday","12:00",
+                       "00:00"])
+axs7[0].set_xticklabels(["00:00\nMonday","12:00",
+                       "00:00\nTuesday","12:00",
+                       "00:00\nWednesday", "12:00",
+                       "00:00\nThursday", "12:00",
+                       "00:00\nFriday","12:00",
+                       "00:00\nSaturday", "12:00",
+                       "00:00\nSunday","12:00",
+                       "00:00"])
+axs7[0].legend(fontsize=14), axs7[1].legend(fontsize=14)
+axs7[0].tick_params(axis = "both", labelsize = 12), axs7[1].tick_params(axis = "both", labelsize = 12)
+fig7.show()
+fig7.savefig("TF_Probability/MST_Rd_Weights/Figures/Stddev_of_Error_Test_and_Traing_Set_Pred.pdf", bbox_inches='tight')
+
+
+
 ########################################################################################################################
 # Save the results in a csv file.
 ########################################################################################################################
@@ -401,5 +446,6 @@ df_errors = pd.DataFrame({"MSE_Train": [np.mean(error_train.iloc[:,-1]**2)],
                           })
 df_errors.to_csv("Compare_Models/Direct_Multi_Step_Probability_Results/Probability_Based_on_Model/NN_error.csv")
 
-training_stats.to_csv("Compare_Models/Direct_Multi_Step_Probability_Results/Probability_Based_on_Model/NN_mean_errors_stddevs.csv")
+training_stats.to_csv("Compare_Models/Direct_Multi_Step_Probability_Results/Probability_Based_on_Model/NN_mean_errors_stddevs_train.csv")
+test_stats.to_csv("Compare_Models/Direct_Multi_Step_Probability_Results/Probability_Based_on_Model/NN_mean_errors_stddevs_test.csv")
 
