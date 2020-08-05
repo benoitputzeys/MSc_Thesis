@@ -17,7 +17,7 @@ X = pd.read_csv('Data_Preprocessing/For_336_SP_Step_Prediction/X.csv', delimiter
 DoW = X["Day of Week"]
 X = X.set_index("Time")
 dates = X.iloc[:,-1]
-X = X.iloc[:,:-5]
+X = X.iloc[:,:-6]
 
 y = pd.read_csv('Data_Preprocessing/For_336_SP_Step_Prediction/y.csv', delimiter=',')
 y = y.set_index("Time")
@@ -40,28 +40,25 @@ y_train = y_scaler.fit_transform(y_train)
 ########################################################################################################################
 # Create the model.
 ########################################################################################################################
-#
-# epochs =8000
-# learning_rate = 0.001
-# batches = 32
-#
-# # Build the model.
-# model = build_model(X_train.shape[1],learning_rate)
-# # Run training session.
-# model.fit(X_train,y_train, epochs=epochs, batch_size=batches, verbose=2)
-# # Describe model.
-# model.summary()
-#
-# # Plot the learning progress.
-# fig1, axs1=plt.subplots(1,1,figsize=(4,4))
-# axs1.plot(model.history.history["mean_absolute_error"], color = "blue")
-# axs1.set_ylabel('Loss')
-# axs1.set_xlabel('Epochs')
-# fig1.show()
+epochs =8000
+learning_rate = 0.005
+batches = 29
+# Build the model.
+model = build_model(X_train.shape[1],learning_rate)
+# Run training session.
+model.fit(X_train,y_train, epochs=epochs, batch_size=batches, verbose=2)
+# Describe model.
+model.summary()
+# Plot the learning progress.
+fig1, axs1=plt.subplots(1,1,figsize=(4,4))
+axs1.plot(model.history.history["mean_absolute_error"], color = "blue")
+axs1.set_ylabel('Loss')
+axs1.set_xlabel('Epochs')
+fig1.show()
 
 # Save or load the model
-#model.save("TF_Probability/MST_Rd_Weights/SMST_No_Date.h5")
-model = keras.models.load_model("TF_Probability/MST_Rd_Weights/SMST_No_Date.h5")
+model.save("TF_Probability/MST_Rd_Weights/DMST_No_Date.h5")
+#model = keras.models.load_model("TF_Probability/MST_Rd_Weights/SMST_No_Date.h5")
 
 ########################################################################################################################
 # Predicting the generation.
@@ -80,9 +77,7 @@ predictions_test = y_scaler.inverse_transform(predictions_test)/1000
 predictions_train = y_scaler.inverse_transform(predictions_train)/1000
 
 X_train = x_scaler.inverse_transform(X_train)
-X_train[:,0] = X_train[:,0]/1000
 X_test = x_scaler.inverse_transform(X_test)
-X_test[:,0] = X_test[:,0]/1000
 y_train = (y_scaler.inverse_transform(y_train)/1000).reshape(-1,)
 y_test = np.array(y_test.iloc[:,-1]/1000).reshape(-1,)
 

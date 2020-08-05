@@ -138,7 +138,7 @@ axs2[0].grid(True), axs2[1].grid(True)
 loc = plticker.MultipleLocator(base=47) # Puts ticks at regular intervals
 axs2[0].xaxis.set_major_locator(loc), axs2[1].xaxis.set_major_locator(loc)
 fig2.autofmt_xdate(rotation=10)
-axs2[0].legend(loc=(1.04,0.9)), axs2[1].legend(loc=(1.04,0.7))
+axs2[0].legend(loc=(1.04,0.7)), axs2[1].legend(loc=(1.04,0.7))
 
 fig2.show()
 fig2.savefig("Electricity_Generation_Prediction/LSTM/Figures/Recursive_Prediction.pdf", bbox_inches='tight')

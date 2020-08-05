@@ -40,31 +40,31 @@ y_train = y_scaler.fit_transform(y_train)
 # Create the model.
 ########################################################################################################################
 
-# # Define the hyperparameters.
-# learning_rate = 0.001
-# number_of_epochs = 120
-# batch_size = 29
-#
-# # Create the model.
-# my_model = create_model(X_train, learning_rate)
-#
-# # Extract the loss per epoch to plot the learning progress.
-# hist_list = pd.DataFrame()
-#
-# tscv = TimeSeriesSplit()
-# for train_index, test_index in tscv.split(X_train):
-#      X_train_split, X_test_split = X_train[train_index], X_train[test_index]
-#      y_train_split, y_test_split = y_train[train_index], y_train[test_index]
-#      X_train_split = np.reshape(X_train_split, (X_train_split.shape[0],X_train_split.shape[1],1))
-#      hist_split = train_model(my_model, X_train_split, y_train_split, number_of_epochs, batch_size)
-#      hist_list = hist_list.append(hist_split)
-#
-# # Plot the loss per epoch.
-# metric = "mean_absolute_error"
-# plot_the_loss_curve(np.linspace(1,len(hist_list), len(hist_list) ), hist_list[metric], metric)
+# Define the hyperparameters.
+learning_rate = 0.001
+number_of_epochs = 160
+batch_size = 23
 
-# my_model.save("Electricity_Generation_Prediction/LSTM/Direct_Multi_Step_Prediction/SMST_No_Date.h5")
-my_model = keras.models.load_model("Electricity_Generation_Prediction/LSTM/Direct_Multi_Step_Prediction/SMST_No_Date.h5")
+# Create the model.
+my_model = create_model(X_train, learning_rate)
+
+# Extract the loss per epoch to plot the learning progress.
+hist_list = pd.DataFrame()
+
+tscv = TimeSeriesSplit()
+for train_index, test_index in tscv.split(X_train):
+     X_train_split, X_test_split = X_train[train_index], X_train[test_index]
+     y_train_split, y_test_split = y_train[train_index], y_train[test_index]
+     X_train_split = np.reshape(X_train_split, (X_train_split.shape[0],X_train_split.shape[1],1))
+     hist_split = train_model(my_model, X_train_split, y_train_split, number_of_epochs, batch_size)
+     hist_list = hist_list.append(hist_split)
+
+# Plot the loss per epoch.
+metric = "mean_absolute_error"
+plot_the_loss_curve(np.linspace(1,len(hist_list), len(hist_list) ), hist_list[metric], metric)
+
+my_model.save("Electricity_Generation_Prediction/LSTM/Direct_Multi_Step_Prediction/SMST_No_Date.h5")
+#my_model = keras.models.load_model("Electricity_Generation_Prediction/LSTM/Direct_Multi_Step_Prediction/SMST_No_Date.h5")
 
 ########################################################################################################################
 # Predicting the generation.
@@ -76,9 +76,7 @@ pred_test = y_scaler.inverse_transform(my_model.predict(np.reshape(X_test, (X_te
 pred_test = pred_test.reshape(-1,)
 
 X_train = x_scaler.inverse_transform(X_train)
-X_train[:,0] = X_train[:,0]/1000
 X_test = x_scaler.inverse_transform(X_test)
-X_train[:,0] = X_train[:,0]/1000
 y_train = (y_scaler.inverse_transform(y_train)/1000).reshape(-1,)
 y_test = np.array(y_test.iloc[:,-1]/1000).reshape(-1,)
 

@@ -18,7 +18,7 @@ X = pd.read_csv('Data_Preprocessing/For_1_SP_Step_Prediction/X.csv', delimiter='
 X = X.set_index("Time")
 X = X.drop(columns = "Transmission_Past")
 dates = X.iloc[:,-1]
-X = X.iloc[:,:-5]
+X = X.iloc[:,:-6]
 
 y = pd.read_csv('Data_Preprocessing/For_1_SP_Step_Prediction/y.csv', delimiter=',')
 y = y.set_index("Time")
@@ -45,21 +45,21 @@ y_train = y_scaler.fit_transform(y_train)
 # Create the model.
 ########################################################################################################################
 
-my_model = keras.models.load_model("Electricity_Generation_Prediction/ANN/Recursive_Prediction/SST_No_Trans_No_Date.h5")
+my_model = keras.models.load_model("Electricity_Generation_Prediction/ANN/Recursive_Prediction/SST_No_Trans_No_Date_No_SP.h5")
 
 ########################################################################################################################
 # Predicting the generation.
 ########################################################################################################################
 
 # Multi-Step prediction
-X_future_features = pd.DataFrame(data=X_train_unscaled.iloc[-335:,:].values,  columns=["0","1","2","3","4","5", "6"])
+X_future_features = pd.DataFrame(data=X_train_unscaled.iloc[-335:,:].values,  columns=["0","1","2","3","4","5"])
 result_future = y_scaler.inverse_transform(y_train[-2:])
 
 for i in range(0,48*7):
 
     prev_value = result_future[-2]
-    new_row = [[prev_value[0], 0, 0, 0, 0, 0, 0]]
-    new_row = DataFrame(new_row, columns=["0","1","2","3","4","5", "6"])
+    new_row = [[prev_value[0], 0, 0, 0, 0, 0]]
+    new_row = DataFrame(new_row, columns=["0","1","2","3","4","5"])
 
     X_future_features = pd.concat([X_future_features,new_row])
     rolling_mean_10 = X_future_features["0"].rolling(window=10).mean().values[-1]
@@ -73,13 +73,12 @@ for i in range(0,48*7):
                    rolling_mean_50,
                    rolling_mean_336,
                    exp_20, exp_50,
-                   X_test_unscaled.iloc[i,-1]
                    ]]
 
-    update_row = DataFrame(update_row, columns=["0","1","2","3","4","5","6"])
+    update_row = DataFrame(update_row, columns=["0","1","2","3","4","5"])
     X_future_features.iloc[-1,:] = update_row.iloc[0,:]
 
-    result_future = np.append(result_future, y_scaler.inverse_transform(my_model.predict(x_scaler.transform(update_row).reshape(1,7))))
+    result_future = np.append(result_future, y_scaler.inverse_transform(my_model.predict(x_scaler.transform(update_row).reshape(1,6))))
     result_future = np.reshape(result_future,(-1,1))
 
 result_future = result_future[2:]/1000
@@ -139,7 +138,7 @@ axs2[1].xaxis.set_major_locator(loc)
 fig2.autofmt_xdate(rotation=15)
 axs2[1].legend(loc=(1.04,0.9)), axs2[0].legend(loc=(1.04,0.7))
 fig2.show()
-fig2.savefig("Electricity_Generation_Prediction/ANN/Figures/Recursive_Prediction.pdf", bbox_inches='tight')
+fig2.savefig("Electricity_Generation_Prediction/ANN/Figures/Recursive_Prediction_No_SP.pdf", bbox_inches='tight')
 
 ########################################################################################################################
 # Save the results in a csv file.

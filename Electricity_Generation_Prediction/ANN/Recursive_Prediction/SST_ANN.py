@@ -16,7 +16,7 @@ X = pd.read_csv('Data_Preprocessing/For_1_SP_Step_Prediction/X.csv', delimiter='
 X = X.set_index("Time")
 X = X.drop(columns = "Transmission_Past")
 dates = X.iloc[:,-1]
-X = X.iloc[:,:-5]
+X = X.iloc[:,:-6]
 
 y = pd.read_csv('Data_Preprocessing/For_1_SP_Step_Prediction/y.csv', delimiter=',')
 y = y.set_index("Time")
@@ -43,10 +43,10 @@ y_train = y_scaler.fit_transform(y_train)
 # Define the hyperparameters.
 learning_rate = 0.001
 number_of_epochs = 100
-batch_size = 32
+batch_size = 23
 
 # Create the model.
-my_model = create_model(7, learning_rate)
+my_model = create_model(6, learning_rate)
 
 # Extract the loss per epoch to plot the learning progress.
 hist_list = pd.DataFrame()
@@ -58,7 +58,7 @@ for train_index, test_index in tscv.split(X_train):
      hist_split = train_model(my_model, X_train_split, y_train_split, number_of_epochs, batch_size)
      hist_list = hist_list.append(hist_split)
 
-my_model.save("Electricity_Generation_Prediction/ANN/Recursive_Prediction/SST_No_Trans_No_Date.h5")
+my_model.save("Electricity_Generation_Prediction/ANN/Recursive_Prediction/SST_No_Trans_No_Date_No_SP.h5")
 
 # Plot the loss per epoch.
 metric = "mean_absolute_error"
