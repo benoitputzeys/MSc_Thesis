@@ -7,14 +7,15 @@ from keras.layers import Dropout
 import datetime
 from pandas import DataFrame
 
-def plot_the_loss_curve(x_value,metric,string):
+def plot_the_loss_curve(x_value,metric):
+    fig, axs = plt.subplots(1, 1, figsize=(6, 6))
+    axs.set_xlabel("Epoch", size = 14)
+    axs.set_ylabel("Loss (Mean Absolute Error)", size = 14)
+    axs.tick_params(axis="both", labelsize=14)
+    axs.plot(x_value, metric, color = "blue")
+    fig.show()
+    fig.savefig("Electricity_Generation_Prediction/ANN/Figures/ANN_Loss.pdf", bbox_inches='tight')
 
-    plt.xlabel("Epoch")
-    plt.ylabel(string)
-
-    plt.plot(x_value,metric, label="Loss", color = "blue")
-    plt.legend()
-    plt.show()
 
 def create_model(dim, learning_rate):
 
@@ -25,9 +26,9 @@ def create_model(dim, learning_rate):
     # excpet for the output label, the temperature.
     my_model.add(Dense(units=50, kernel_initializer='uniform', input_dim = dim, activation='relu'))
     my_model.add(Dropout(0.2))
-    my_model.add(Dense(units=75, kernel_initializer='uniform', activation='relu'))
-    my_model.add(Dropout(0.2))
     my_model.add(Dense(units=50, kernel_initializer='uniform', activation='relu'))
+    my_model.add(Dropout(0.2))
+    my_model.add(Dense(units=25, kernel_initializer='uniform', activation='relu'))
     my_model.add(Dropout(0.2))
     my_model.add(Dense(units=1, kernel_initializer='uniform', activation='linear'))
 

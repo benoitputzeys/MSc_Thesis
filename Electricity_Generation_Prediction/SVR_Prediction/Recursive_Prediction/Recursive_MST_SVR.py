@@ -117,22 +117,22 @@ error_test_plot[-336:] = error_test[:48*7]
 fig2, axs2=plt.subplots(2,1,figsize=(12,6))
 axs2[0].plot(dates.iloc[-len(X_test)-48*3:-len(X_test)],
              y_train[-48*3:,0],
-             label = "Training Set (True Values)", alpha = 1, color = "blue")
+             label = "Training Set (Actual Values)", alpha = 1, color = "blue")
 axs2[0].plot(dates.iloc[-len(X_test):-len(X_test)+48*7],
              result_future[:48*7,0],
              label = "SVR Recursive Pred.", color = "orange")
 axs2[0].plot(dates.iloc[-len(X_test):-len(X_test)+48*7],
              y_test[:48*7],
-             label = "Test Set (True Values)", alpha = 1, color = "black")
+             label = "Test Set (Actual Values)", alpha = 1, color = "black")
 axs2[0].axvline(dates.iloc[-len(X_test)], linestyle="--", color = "black")
-axs2[0].set_ylabel('Load [GW]',size = 14)
+axs2[0].set_ylabel('Load, GW',size = 14)
 
 axs2[1].plot(dates.iloc[-len(X_test)-48*3:-len(X_test)+48*7],
              error_test_plot,
              label = "Error", alpha = 1, color = "red")
 axs2[1].axvline(dates.iloc[-len(X_test)], linestyle="--", color = "black")
 axs2[1].set_xlabel('Date',size = 14)
-axs2[1].set_ylabel('Error [GW]',size = 14)
+axs2[1].set_ylabel('Error, GW',size = 14)
 
 # Include additional details such as tick intervals, rotation, legend positioning and grid on.
 loc = plticker.MultipleLocator(base=47) # Puts ticks at regular intervals

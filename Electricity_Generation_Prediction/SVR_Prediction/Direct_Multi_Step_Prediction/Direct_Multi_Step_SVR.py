@@ -44,7 +44,9 @@ y_train = y_scaler.fit_transform(y_train)
 ########################################################################################################################
 
 # Fit the SVR to our data
-regressor = SVR(kernel = 'rbf')
+# Define the three parameters for the SVR: C, Epsilon and Gamme
+# With gamma = 'scale', SVR uses 1 / (n_features * X.var()) as value of gamma
+regressor = SVR(kernel = 'rbf', C = 1.0, epsilon = 0.1, gamma = 'scale')
 regressor.fit(X_train, y_train)
 
 ########################################################################################################################

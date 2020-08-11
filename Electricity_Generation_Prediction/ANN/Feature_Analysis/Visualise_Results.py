@@ -21,17 +21,17 @@ string = ['F7_SP_DoW_D_M_Y', 'F7_SP_DoW_D_M','F7_SP_DoW_D', 'F7_SP_DoW','F7_SP',
 # Create histograms for RMSE, MSE and MAE.
 fig, axes = plt.subplots(1,3,figsize=(12,6))
 axes[0].bar(df.iloc[:,0], df.iloc[:,1]/1000000, color='blue')
-axes[0].set_ylabel('MSE [GW^2]', size = 14)
+axes[0].set_ylabel('MSE, GW^2', size = 14)
 axes[0].set_xticklabels(rotation=90, labels = string)
 axes[0].grid(True)
 
 axes[1].bar(df.iloc[:,0], df.iloc[:,2]/1000, color='blue')
-axes[1].set_ylabel('MAE [GW]', size = 14)
+axes[1].set_ylabel('MAE, GW', size = 14)
 axes[1].set_xticklabels(rotation=90, labels = string)
 axes[1].grid(True)
 
 axes[2].bar(df.iloc[:,0], df.iloc[:,3]/1000, color='blue')
-axes[2].set_ylabel('RMSE [GW]', size = 14)
+axes[2].set_ylabel('RMSE, GW', size = 14)
 axes[2].grid(True)
 axes[2].set_xticklabels(rotation=90, labels = string)
 fig.show()
@@ -53,17 +53,17 @@ string = ['F6_(No_Transmission)', 'F7']
 # Create histograms for RMSE, MSE and MAE.
 fig3, axes3 = plt.subplots(1,3,figsize=(12,6))
 axes3[0].bar(df.iloc[:,0], df.iloc[:,1]/1000000, color='blue')
-axes3[0].set_ylabel('MSE [GW^2]', size = 14)
+axes3[0].set_ylabel('MSE, GW^2', size = 14)
 axes3[0].set_xticklabels(rotation=0, labels = string)
 axes3[0].grid(True)
 
 axes3[1].bar(df.iloc[:,0], df.iloc[:,2]/1000, color='blue')
-axes3[1].set_ylabel('MAE [GW]', size = 14)
+axes3[1].set_ylabel('MAE, GW', size = 14)
 axes3[1].set_xticklabels(rotation=0, labels = string)
 axes3[1].grid(True)
 
 axes3[2].bar(df.iloc[:,0], df.iloc[:,3]/1000, color='blue')
-axes3[2].set_ylabel('RMSE [GW]', size = 14)
+axes3[2].set_ylabel('RMSE, GW', size = 14)
 axes3[2].grid(True)
 axes3[2].set_xticklabels(rotation=0, labels = string)
 fig3.show()
