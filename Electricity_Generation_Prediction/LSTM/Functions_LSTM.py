@@ -59,15 +59,16 @@ def train_model(model, xvalues, yvalues, epochs, batch):
 
     return hist
 
-def plot_the_loss_curve(epochs, difference,string):
+def plot_the_loss_curve(epochs, difference):
 
-    plt.figure(1)
-    plt.xlabel("Epoch", size = 14)
-    plt.ylabel("Mean Absolute Error", size = 14)
-    plt.plot(epochs, difference, color = "blue")
-    plt.legend()
-    plt.show()
-    #plt.figure(1).savefig("Electricity_Generation_Prediction/LSTM/Figures/Loss_Curve",bbox_inches='tight')
+    fig, axs = plt.subplots(1, 1, figsize=(10, 6))
+    axs.set_xlabel("Epoch", size = 14)
+    axs.set_ylabel("Loss (Mean Absolute Error)\nduring training of the LSTM", size = 14)
+    axs.tick_params(axis="both", labelsize=14)
+    axs.plot(epochs, difference, color = "blue")
+    fig.show()
+    fig.savefig("Electricity_Generation_Prediction/LSTM/Figures/LSTM_Loss.pdf", bbox_inches='tight')
+
 
 
 def plot_generation(ax, x_values, y_values, string):
