@@ -61,15 +61,16 @@ fig2, axs2=plt.subplots(2,1,figsize=(12,6))
 # First plot contains the prediction and the true values from the test and training set.
 axs2[0].plot(dates.iloc[-len(X_test)-48*3:-len(X_test)],
              y_train[-48*3:],
-             label = "Training Set (Actual Values)", alpha = 1, color = "blue")
+             label = "Training Set", alpha = 1, color = "blue")
 axs2[0].plot(dates.iloc[-len(X_test):-len(X_test)+48*7],
              LSTM_pred[:48*7],
              label = "LSTM Pred.", color = "orange")
 axs2[0].plot(dates.iloc[-len(X_test):-len(X_test)+48*7],
              y_test[:48*7],
-             label = "Test Set (True Values)", alpha = 1, color = "black")
+             label = "Test Set", alpha = 1, color = "black")
 axs2[0].axvline(dates.iloc[-len(X_test)], linestyle="--", color = "black")
 axs2[0].set_ylabel('Load, GW',size = 14)
+axs2[0].plot(30,30,label = "Error", color = "red")
 
 # Second plot contains the errors.
 axs2[1].plot(dates.iloc[-len(X_test)-48*3:-len(X_test)+48*7],
@@ -81,10 +82,18 @@ axs2[1].set_ylabel('Error, GW',size = 14)
 
 # Include additional details such as tick intervals, rotation, legend positioning and grid on.
 axs2[0].grid(True), axs2[1].grid(True)
-loc = plticker.MultipleLocator(base=47) # this locator puts ticks at regular intervals
-axs2[1].xaxis.set_major_locator(loc), axs2[0].xaxis.set_major_locator(loc)
-fig2.autofmt_xdate(rotation=12)
-axs2[1].legend(loc=(1.04,0.9)), axs2[0].legend(loc=(1.04,0.7))
+loc = plticker.MultipleLocator(base=48) # Puts ticks at regular intervals
+axs2[0].xaxis.set_major_locator(loc), axs2[1].xaxis.set_major_locator(loc)
+fig2.autofmt_xdate(rotation=0)
+axs2[0].legend(loc=(1.02,0.55))
+axs2[0].tick_params(axis = "both",labelsize = 12)
+axs2[1].tick_params(axis = "both",labelsize = 12)
+
+plt.xticks(np.arange(1,482, 48), ["14:00\n07/22","14:00\n07/23","14:00\n07/24",
+                                  "14:00\n07/25","14:00\n07/26","14:00\n07/27",
+                                  "14:00\n07/28","14:00\n07/29","14:00\n07/30",
+                                  "14:00\n07/31","14:00\n08/01"])
+
 fig2.show()
 
 ########################################################################################################################
@@ -99,13 +108,13 @@ fig3, axs3=plt.subplots(2,1,figsize=(12,6))
 # First plot contains the prediction and the true values from the test and training set.
 axs3[0].plot(dates.iloc[-len(X_test)-48*3:-len(X_test)],
              y_train[-48*3:],
-             label = "Training Set (Actual Values)", alpha = 1, color = "blue")
+             label = "Training Set", alpha = 1, color = "blue")
 axs3[0].plot(dates.iloc[-len(X_test):-len(X_test)+48*7],
              LSTM_pred[:48*7],
              label = "LSTM Pred.", color = "orange")
 axs3[0].plot(dates.iloc[-len(X_test):-len(X_test)+48*7],
              y_test[:48*7],
-             label = "Test Set (Actual Values)", alpha = 1, color = "black")
+             label = "Test Set", alpha = 1, color = "black")
 axs3[0].axvline(dates.iloc[-len(X_test)], linestyle="--", color = "black")
 axs3[0].set_ylabel('Load, GW',size = 14)
 # Use the blue band from Thursday 14:00 to Sunday 23:30 (corresponds to an interval of 164 SPs)
@@ -118,21 +127,30 @@ axs3[0].fill_between(dates.iloc[-len(X_test)+164:-len(X_test)+48*7],
                     LSTM_pred[164:48*7].values+historic_stddev.iloc[:172,-1],
                     LSTM_pred[164:48*7].values-historic_stddev.iloc[:172,-1],
                     label = "+-1 x Historic\nStandard Deviation", alpha = 0.2, color = "blue")
+axs3[0].plot(30,30,label = "Error", color = "red")
 
 # Second plot contains the errors.
 axs3[1].plot(dates.iloc[-len(X_test)-48*3:-len(X_test)+48*7],
              error_test_plot,
              label = "Error", alpha = 1, color = "red")
 axs3[1].axvline(dates.iloc[-len(X_test)], linestyle="--", color = "black")
+axs3[1].set_ylabel('Error, GW', size = 14)
+axs3[1].set_xlabel('2019', size = 14)
 
 # Include additional details such as tick intervals, rotation, legend positioning and grid on.
 axs3[0].grid(True), axs3[1].grid(True)
-axs3[1].set_xlabel('Date',size = 14)
-axs3[1].set_ylabel('Error, GW',size = 14)
-loc = plticker.MultipleLocator(base=47) # this locator puts ticks at regular intervals
-axs3[1].xaxis.set_major_locator(loc), axs3[0].xaxis.set_major_locator(loc)
-fig3.autofmt_xdate(rotation=12)
-axs3[1].legend(loc=(1.04,0.9)), axs3[0].legend(loc=(1.04,0.55))
+loc = plticker.MultipleLocator(base=48) # Puts ticks at regular intervals
+axs3[0].xaxis.set_major_locator(loc), axs3[1].xaxis.set_major_locator(loc)
+fig3.autofmt_xdate(rotation=0)
+axs3[0].legend(loc=(1.02,0.45))
+axs3[0].tick_params(axis = "both",labelsize = 12)
+axs3[1].tick_params(axis = "both",labelsize = 12)
+
+plt.xticks(np.arange(1,482, 48), ["14:00\n07/22","14:00\n07/23","14:00\n07/24",
+                                  "14:00\n07/25","14:00\n07/26","14:00\n07/27",
+                                  "14:00\n07/28","14:00\n07/29","14:00\n07/30",
+                                  "14:00\n07/31","14:00\n08/01"])
+
 fig3.show()
 fig3.savefig("Electricity_Generation_Prediction/LSTM/Figures/DMST_Pred_w_Historic_Variability.pdf", bbox_inches='tight')
 

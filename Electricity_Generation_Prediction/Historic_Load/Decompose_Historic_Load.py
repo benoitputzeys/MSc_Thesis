@@ -54,12 +54,16 @@ axs[2].plot(dates[36000:38020],mean_each_week[36000:38020], color = "blue")
 axs[2].set_ylabel("Weekly Average \nGW", size = 14)
 axs[3].plot(dates[36000:38020], residual[36000:38020] , color = "blue")
 axs[3].set_ylabel("Residual, GW", size = 14)
-axs[3].set_xlabel("Date", size = 18)
+axs[3].set_xlabel("Date (2018)", size = 18)
 loc = plticker.MultipleLocator(base=48*7) # Puts ticks at regular intervals
 axs[0].xaxis.set_major_locator(loc), axs[1].xaxis.set_major_locator(loc), axs[2].xaxis.set_major_locator(loc), axs[3].xaxis.set_major_locator(loc)
 axs[0].grid(True), axs[1].grid(True), axs[2].grid(True), axs[3].grid(True)
-fig.autofmt_xdate(rotation = 7)
+fig.autofmt_xdate(rotation = 0)
 axs[3].tick_params(axis = "both", labelsize = 14), axs[2].tick_params(axis = "both", labelsize = 14), axs[1].tick_params(axis = "both", labelsize = 14), axs[0].tick_params(axis = "both", labelsize = 14)
+plt.xticks(np.arange(1,2020, 336), ["01/20","01/27","02/03",
+                                  "02/10","02/17","02/24",
+                                  "03/03"])
+
 fig.show()
 fig.savefig("Electricity_Generation_Prediction/Historic_Load/Figures/Decomposition_Zoomed_In.pdf", bbox_inches='tight')
 
@@ -72,7 +76,11 @@ loc = plticker.MultipleLocator(base=48*130) # this locator puts ticks at regular
 axs.grid(True)
 axs.xaxis.set_major_locator(loc)
 axs.tick_params(axis = "both", labelsize = 14)
-fig.autofmt_xdate(rotation = 12)
+fig.autofmt_xdate(rotation = 0)
+plt.xticks(np.arange(1,len(dates), 48*130), ["2016-01","2016-05","2016-09",
+                                  "2017-01","2017-06","2017-11",
+                                  "2018-02","2018-06","2018-11",
+                                  "2019-03","2019-07","2019-12","2020-04"])
 fig.show()
 fig.savefig("Electricity_Generation_Prediction/Historic_Load/Figures/Weekly_Average.pdf", bbox_inches='tight')
 
@@ -117,7 +125,9 @@ loc = plticker.MultipleLocator(base=48*10) # this locator puts ticks at regular 
 axs[0].xaxis.set_major_locator(loc), axs[1].xaxis.set_major_locator(loc), axs[2].xaxis.set_major_locator(loc), axs[3].xaxis.set_major_locator(loc)
 axs[0].grid(True), axs[1].grid(True), axs[2].grid(True), axs[3].grid(True)
 axs[0].tick_params(axis = "both", labelsize = 14), axs[1].tick_params(axis = "both", labelsize = 14), axs[2].tick_params(axis = "both", labelsize = 14), axs[3].tick_params(axis = "both", labelsize = 14)
-fig.autofmt_xdate(rotation = 5)
+fig.autofmt_xdate(rotation = 0)
+plt.xticks(np.arange(1,2520, 48*10), ["2017/11/28","12/08","18/12",
+                                  "28/12","2018/01/07","01/17"])
 fig.show()
 fig.savefig("Electricity_Generation_Prediction/Historic_Load/Figures/Decomposition_around_Christmas.pdf", bbox_inches='tight')
 
@@ -173,19 +183,17 @@ modified_timeseries_train = modified_timeseries.iloc[31238:62476]
 fig3, axs3=plt.subplots(2,1,figsize=(12,10))
 axs3[0].plot(dates.iloc[31238+10+48*3:31238+48*7*4+10+48*3+1],
              modified_timeseries_train.iloc[10+48*3:48*7*4+10+48*3+1,-1],
-             label = "True Values", alpha = 1, color = "blue")
+            alpha = 1, color = "blue")
 axs3[0].set_ylabel('Electricity Load Training Set, GW',size = 14)
-axs3[0].set_xlabel('Date',size = 14)
 
 axs3[1].scatter(modified_timeseries_train["SP"], modified_timeseries_train["Load"], alpha=0.05, label = "Projected Loads", color = "blue")
 axs3[1].set_ylabel("Electricity Load Training Set, GW", size = 14)
-axs3[1].set_xlabel("Settlement Period / Weekday", size = 14)
 axs3[1].grid(True)
 
 loc = plticker.MultipleLocator(base=48*7) # Puts ticks at regular intervals
 axs3[0].xaxis.set_major_locator(loc)
-axs3[0].legend(loc = "upper right",fontsize = 14), axs3[1].legend(loc = "upper right",fontsize = 14)
-axs3[1].set_xlabel("Hour / Weekday", size = 14)
+axs3[1].legend(loc = "upper right",fontsize = 14)
+axs3[0].set_xticklabels(["2017/10/16","2017/10/16","2017/10/23","2017/10/30","2017/11/06","2017/11/13"])
 loc = plticker.MultipleLocator(base=24) # Puts ticks at regular intervals
 plt.xticks(np.arange(1,385, 24), ["00:00 \nMonday", "12:00",
                                   "00:00 \nTuesday", "12:00",
@@ -217,7 +225,6 @@ axs4.fill_between(df_stats.iloc[:,0],
                   (df_stats.iloc[:,1]+df_stats.iloc[:,2]),
                   alpha=0.2, color = "blue", label = "+- 1 x Standard Deviation")
 axs4.set_ylabel("Electricity Load Training Set, GW", size = 14)
-axs4.set_xlabel("Hour / Weekday", size = 14)
 loc = plticker.MultipleLocator(base=48) # Puts ticks at regular intervals
 plt.xticks(np.arange(1,385, 24), ["00:00 \nMonday", "12:00",
                                   "00:00 \nTuesday", "12:00",
@@ -243,7 +250,6 @@ axs5.fill_between(df_stats.iloc[:,0],
                   (+df_stats.iloc[:,2]),
                   alpha=0.2, color = "blue", label = "+- 1 x Standard Deviation")
 axs5.set_ylabel("Electricity Load Training Set, GW", size = 14)
-axs5.set_xlabel("Hour / Weekday", size = 14)
 loc = plticker.MultipleLocator(base=48) # Puts ticks at regular intervals
 plt.xticks(np.arange(1,385, 24), ["00:00 \nMonday", "12:00",
                                   "00:00 \nTuesday", "12:00",
@@ -291,7 +297,6 @@ axs7.fill_between(df_stats.iloc[:,0],
 axs7.axvline(df_stats.iloc[120,0], linestyle="--", color = "green", label = "Example 1", linewidth = 2)
 axs7.axvline(df_stats.iloc[235,0], linestyle="--", color = "orange", label = "Example 2", linewidth = 2)
 axs7.set_ylabel("Electricity Load Training Set, GW", size = 14)
-axs7.set_xlabel("Hour / Weekday", size = 14)
 plt.xticks(np.arange(1,385, 24), ["00:00 \nMonday", "12:00",
                                   "00:00 \nTuesday", "12:00",
                                   "00:00 \nWednesday", "12:00",
