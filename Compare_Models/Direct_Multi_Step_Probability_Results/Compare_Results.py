@@ -103,33 +103,35 @@ zeros = np.zeros((336,))
 
 # Compare the mean and standard deviations of errors of the NN between predictions and true values of the training set.
 fig4, axes4 = plt.subplots(4,1,figsize=(12,10))
-fig4.suptitle("Mean Errors of Predictions on the Training Set (w. Standard Deviation)",fontsize =14)
 axes4[0].plot(x_axis, NN_mean_stddev.iloc[:,-2], color='orange')
 axes4[0].fill_between(x_axis,
                    (NN_mean_stddev.iloc[:,-2]+NN_mean_stddev.iloc[:,-1]),
                    (NN_mean_stddev.iloc[:,-2]-NN_mean_stddev.iloc[:,-1]),
                    alpha = 0.2, color='orange')
+axes4[0].set_ylim([-5.4,5.4])
 axes4[1].plot(x_axis, LSTM_mean_stddev.iloc[:,-2], color='orange')
 axes4[1].fill_between(x_axis,
                    (LSTM_mean_stddev.iloc[:,-2]+LSTM_mean_stddev.iloc[:,-1]),
                    (LSTM_mean_stddev.iloc[:,-2]-LSTM_mean_stddev.iloc[:,-1]),
                    alpha = 0.2, color='orange')
+axes4[1].set_ylim([-5.4,5.4])
 axes4[2].plot(x_axis, RF_mean_stddev.iloc[:,-2], color='orange')
 axes4[2].fill_between(x_axis,
                    (RF_mean_stddev.iloc[:,-2]+RF_mean_stddev.iloc[:,-1]),
                    (RF_mean_stddev.iloc[:,-2]-RF_mean_stddev.iloc[:,-1]),
                    alpha = 0.2, color='orange')
+axes4[2].set_ylim([-5.4,5.4])
 axes4[3].plot(x_axis, SVR_mean_stddev.iloc[:,-2], color='orange')
 axes4[3].fill_between(x_axis,
                    (SVR_mean_stddev.iloc[:,-2]+SVR_mean_stddev.iloc[:,-1]),
                    (SVR_mean_stddev.iloc[:,-2]-SVR_mean_stddev.iloc[:,-1]),
                    alpha = 0.2, color='orange')
+axes4[3].set_ylim([-5.4,5.4])
 
 axes4[0].set_ylabel('NN Error, GW', size = 12), axes4[1].set_ylabel('LSTM Error, GW', size = 12), axes4[2].set_ylabel('RF Error, GW', size = 12), axes4[3].set_ylabel('SVR Error, GW', size = 12)
-
 axes4[0].set_xticks(np.arange(1,385, 24)), axes4[1].set_xticks(np.arange(1,385, 24)), axes4[2].set_xticks(np.arange(1,385, 24)), axes4[3].set_xticks(np.arange(1,385, 24))
 
-axes4[0].set_xticklabels([0]), axes4[1].set_xticklabels([]), axes4[2].set_xticklabels([])
+axes4[0].set_xticklabels([]), axes4[1].set_xticklabels([]), axes4[2].set_xticklabels([])
 axes4[3].set_xticklabels(["00:00\nMonday","12:00",
                        "00:00\nTuesday","12:00",
                        "00:00\nWednesday", "12:00",
@@ -138,7 +140,6 @@ axes4[3].set_xticklabels(["00:00\nMonday","12:00",
                        "00:00\nSaturday", "12:00",
                        "00:00\nSunday","12:00",
                        "00:00"])
-axes4[3].set_xlabel("Hour / Weekday", size = 14)
 axes4[0].grid(True), axes4[1].grid(True), axes4[2].grid(True), axes4[3].grid(True)
 axes4[0].minorticks_on(), axes4[1].minorticks_on(), axes4[2].minorticks_on(), axes4[3].minorticks_on()
 axes4[0].grid(b=True, which='major'), axes4[1].grid(b=True, which='major'), axes4[2].grid(b=True, which='major'), axes4[3].grid(b=True, which='major')
@@ -160,6 +161,7 @@ axes5.fill_between(x_axis,
                   (+Training_mean_stddev.iloc[:,-1]),
                   (zeros),
                   label= "S. Dev. in the Training Set", alpha=0.2, color = "blue")
+axes5.plot(x_axis,abs(NN_mean_stddev.iloc[:,-2]),label= "Error in the Training Set", color = "orange")
 axes5.set_ylabel('Standard deviation, electricity load, GW', size = 14)
 axes5.set_xticks(np.arange(1,385, 24))
 axes5.set_xticklabels(["00:00\nMonday","12:00",
@@ -170,7 +172,6 @@ axes5.set_xticklabels(["00:00\nMonday","12:00",
                        "00:00\nSaturday", "12:00",
                        "00:00\nSunday","12:00",
                        "00:00"])
-axes5.set_xlabel("Hour / Weekday", size = 14)
 axes5.grid(True)
 axes5.minorticks_on()
 axes5.grid(b=True, which='major')
@@ -193,6 +194,7 @@ axes6.fill_between(x_axis,
                   (+Training_mean_stddev.iloc[:,-1]),
                   (zeros),
                   label= "S. Dev. in the Training Set", alpha=0.2, color = "blue")
+axes6.plot(x_axis,abs(LSTM_mean_stddev.iloc[:,-2]),label= "Error in the Training Set", color = "orange")
 axes6.set_ylabel('Standard deviation, electricity load, GW', size = 14)
 axes6.set_xticks(np.arange(1,385, 24))
 axes6.set_xticklabels(["00:00\nMonday","12:00",
@@ -203,7 +205,6 @@ axes6.set_xticklabels(["00:00\nMonday","12:00",
                        "00:00\nSaturday", "12:00",
                        "00:00\nSunday","12:00",
                        "00:00"])
-axes6.set_xlabel("Hour / Weekday", size = 14)
 axes6.grid(True)
 axes6.minorticks_on()
 axes6.grid(b=True, which='major')
@@ -226,6 +227,7 @@ axes7.fill_between(x_axis,
                   (+Training_mean_stddev.iloc[:,-1]),
                    (zeros),
                    label= "S. Dev. in the Training Set", alpha=0.2, color = "blue")
+axes7.plot(x_axis,abs(RF_mean_stddev.iloc[:,-2]),label= "Error in the Training Set", color = "orange")
 axes7.set_ylabel('Standard deviation, electricity load, GW', size = 14)
 axes7.set_xticks(np.arange(1,385, 24))
 axes7.set_xticklabels(["00:00\nMonday","12:00",
@@ -236,7 +238,6 @@ axes7.set_xticklabels(["00:00\nMonday","12:00",
                        "00:00\nSaturday", "12:00",
                        "00:00\nSunday","12:00",
                        "00:00"])
-axes7.set_xlabel("Hour / Weekday", size = 14)
 axes7.grid(True)
 axes7.minorticks_on()
 axes7.grid(b=True, which='major')
@@ -259,6 +260,7 @@ axes8.fill_between(x_axis,
                   (+Training_mean_stddev.iloc[:,-1]),
                    (zeros),
                    label= "S. Dev. in the Training Set", alpha=0.2, color = "blue")
+axes8.plot(x_axis,abs(SVR_mean_stddev.iloc[:,-2]),label= "Error in the Training Set", color = "orange")
 axes8.set_ylabel('Standard deviation, electricity load, GW', size = 14)
 axes8.set_xticks(np.arange(1,385, 24))
 axes8.set_xticklabels(["00:00\nMonday","12:00",
@@ -269,7 +271,6 @@ axes8.set_xticklabels(["00:00\nMonday","12:00",
                        "00:00\nSaturday", "12:00",
                        "00:00\nSunday","12:00",
                        "00:00"])
-axes8.set_xlabel("Hour / Weekday", size = 14)
 axes8.grid(True)
 axes8.minorticks_on()
 axes8.grid(b=True, which='major')
@@ -293,6 +294,7 @@ axes9.fill_between(x_axis,
                   (+Training_mean_stddev.iloc[:,-1]),
                    (zeros),
                    label= "S. Dev. in the Training Set", alpha=0.2, color = "blue")
+axes9.plot(x_axis,abs(NN_Rd_weigths_mean_stddev_train.iloc[:,-2]),label= "Error in the Training Set", color = "orange")
 axes9.set_ylabel('Standard deviation, electricity load, GW', size = 14)
 axes9.set_xticks(np.arange(1,385, 24))
 axes9.set_xticklabels(["00:00\nMonday","12:00",
@@ -303,7 +305,6 @@ axes9.set_xticklabels(["00:00\nMonday","12:00",
                        "00:00\nSaturday", "12:00",
                        "00:00\nSunday","12:00",
                        "00:00"])
-axes9.set_xlabel("Hour / Weekday", size = 14)
 axes9.grid(True)
 axes9.minorticks_on()
 axes9.grid(b=True, which='major')
@@ -327,6 +328,7 @@ axes10.fill_between(x_axis,
                   (+Training_mean_stddev.iloc[:,-1]),
                     (zeros),
                     label= "S. Dev. in the Training Set", alpha=0.2, color = "blue")
+axes10.plot(x_axis,abs(NN_Rd_weigths_mean_stddev_test.iloc[:,-2]),label= "Error in the Training Set", color = "orange")
 axes10.set_ylabel('Standard deviation, electricity load, GW', size = 14)
 axes10.set_xticks(np.arange(1,385, 24))
 axes10.set_xticklabels(["00:00\nMonday","12:00",
@@ -337,7 +339,6 @@ axes10.set_xticklabels(["00:00\nMonday","12:00",
                        "00:00\nSaturday", "12:00",
                        "00:00\nSunday","12:00",
                        "00:00"])
-axes10.set_xlabel("Hour / Weekday", size = 14)
 axes10.grid(True)
 axes10.minorticks_on()
 axes10.grid(b=True, which='major')
