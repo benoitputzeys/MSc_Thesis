@@ -335,13 +335,9 @@ fig8.show()
 fig8.savefig("Electricity_Generation_Prediction/Historic_Load/Figures/Histograms_Examples_1_2.pdf", bbox_inches='tight')
 
 # Print their mean and standard deviation
-print("The mean of example 1 is %.2f" % np.mean(example_1.iloc[:,-1]),"[GW] and the standard deviation is %.2f" % np.std(example_1.iloc[:,-1]),"[GW]." )
-print("The mean of example 2 is %.2f" % np.mean(example_2.iloc[:,-1]),"[GW] and the standard deviation is %.2f" % np.std(example_2.iloc[:,-1]),"[GW]." )
+print("The mean of example 1 is %.2f" % np.mean(example_1.iloc[:,-1]),"GW and the standard deviation is %.2f" % np.std(example_1.iloc[:,-1]),"[GW]." )
+print("The mean of example 2 is %.2f" % np.mean(example_2.iloc[:,-1]),"GW and the standard deviation is %.2f" % np.std(example_2.iloc[:,-1]),"[GW]." )
 
-df_stats.to_csv("TF_Probability/Results/Projected_Data")
-
-print(np.mean(df_stats.iloc[:,1]))
-
-df_stats.to_csv("Compare_Models/Direct_Multi_Step_Probability_Results/Probability_Based_on_Training/Training_mean_errors_stddevs.csv")
+df_stats.to_csv("Compare_Models/Direct_Multi_Step_Probability_Results/Probability_Based_on_Training/Historic_mean_and_stddevs_train.csv")
 
 
