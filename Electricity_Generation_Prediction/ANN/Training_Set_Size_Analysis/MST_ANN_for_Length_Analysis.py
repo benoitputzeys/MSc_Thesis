@@ -5,6 +5,8 @@ from sklearn.model_selection import train_test_split, TimeSeriesSplit
 from sklearn.preprocessing import StandardScaler
 import pandas as pd
 from sklearn.metrics import mean_absolute_error, mean_squared_error
+import matplotlib.ticker as plticker
+import keras
 
 ########################################################################################################################
 # Get data and data preprocessing.
@@ -13,7 +15,8 @@ from sklearn.metrics import mean_absolute_error, mean_squared_error
 # Get the X (containing the features) and y (containing the labels) values
 X = pd.read_csv('Data_Preprocessing/For_336_SP_Step_Prediction/X.csv', delimiter=',')
 X = X.set_index("Time")
-X = X.iloc[:,:-1]
+dates = X.iloc[:,-1]
+X = X.iloc[:,:-6]
 
 y = pd.read_csv('Data_Preprocessing/For_336_SP_Step_Prediction/y.csv', delimiter=',')
 y = y.set_index("Time")
@@ -24,8 +27,8 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, rando
 X_test_unscaled = X_test
 X_train_unscaled = X_train
 
-X_train = X_train[int(len(X_train)*1/2):]
-y_train = y_train[int(len(y_train)*1/2):]
+X_train = X_train[int(len(X_train)*2/5):]
+y_train = y_train[int(len(y_train)*2/5):]
 
 # Feature Scaling
 x_scaler = StandardScaler()
@@ -40,8 +43,8 @@ y_train = y_scaler.fit_transform(y_train)
 
 # Define the hyperparameters.
 learning_rate = 0.001
-number_of_epochs = 100
-batch_size = 32
+number_of_epochs = 160
+batch_size = 19
 
 # Create the model.
 my_model = create_model(len(X_train[1]), learning_rate)
@@ -59,10 +62,10 @@ for train_index, test_index in tscv.split(X_train):
 
 # Plot the loss per epoch.
 metric = "mean_absolute_error"
-plot_the_loss_curve(np.linspace(1,len(hist_list), len(hist_list) ), hist_list[metric], metric)
+plot_the_loss_curve(np.linspace(1,len(hist_list), len(hist_list) ), hist_list[metric])
 
-my_model.save("Electricity_Generation_Prediction/ANN/Training_Set_Size_Analysis/SMST_ANN_model.h5")
-#my_model = keras.models.load_model("Electricity_Generation_Prediction/ANN/Training_Set_Size_Analysis/SST_ANN_model.h5")
+my_model.save("Electricity_Generation_Prediction/ANN/Training_Set_Size_Analysis/Models/DMST_ANN_35L_Training_Set.h5")
+#my_model = keras.models.load_model("Electricity_Generation_Prediction/ANN/Training_Set_Size_Analysis/Models/DMST_ANN_1L_Training_Set.h5")
 
 ########################################################################################################################
 # Predicting the generation.
@@ -94,77 +97,44 @@ print("The mean squared error of the test set is %0.2f" % mean_squared_error(y_t
 print("The root mean squared error of the test set is %0.2f" % np.sqrt(mean_squared_error(y_test,result_test)))
 print("-"*200)
 ########################################################################################################################
-# Plotting curves.
+# Plotting curves. For Info only, not really necessary!!!
 ########################################################################################################################
-
-# Plot the actual recorded generation against the date.
-from Electricity_Generation_Prediction.ANN.Functions_ANN import plot_actual_generation, plot_predicted_generation, plot_error, plot_prediction_zoomed_in, plot_total_generation, create_dates
-
-#plot_total_generation(X_train_1, y_train_1, "Total generation (Train + Test Set")
-
-# Plot the actual recorded generation against the date.
-fig1, axes1 = plt.subplots(3,1,figsize=(12,6))
-#fig1.suptitle('Train Set (ANN)', fontsize=16)
-# Plot the actual generation in a new subplot of 3x1.
-plot_actual_generation(axes1, X_train, y_train, "Actual Generation")
-# Plot the the predicted (NN) generation.
-plot_predicted_generation(axes1, X_train, result_train, "NN prediction train set")
-# Plot the error between the predicted and the actual temperature.
-plot_error(axes1, X_train, error_train, "NN error train set")
-fig1.show()
-
-# Print the prediction of the training set.
-y_values_dates = create_dates(X_train[-48*7:],result_train[-48*7:])
-fig2, axes2 = plt.subplots(2,1,figsize=(12,6))
-axes2[0].plot( y_values_dates/1000, label = "Prediction Train", color = "orange")
-y_values_dates = create_dates(X_train[-48*7:],y_train[-48*7:])
-axes2[0].plot( y_values_dates/1000, label = "Actual", color = "blue")
-axes2[0].set_ylabel("Electricity Load [GW]")
-axes2[0].grid(True)
-axes2[0].legend()
-plt.setp(axes2[0].get_xticklabels(), visible=False)
-
-y_values_dates = create_dates(X_train[-48*7:],result_train[-48*7:]-y_train[-48*7:])
-axes2[1].plot(y_values_dates/1000, label = "Error", color = "red")
-axes2[1].set_xlabel("Date", size = 14)
-axes2[1].set_ylabel("Error [GW]")
-axes2[1].legend()
-axes2[1].grid(True)
-fig2.show()
-
-# Print the prediction of the first week in the test set.
-fig4, axes4 = plt.subplots(2,1,figsize=(12,6))
-y_values_dates = create_dates(X_test[:48*7,:],result_test[:48*7])
-axes4[0].plot(y_values_dates/1000, label = "Prediction Test", color = "orange")
-y_values_dates = create_dates(X_test[:48*7,:],y_test[:48*7])
-axes4[0].plot(y_values_dates/1000, label = "Actual", color = "blue")
-# for tick in axes4[0].get_xticklabels():
-#     tick.set_rotation(20)
-axes4[0].set_ylabel("Electricity Load [GW]")
-axes4[0].grid(True)
-axes4[0].legend()
-plt.setp(axes4[0].get_xticklabels(), visible=False)
-
-y_values_dates = create_dates(X_test[:48*7,:],abs(result_test[:48*7]-(y_test[:48*7])))
-axes4[1].plot(y_values_dates/1000, label = "Error", color = "red")
-axes4[1].set_xlabel("Settlement Periods Test Set")
-# for tick in axes4[1].get_xticklabels():
-#     tick.set_rotation(20)
-axes4[1].set_ylabel("Error in [GW]")
-axes4[1].grid(True)
-axes4[1].legend()
-fig4.show()
-
+#
+## Print the prediction of the first week in the test set.
+#fig4, axes4 = plt.subplots(2,1,figsize=(12,6))
+#axes4[0].plot(dates[-len(X_test):-len(X_test)+48*7],result_test[:48*7]/1000, label = "ANN Prediction", color = "orange")
+#axes4[0].plot(dates[-len(X_test):-len(X_test)+48*7],y_test[:48*7]/1000, label = "Training Set", color = "blue")
+#axes4[0].plot(30,30, label = "Error", color = "red")
+#axes4[0].set_ylabel("Electricity Load, GW")
+#axes4[0].grid(True)
+#axes4[0].legend()
+#plt.setp(axes4[0].get_xticklabels(), visible=False)
+#
+#axes4[1].plot(dates[-len(X_test):-len(X_test)+48*7],abs(result_test[:48*7]-(y_test[:48*7]))/1000, label = "Error", color = "red")
+#axes4[1].set_ylabel("Error in, GW")
+#
+## Include additional details such as tick intervals, rotation, legend positioning and grid on.
+#axes4[0].grid(True), axes4[1].grid(True)
+#loc = plticker.MultipleLocator(base=48) # Puts ticks at regular intervals
+#axes4[0].xaxis.set_major_locator(loc), axes4[1].xaxis.set_major_locator(loc)
+#fig4.autofmt_xdate(rotation=0)
+#axes4[0].legend(loc=(1.02,0.65)),
+#
+#plt.xticks(np.arange(1,48*7+2, 48), ["14:00\n07/25","14:00\n07/26","14:00\n07/27",
+#                                  "14:00\n07/28","14:00\n07/29","14:00\n07/30",
+#                                  "14:00\n07/31","14:00\n08/01"])
+#
+#fig4.show()
 ########################################################################################################################
 # Save the results in a csv file.
 ########################################################################################################################
 
 
 import csv
-with open('Electricity_Generation_Prediction\ANN\Training_Set_Size_Analysis\AF_12L.csv', 'w', newline='',) as file:
+with open('Electricity_Generation_Prediction\ANN\Training_Set_Size_Analysis\AF_35L.csv', 'w', newline='',) as file:
     writer = csv.writer(file)
     writer.writerow(["Method","MSE","MAE","RMSE"])
-    writer.writerow(["1/2 L",
+    writer.writerow(["3/5 L",
                      str(mean_squared_error(y_test,result_test)),
                      str(mean_absolute_error(y_test,result_test)),
                      str(np.sqrt(mean_squared_error(y_test,result_test)))
