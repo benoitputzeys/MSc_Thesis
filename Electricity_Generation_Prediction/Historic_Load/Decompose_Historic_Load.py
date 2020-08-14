@@ -121,13 +121,13 @@ axs[2].set_ylabel("Weekly Average \nGW", size = 14)
 axs[3].plot(dates[33500:36020], residual[33500:36020] , color = "blue")
 axs[3].set_ylabel("Residual, [GW]", size = 14)
 axs[3].set_xlabel("Date", size = 18)
-loc = plticker.MultipleLocator(base=48*10) # this locator puts ticks at regular intervals
+loc = plticker.MultipleLocator(base=48*7) # this locator puts ticks at regular intervals
 axs[0].xaxis.set_major_locator(loc), axs[1].xaxis.set_major_locator(loc), axs[2].xaxis.set_major_locator(loc), axs[3].xaxis.set_major_locator(loc)
 axs[0].grid(True), axs[1].grid(True), axs[2].grid(True), axs[3].grid(True)
 axs[0].tick_params(axis = "both", labelsize = 14), axs[1].tick_params(axis = "both", labelsize = 14), axs[2].tick_params(axis = "both", labelsize = 14), axs[3].tick_params(axis = "both", labelsize = 14)
 fig.autofmt_xdate(rotation = 0)
-plt.xticks(np.arange(1,2520, 48*10), ["2017/11/28","12/08","18/12",
-                                  "28/12","2018/01/07","01/17"])
+plt.xticks(np.arange(1,2520, 48*7), ["2017/11/28","12/05","12/12",
+                                  "12/19","12/26","2018/01/02","01/09","01/16"])
 fig.show()
 fig.savefig("Electricity_Generation_Prediction/Historic_Load/Figures/Decomposition_around_Christmas.pdf", bbox_inches='tight')
 
