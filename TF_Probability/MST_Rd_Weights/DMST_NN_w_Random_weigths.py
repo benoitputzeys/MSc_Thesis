@@ -101,7 +101,7 @@ error_train_plot = error_train[-48*7*2:-48*7+1].reshape(-1,1)
 fig2, axs2=plt.subplots(2,1,figsize=(12,6))
 axs2[0].plot(dates.iloc[-len(X_test)-48*7*2:-len(X_test)-48*7+1],
           y_train[-48*7*2:-48*7+1],
-          label = "Training Set (True Values)", color = "blue")
+          label = "Training Set", color = "blue")
 axs2[0].plot(dates.iloc[-len(X_test)-48*7*2:-len(X_test)-48*7+1],
           mean_train[-48*7*2:-48*7+1],
           label = "Mean of the predictions", color = "orange")
@@ -114,24 +114,31 @@ axs2[0].fill_between(dates.iloc[-len(X_test)-48*7*2:-len(X_test)-48*7+1],
                   (mean_train - stddev_train)[-48*7*2:-48*7+1].reshape(-1,),
                   label = "+- 1x Standard Deviation",
                   alpha=0.2, color = "orange")
-axs2[0].set_ylabel('Load [GW]', size = 14)
+axs2[0].set_ylabel('Load, GW', size = 14)
+axs2[0].plot(30, 30, color = "red", label = 'Error')
 
 axs2[1].plot(dates.iloc[-len(X_test)-48*7*2:-len(X_test)-48*7+1],
              error_train_plot,
-             label = "Absolute Error", color = "red")
-axs2[1].set_xlabel('Date',size = 14)
-axs2[1].set_ylabel('Absolute Error [GW]',size = 14)
+             label = "Error", color = "red")
+axs2[1].set_xlabel('Date (2019)',size = 14)
+axs2[1].set_ylabel('Error, GW',size = 14)
 
 # Include additional details such as tick intervals
 loc = plticker.MultipleLocator(base=48) # Puts ticks at regular intervals
 axs2[0].xaxis.set_major_locator(loc), axs2[1].xaxis.set_major_locator(loc)
 axs2[0].grid(True), axs2[1].grid(True)
-fig2.autofmt_xdate(rotation = 12)
-axs2[0].legend(loc = (1.04, 0.7)), axs2[1].legend(loc = (1.04, 0.9))
+fig2.autofmt_xdate(rotation = 0)
+axs2[0].legend(loc = (1.02, 0.6))
+plt.xticks(np.arange(1,339, 48), ["14:00\n07/11","14:00\n07/12","14:00\n07/13",
+                                  "14:00\n07/14","14:00\n07/15","14:00\n07/16",
+                                  "14:00\n07/17","14:00\n07/18"])
 fig2.show()
 fig2.savefig("TF_Probability/MST_Rd_Weights/Figures/DMST_Train_Set_Pred.pdf", bbox_inches='tight')
 
+########################################################################################################################
 # Calculate the stddev from the 350 predictions.
+########################################################################################################################
+
 mean_test = (sum(predictions_test)/350).reshape(-1,1)
 stddev_test = np.zeros((len(mean_test),1))
 for i in range (len(X_test)):
@@ -145,14 +152,10 @@ error_test_plot[-336:] = error_test[:48*7].reshape(-1,1)
 fig3, axs3=plt.subplots(2,1,figsize=(12,6))
 axs3[0].plot(dates.iloc[-len(X_test)-48*3:-len(X_test)],
           y_train[-48*3:],
-          label = "Training Set (True Values)", color = "blue")
+          label = "Training Set", color = "blue")
 axs3[0].plot(dates.iloc[-len(X_test):-len(X_test)+48*7],
           mean_test[:48*7],
-          label = "Mean of the predictions", color = "orange")
-
-# Potentially include all the predictions made
-#fig3.plot(X_axis[-48*7:], predictions.T[:,:50], alpha = 0.1, color = "orange")
-
+          label = "Mean of the predictions\nNN with random weights", color = "orange")
 axs3[0].fill_between(dates.iloc[-len(X_test):-len(X_test)+48*7+1],
                      (mean_test+stddev_test)[:48*7+1].reshape(-1,),
                      (mean_test-stddev_test)[:48*7+1].reshape(-1,),
@@ -160,25 +163,34 @@ axs3[0].fill_between(dates.iloc[-len(X_test):-len(X_test)+48*7+1],
                      alpha=0.2, color = "orange")
 axs3[0].plot(dates.iloc[-len(X_test):-len(X_test)+48*7+1],
           y_test[:48*7+1],
-          label = "Test Set (True Values)", color = "black")
-axs3[0].set_ylabel('Load [GW]', size = 14)
+          label = "Test Set", color = "black")
+axs3[0].set_ylabel('Load, GW', size = 14)
 axs3[0].axvline(dates.iloc[-len(X_test)], linestyle="--", color = "black")
+axs3[0].plot(30, 30, color = "red", label = "Error")
 
 axs3[1].plot(dates.iloc[-len(X_test)-48*3:-len(X_test)+48*7+1],
              error_test_plot,
-             label = "Absolute Error", color = "red")
+             label = "Error", color = "red")
 axs3[1].axvline(dates.iloc[-len(X_test)], linestyle="--", color = "black")
-axs3[1].set_xlabel('Date',size = 14)
-axs3[1].set_ylabel('Absolute Error [GW]',size = 14)
+axs3[1].set_xlabel('Date (2019)',size = 14)
+axs3[1].set_ylabel('Error, GW',size = 14)
 
 # Include additional details such as tick intervals
 loc = plticker.MultipleLocator(base=48) # Puts ticks at regular intervals
 axs3[0].xaxis.set_major_locator(loc), axs3[1].xaxis.set_major_locator(loc)
 axs3[0].grid(True), axs3[1].grid(True)
-fig3.autofmt_xdate(rotation = 12)
-axs3[0].legend(loc = (1.04, 0.6)), axs3[1].legend(loc = (1.04, 0.9))
+fig3.autofmt_xdate(rotation = 0)
+axs3[0].legend(loc = (1.02, 0.48))
+plt.xticks(np.arange(1,482, 48), ["14:00\n07/22","14:00\n07/23","14:00\n07/24",
+                                  "14:00\n07/25","14:00\n07/26","14:00\n07/27",
+                                  "14:00\n07/28","14:00\n07/29","14:00\n07/30",
+                                  "14:00\n07/31","14:00\n08/01"])
 fig3.show()
 fig3.savefig("TF_Probability/MST_Rd_Weights/Figures/DMST_Test_Set_Pred.pdf", bbox_inches='tight')
+
+########################################################################################################################
+# Calculate the errors on the training and the test set.
+########################################################################################################################
 
 # Make one large column vector containing all the predictions
 pred_train_vector = predictions_train.reshape(-1, 1)
@@ -207,26 +219,23 @@ for i in range (len(pred_train_vector)):
 # Plot the histogram of the errors.
 error_column_test = predictions_and_errors_test[:,1]
 error_column_train = predictions_and_errors_train[:,1]
-# for i in range(60):
-#     error_column = np.delete(error_column,np.argmax(error_column),0)
-#     #error_column = np.delete(error_column,np.argmin(error_column),0)
 
 # Plot the histograms of the 2 sets.
-fig3, axs3=plt.subplots(1,2,figsize=(12,6))
-axs3[0].grid(True)
-axs3[0].hist(error_column_train, bins = 50, color = "blue")
-axs3[0].set_xlabel("Prediction Error on Training Set [GW]", size = 14)
-axs3[0].set_ylabel("Count", size = 14)
+fig4, axs4=plt.subplots(1,2,figsize=(12,6))
+axs4[0].grid(True)
+axs4[0].hist(error_column_train, bins = 50, color = "blue")
+axs4[0].set_xlabel("Prediction Error on Training Set [GW]", size = 14)
+axs4[0].set_ylabel("Count", size = 14)
 
-axs3[1].grid(True)
-axs3[1].hist(error_column_test, bins = 50, color = "blue")
-axs3[1].set_xlabel("Prediction Error on Test Set [GW]", size = 14)
-axs3[1].set_ylabel("Count", size = 14)
-fig3.show()
-fig3.savefig("TF_Probability/MST_Rd_Weights/Figures/DMST_Histograms_Train_and_Test_Set_Error_Pred.pdf", bbox_inches='tight')
+axs4[1].grid(True)
+axs4[1].hist(error_column_test, bins = 50, color = "blue")
+axs4[1].set_xlabel("Prediction Error on Test Set [GW]", size = 14)
+axs4[1].set_ylabel("Count", size = 14)
+fig4.show()
+fig4.savefig("TF_Probability/MST_Rd_Weights/Figures/DMST_Histograms_Train_and_Test_Set_Error_Pred.pdf", bbox_inches='tight')
 
 ########################################################################################################################
-# Plot the mean and standard deviation per week for the training set.
+# Plot the mean and standard deviation per week for the training and test set.
 ########################################################################################################################
 
 X = pd.read_csv('Data_Preprocessing/For_336_SP_Step_Prediction/X.csv', delimiter=',')
@@ -259,34 +268,33 @@ for i in range(1,337):
     test_stats.iloc[i-1,2]=np.std(error_test[error_test["SP"]==i].iloc[:,-1])
 
 # Plot the projected errors onto a single week to see the variation in the timeseries.
-fig4, axs4=plt.subplots(2,1,figsize=(12,10))
+fig5, axs5=plt.subplots(2,1,figsize=(12,10))
 
 # Plot the mean and standard deviation of the errors that are made on the training set.
-axs4[0].plot(training_stats.iloc[:,0],
+axs5[0].plot(training_stats.iloc[:,0],
           training_stats.iloc[:,1],
           color = "orange", label = "Mean of all projected errors (Training Set)")
-axs4[0].fill_between(training_stats.iloc[:,0],
+axs5[0].fill_between(training_stats.iloc[:,0],
                   (training_stats.iloc[:,1]-training_stats.iloc[:,2]),
                   (training_stats.iloc[:,1]+training_stats.iloc[:,2]),
                   alpha=0.2, color = "orange", label = "+- 1x Standard Deviation")
-axs4[0].set_ylabel("Error during training [GW]", size = 14)
+axs5[0].set_ylabel("Error when training\nNN w. random weights, GW", size = 14)
 
-axs4[1].plot(test_stats.iloc[:,0],
+axs5[1].plot(test_stats.iloc[:,0],
           test_stats.iloc[:,1],
           color = "orange", label = "Mean of all projected errors (Test Set)")
-axs4[1].fill_between(test_stats.iloc[:,0],
+axs5[1].fill_between(test_stats.iloc[:,0],
                   (test_stats.iloc[:,1]-test_stats.iloc[:,2]),
                   (test_stats.iloc[:,1]+test_stats.iloc[:,2]),
                   alpha=0.2, color = "orange", label = "+- 1x Standard Deviation")
-axs4[1].set_ylabel("Error during test [GW]", size = 14)
-axs4[1].set_xlabel("Hour / Weekday", size = 14)
+axs5[1].set_ylabel("Error when testing\nNN w. random weights, GW", size = 14)
 
 # Include additional details such as tick intervals, legend positioning and grid on.
-axs4[0].minorticks_on(), axs4[1].minorticks_on()
-axs4[0].grid(b=True, which='major'), axs4[0].grid(b=True, which='minor',alpha = 0.2)
-axs4[1].grid(b=True, which='major'), axs4[1].grid(b=True, which='minor',alpha = 0.2)
-axs4[0].set_xticks(np.arange(1,385, 24)), axs4[1].set_xticks(np.arange(1,385, 24))
-axs4[0].set_xticklabels(["00:00\nMonday","12:00",
+axs5[0].minorticks_on(), axs5[1].minorticks_on()
+axs5[0].grid(b=True, which='major'), axs5[0].grid(b=True, which='minor',alpha = 0.2)
+axs5[1].grid(b=True, which='major'), axs5[1].grid(b=True, which='minor',alpha = 0.2)
+axs5[0].set_xticks(np.arange(1,385, 24)), axs5[1].set_xticks(np.arange(1,385, 24))
+axs5[0].set_xticklabels(["00:00\nMonday","12:00",
                        "00:00\nTuesday","12:00",
                        "00:00\nWednesday", "12:00",
                        "00:00\nThursday", "12:00",
@@ -294,33 +302,7 @@ axs4[0].set_xticklabels(["00:00\nMonday","12:00",
                        "00:00\nSaturday", "12:00",
                        "00:00\nSunday","12:00",
                        "00:00"])
-axs4[1].set_xticklabels(["00:00\nMonday","12:00",
-                       "00:00\nTuesday","12:00",
-                       "00:00\nWednesday", "12:00",
-                       "00:00\nThursday", "12:00",
-                       "00:00\nFriday","12:00",
-                       "00:00\nSaturday", "12:00",
-                       "00:00\nSunday","12:00",
-                       "00:00"])
-
-axs4[0].legend(fontsize=10), axs4[1].legend(fontsize=10)
-axs4[0].tick_params(axis = "both", labelsize = 14), axs4[1].tick_params(axis = "both", labelsize = 14)
-fig4.show()
-fig4.savefig("TF_Probability/MST_Rd_Weights/Figures/DMST_Mean_and_Stddev_of_Error_Train_and_Test_Set_Pred.pdf", bbox_inches='tight')
-
-########################################################################################################################
-# Plot the mean and standard deviation per week for the test set.
-########################################################################################################################
-
-fig5, axs5=plt.subplots(1,1,figsize=(12,6))
-# Compute the mean and variation for each x.
-# Plot the mean and standard deviation of the errors that are made on the test set.
-
-# Include additional details such as tick intervals, legend positioning and grid on.
-axs5.minorticks_on()
-axs5.grid(b=True, which='major'), axs5.grid(b=True, which='minor',alpha = 0.2)
-axs5.set_xticks(np.arange(1,385, 24))
-axs5.set_xticklabels(["00:00\nMonday","12:00",
+axs5[1].set_xticklabels(["00:00\nMonday","12:00",
                        "00:00\nTuesday","12:00",
                        "00:00\nWednesday", "12:00",
                        "00:00\nThursday", "12:00",
@@ -329,24 +311,29 @@ axs5.set_xticklabels(["00:00\nMonday","12:00",
                        "00:00\nSunday","12:00",
                        "00:00"])
 
-axs5.legend(fontsize=14)
-axs5.tick_params(axis = "both", labelsize = 12)
+axs5[0].legend(fontsize=12), axs5[1].legend(fontsize=12)
+axs5[0].tick_params(axis = "both", labelsize = 12), axs5[1].tick_params(axis = "both", labelsize = 12)
 fig5.show()
-fig5.savefig("TF_Probability/MST_Rd_Weights/Figures/DMST_Mean_and_Stddev_of_Error_Test_Set_Pred.pdf", bbox_inches='tight')
+fig5.savefig("TF_Probability/MST_Rd_Weights/Figures/DMST_Mean_and_Stddev_of_Error_Train_and_Test_Set_Pred.pdf", bbox_inches='tight')
+
+########################################################################################################################
+# Plot the standard deviation per week for the test and training set.
+########################################################################################################################
+
+zeros = np.zeros((336,))
 
 fig7, axs7=plt.subplots(2,1,figsize=(12,10))
 axs7[0].fill_between(training_stats.iloc[:,0],
-                  (-training_stats.iloc[:,2]),
-                  (+training_stats.iloc[:,2]),
-                  alpha=0.2, color = "orange", label = "+- 1x Standard Deviation of the Error during Training")
-axs7[0].set_ylabel("Load [GW]", size = 14)
+                  zeros,
+                  +training_stats.iloc[:,2],
+                  alpha=0.2, color = "orange", label = "Error when training the NN w. random weigths")
+axs7[0].set_ylabel("Standard deviation, electricity load, GW", size = 14)
 
 axs7[1].fill_between(test_stats.iloc[:,0],
-                  (-test_stats.iloc[:,2]),
-                  (+test_stats.iloc[:,2]),
-                  alpha=0.2, color = "orange", label = "+- 1x Standard Deviation of the Error during Testing")
-axs7[1].set_ylabel("Load [GW]", size = 14)
-axs7[1].set_xlabel("Hour / Weekday", size = 14)
+                  zeros,
+                  test_stats.iloc[:,2],
+                  alpha=0.2, color = "orange", label = "Error when testing the NN w. random weigths")
+axs7[1].set_ylabel("Standard deviation, electricity load, GW", size = 14)
 
 # Include additional details such as tick intervals, legend positioning and grid on.
 axs7[0].minorticks_on(), axs7[1].minorticks_on()
@@ -371,10 +358,10 @@ axs7[0].set_xticklabels(["00:00\nMonday","12:00",
                        "00:00"])
 axs7[0].legend(fontsize=14), axs7[1].legend(fontsize=14)
 axs7[0].tick_params(axis = "both", labelsize = 12), axs7[1].tick_params(axis = "both", labelsize = 12)
+axs7[0].set_ylim([0,5.4]), axs7[1].set_ylim([0,5.4])
+
 fig7.show()
 fig7.savefig("TF_Probability/MST_Rd_Weights/Figures/Stddev_of_Error_Test_and_Traing_Set_Pred.pdf", bbox_inches='tight')
-
-
 
 ########################################################################################################################
 # Save the results in a csv file.
@@ -382,13 +369,13 @@ fig7.savefig("TF_Probability/MST_Rd_Weights/Figures/Stddev_of_Error_Test_and_Tra
 
 # Calculate the errors from the mean to the actual vaules.
 print("-"*200)
-print("The mean absolute error of the training set is %0.2f [GW]." % np.mean(abs(error_train.iloc[:,-1])))
-print("The mean squared error of the training set is %0.2f [GW]." % np.mean(error_train.iloc[:,-1]**2))
-print("The root mean squared error of the training set is %0.2f [GW]." % np.sqrt(np.mean(error_train.iloc[:,-1]**2)))
+print("The mean absolute error of the training set is %0.2f GW." % np.mean(abs(error_train.iloc[:,-1])))
+print("The mean squared error of the training set is %0.2f GW." % np.mean(error_train.iloc[:,-1]**2))
+print("The root mean squared error of the training set is %0.2f GW." % np.sqrt(np.mean(error_train.iloc[:,-1]**2)))
 print("-"*200)
-print("The mean absolute error of the test set is %0.2f [GW]." % np.mean(abs(error_test.iloc[:,-1])))
-print("The mean squared error of the test set is %0.2f [GW]." % np.mean(error_test.iloc[:,-1]**2))
-print("The root mean squared error of the test set is %0.2f [GW]." % np.sqrt(np.mean(error_test.iloc[:,-1]**2)))
+print("The mean absolute error of the test set is %0.2f GW." % np.mean(abs(error_test.iloc[:,-1])))
+print("The mean squared error of the test set is %0.2f GW." % np.mean(error_test.iloc[:,-1]**2))
+print("The root mean squared error of the test set is %0.2f GW." % np.sqrt(np.mean(error_test.iloc[:,-1]**2)))
 print("-"*200)
 
 df_errors = pd.DataFrame({"MSE_Train": [np.mean(error_train.iloc[:,-1]**2)],
