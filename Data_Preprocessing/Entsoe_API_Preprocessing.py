@@ -41,10 +41,12 @@ axs21.axes.tick_params(labelsize = 14)
 axs21.grid(True)
 fig21.show()
 
+counter = 0
 # Filter some erroneous data out.
 for i in range(1,len(load_GB_processed)-1):
     if (np.abs(load_GB_processed[i] - load_GB_processed[i - 1]) > 10000) & (np.abs(load_GB_processed[i] - load_GB_processed[i + 1])>10000):
         load_GB_processed[i] = load_GB_processed[i - 1]
+        counter +=1
 
 # Create plot of processed data.
 fig2, axs2=plt.subplots(1,1,figsize=(12,6))
@@ -63,6 +65,7 @@ axs3[0].axes.tick_params(labelsize = 12)
 axs3[0].grid(True)
 
 load_GB_processed[51772:51784]=load_GB_processed[51772-48:51784-48]
+counter = counter + (51784-51772)
 axs3[1].plot(load_GB_processed[51600:52000]/1000, color = "blue")
 axs3[1].set_ylabel("Processed Data, GW",size = 16)
 axs3[1].set_xlabel("Date", size = 16)
@@ -78,6 +81,7 @@ axs4[0].axes.tick_params(labelsize = 12)
 axs4[0].grid(True)
 
 load_GB_processed[60894:60896]=load_GB_raw[60894-48*7:60896-48*7]
+counter = counter + (60896-60894)
 axs4[1].plot(load_GB_processed[60800:61000]/1000, color = "blue")
 axs4[1].set_ylabel("Processed Data, GW",size = 16)
 axs4[1].set_xlabel("Date", size = 16)
@@ -93,6 +97,7 @@ axs5[0].axes.tick_params(labelsize = 12)
 axs5[0].grid(True)
 
 load_GB_processed[60397:60423]=load_GB_raw[60397-48:60423-48]
+counter = counter + (60423-60397)
 axs5[1].plot(load_GB_processed[60200:60600]/1000, color = "blue")
 axs5[1].set_ylabel("Processed Data, GW",size = 16)
 axs5[1].set_xlabel("Date",size = 16)
@@ -108,12 +113,14 @@ axs6[0].axes.tick_params(labelsize = 12)
 axs6[0].grid(True)
 
 load_GB_processed[62431:62439]= load_GB_raw[62431-48*7:62439-48*7]
+counter = counter + (62439-62431)
 axs6[1].plot(load_GB_processed[62200:62650]/1000, color = "blue")
 axs6[1].set_ylabel("Processed Data, GW", size = 12)
 axs6[1].axes.tick_params(labelsize = 12)
 axs6[1].grid(True)
 
 load_GB_processed[62382:62391]= load_GB_raw[62382-48*7:62391-48*7]
+counter = counter + (62391-62382)
 axs6[2].plot(load_GB_processed[62200:62650]/1000, color = "blue")
 axs6[2].set_ylabel("Processed Data, GW", size = 12)
 axs6[2].set_xlabel("Date", size = 16)
@@ -129,6 +136,7 @@ axs7[0].axes.tick_params(labelsize = 12)
 axs7[0].grid(True)
 
 load_GB_processed[59273:59280] = load_GB_processed[59273-46:59280-46]
+counter = counter + (59280-59273)
 axs7[1].plot(load_GB_processed[59000:59750]/1000, color = "blue")
 axs7[1].set_ylabel("Processed Data, GW", size = 16)
 axs7[1].set_xlabel("Date", size = 16)
@@ -145,12 +153,14 @@ axs8[0].axes.tick_params(labelsize = 11)
 axs8[0].grid(True)
 
 load_GB_processed[56272:56274] = load_GB_processed[56272-48*7:56274-48*7]
+counter = counter + (56274-56272)
 axs8[1].plot(load_GB_processed[56100:56600]/1000, color = "blue")
 axs8[1].set_ylabel("Processed Data, GW", size = 12)
 axs8[1].axes.tick_params(labelsize = 11)
 axs8[1].grid(True)
 
 load_GB_processed[56370:56372] = load_GB_raw[56370-48:56372-48]
+counter = counter + (56372-56370)
 axs8[2].plot(load_GB_processed[56100:56600]/1000, color = "blue")
 axs8[2].set_ylabel("Processed Data, GW", size = 12)
 axs8[2].set_xlabel("Date", size = 18)
@@ -166,6 +176,7 @@ axs9[1].axes.tick_params(labelsize = 11)
 axs9[0].grid(True)
 
 load_GB_processed[56738:56739] = load_GB_processed[56738-48:56739-48]
+counter = counter + (56739-56738)
 axs9[1].plot(load_GB_processed[56540:56941]/1000, color = "blue")
 axs9[1].set_ylabel("Processed Data, GW", size = 16)
 axs9[1].set_xlabel("Date", size = 16)
@@ -184,7 +195,7 @@ axs10.grid(True)
 fig10.show()
 fig10.savefig("Data_Preprocessing/Figures/Processed_Data.pdf", bbox_inches='tight')
 
-load_GB_processed.to_csv("Data_Preprocessing/Load_GB_Processed_Data")
+#load_GB_processed.to_csv("Data_Preprocessing/Load_GB_Processed_Data")
 
 not_shifted_processed = np.array(load_GB_processed)
 shifted_processed = load_GB_processed.shift(+1)
@@ -205,4 +216,5 @@ axs21[1].grid(True)
 fig21.show()
 fig21.savefig("Data_Preprocessing/Figures/Difference_Load_Before_and_After.pdf", bbox_inches='tight')
 
-
+percentage = counter/len(load_GB_raw)*100
+print("The number of processed SPs is", counter, "which corresponds to",round(percentage,2),"% of the initial dataset.")
