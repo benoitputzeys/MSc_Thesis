@@ -40,9 +40,10 @@ y_train = y_scaler.fit_transform(y_train)
 ########################################################################################################################
 # Create the model.
 ########################################################################################################################
+
 epochs =4000
 learning_rate = 0.001
-batches = 29
+batches = 19
 # Build the model.
 model = build_model(X_train.shape[1],learning_rate)
 # Run training session.
@@ -59,8 +60,8 @@ fig1.show()
 fig1.savefig("TF_Probability/MST_Rd_Weights/Figures/Loss_Epochs.pdf", bbox_inches='tight')
 
 # Save or load the model
-model.save("TF_Probability/MST_Rd_Weights/DMST_No_Date.h5")
-#model = keras.models.load_model("TF_Probability/MST_Rd_Weights/Model_1.h5")
+model.save("TF_Probability/MST_Rd_Weights/DMST_NN_w_Rd_Weights.h5")
+#model = keras.models.load_model("TF_Probability/MST_Rd_Weights/DMST_NN_w_Rd_Weights.h5")
 
 ########################################################################################################################
 # Predicting the generation.
@@ -332,53 +333,6 @@ axs5.legend(fontsize=14)
 axs5.tick_params(axis = "both", labelsize = 12)
 fig5.show()
 fig5.savefig("TF_Probability/MST_Rd_Weights/Figures/DMST_Mean_and_Stddev_of_Error_Test_Set_Pred.pdf", bbox_inches='tight')
-
-# # This section might take some time but calculating the mean for each is "safer" this way.
-# # (If a value is missing in the original data, that is not a problem in computing the mean per week.)
-# mean_each_week = pred_train_vector.copy()
-# counter = 0
-# for i in range(len(X)-1):
-#     mean_each_week[i-counter:i+1] = np.mean(pred_train_vector[i-counter:i+1])
-#     counter = counter + 1
-#     if (pred_train_vector["SP"][i] == 336) & (pred_train_vector["SP"][i+1]==0):
-#         counter = 0
-# mean_each_week.iloc[-1]=mean_each_week.iloc[-2]
-#
-# pred_train_no_mean =  pd.DataFrame({'SP':long_column, 'Projection': (pred_train_vector-mean_each_week)})
-#
-# pred_train_projected = pd.DataFrame({'SP':np.linspace(1,336,336),
-#                                     'Mean':np.linspace(1,336,336),
-#                                     'Stddev': np.linspace(1,336,336)})
-# for i in range(1,337):
-#     pred_train_projected.iloc[i-1,1]=np.mean(pred_train_no_mean[pred_train_no_mean["SP"]==i].iloc[:,-1])
-#     pred_train_projected.iloc[i-1,2]=np.std(pred_train_no_mean[pred_train_no_mean["SP"]==i].iloc[:,-1])
-#
-# # Plot the mean and standard deviation of the errors that are made on the training set.
-# fig6, axs6=plt.subplots(1,1,figsize=(12,6))
-# axs6.plot(pred_train_projected.iloc[:,0],
-#           pred_train_projected.iloc[:,1],
-#           color = "orange", label = "Mean of all projected errors")
-# axs6.fill_between(pred_train_projected.iloc[:,0],
-#                   (pred_train_projected.iloc[:,1]-pred_train_projected.iloc[:,2]),
-#                   (pred_train_projected.iloc[:,1]+pred_train_projected.iloc[:,2]),
-#                   alpha=0.2, color = "orange", label = "+- 1x Standard Deviation")
-# axs6.set_xlabel("Hour / Weekday", size = 14)
-# axs6.set_ylabel("Prediction Variability of the [GW]", size = 14)
-# # Include additional details such as tick intervals, legend positioning and grid on.
-# axs6.minorticks_on()
-# axs6.grid(b=True, which='major'), axs6.grid(b=True, which='minor',alpha = 0.2)
-# axs6.set_xticks(np.arange(1,385, 24))
-# axs6.set_xticklabels(["00:00\nMonday","12:00",
-#                        "00:00\nTuesday","12:00",
-#                        "00:00\nWednesday", "12:00",
-#                        "00:00\nThursday", "12:00",
-#                        "00:00\nFriday","12:00",
-#                        "00:00\nSaturday", "12:00",
-#                        "00:00\nSunday","12:00",
-#                        "00:00"])
-# axs6.legend(fontsize=14)
-# axs6.tick_params(axis = "both", labelsize = 12)
-# fig6.show()
 
 fig7, axs7=plt.subplots(2,1,figsize=(12,10))
 axs7[0].fill_between(training_stats.iloc[:,0],

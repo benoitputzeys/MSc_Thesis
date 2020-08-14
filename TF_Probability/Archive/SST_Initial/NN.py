@@ -2,8 +2,7 @@ from matplotlib import pylab as plt
 import numpy as np
 from sklearn.model_selection import train_test_split
 from numpy import genfromtxt
-from TF_Probability.SST_Initial.Functions import build_model
-from sklearn.preprocessing import StandardScaler
+from TF_Probability.Archive.SST_Initial.Functions import build_model
 
 # Get the X (containing the features) and y (containing the labels) values
 X = genfromtxt('Data_Entsoe/Data_Preprocessing/X.csv', delimiter=',')
