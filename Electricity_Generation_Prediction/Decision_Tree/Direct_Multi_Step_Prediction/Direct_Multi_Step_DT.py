@@ -133,3 +133,8 @@ df_errors = pd.DataFrame({"MSE_Train": [mean_squared_error(y_train,pred_train)],
 df_errors.to_csv("Compare_Models/Direct_Multi_Step_Probability_Results/Probability_Based_on_Training/DT_error.csv")
 df_errors.to_csv("Compare_Models/Direct_Multi_Step_Results/DT.csv")
 
+df_pred_test = pd.DataFrame({"Test_Prediction":pred_test})
+df_pred_train = pd.DataFrame({"Train_Prediction":pred_train})
+df_pred_test.to_csv("Electricity_Generation_Prediction/Decision_Tree/Direct_Multi_Step_Prediction/Pred_Test.csv")
+df_pred_train.to_csv("Electricity_Generation_Prediction/Decision_Tree/Direct_Multi_Step_Prediction/Pred_Train.csv")
+
