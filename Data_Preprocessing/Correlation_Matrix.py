@@ -16,10 +16,10 @@ X["Actual Load"]=y
 X = X.rename(columns={"Load_Past": "Load from\n1 Week ago",
                   "Transmission_Past": "Net Transmission\ninto GB",
                   "Simple_Moving_Average_10_SP": "SMA\n(10 SP)",
-                  "Simple_Moving_Average_50_SP": "SMA\n(50 SP)",
+                  "Simple_Moving_Average_48_SP": "SMA\n(48 SP)",
                   "Simple_Moving_Average_336_SP": "SMA\n(336 SP)",
-                  "Exp_Moving_Average_20_SP": "EMA\n(20 SP)",
-                  "Exp_Moving_Average_50_SP": "EMA\n(50 SP)",
+                  "Exp_Moving_Average_10_SP": "EMA\n(10 SP)",
+                  "Exp_Moving_Average_48_SP": "EMA\n(48 SP)",
                   })
 
 

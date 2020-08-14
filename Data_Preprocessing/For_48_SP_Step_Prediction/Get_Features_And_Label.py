@@ -13,7 +13,7 @@ df = df.set_index(["Time"])
 
 fig1, axs1=plt.subplots(1,1,figsize=(12,6))
 axs1.plot(df.iloc[:,1], color = "blue", linewidth = 0.5)
-axs1.set_ylabel("Load in UK [MW]", size = 14)
+axs1.set_ylabel("Load in UK, MW", size = 14)
 axs1.set_xlabel("Date", size = 14)
 axs1.grid(True)
 #fig1.suptitle("Electricity Load in the UK from January 2016 to July 2020",fontsize=15)
@@ -26,16 +26,16 @@ df_features["Transmission_Past"] = df["Transmission"].shift(+48)
 
 # Create artificial features.
 rolling_mean_10 = df_features["Load_Past"].rolling(window=10).mean()
-rolling_mean_50 = df_features["Load_Past"].rolling(window=50).mean()
+rolling_mean_48 = df_features["Load_Past"].rolling(window=48).mean()
 rolling_mean_336 = df_features["Load_Past"].rolling(window=336).mean()
-exp_20 = df_features["Load_Past"].ewm(span=20, adjust=False).mean()
-exp_50 = df_features["Load_Past"].ewm(span=50, adjust=False).mean()
+exp_10 = df_features["Load_Past"].ewm(span=10, adjust=False).mean()
+exp_48 = df_features["Load_Past"].ewm(span=48, adjust=False).mean()
 
 df_features["Simple_Moving_Average_10_SP"] = rolling_mean_10
-df_features["Simple_Moving_Average_50_SP"] = rolling_mean_50
+df_features["Simple_Moving_Average_48_SP"] = rolling_mean_48
 df_features["Simple_Moving_Average_336_SP"] = rolling_mean_336
-df_features["Exp_Moving_Average_20_SP"] = exp_20
-df_features["Exp_Moving_Average_50_SP"] = exp_50
+df_features["Exp_Moving_Average_10_SP"] = exp_10
+df_features["Exp_Moving_Average_48_SP"] = exp_48
 
 # Create date relevant features.
 df_features["Settlement Period"] = df['Timestamp'].dt.hour*2+1+df['Timestamp'].dt.minute/30
@@ -64,9 +64,9 @@ y.to_csv("Data_Preprocessing/For_48_SP_Step_Prediction/y.csv")
 # plt.ylabel("Electricity Generation [MW]")
 # #plt.plot(y[-48*3:,0], label='Total Generation Actual', linewidth=0.5 )
 # plt.plot(X[:,1], label='10 Day MA', color='black' , linewidth=0.5 )
-# #plt.plot(X[-48*3:,2], label='50 Day SMA', color='black',  linewidth=0.5 )
-# #plt.plot(X[-48*3:,3], label='10 Day Exp MA', color='red',  linewidth=0.5 )
-# #plt.plot(X[-48*3:,4], label='50 Day Exp MA', color='red',  linewidth=0.5 )
+# #plt.plot(X[-48*3:,2], label='48 SP SMA', color='black',  linewidth=0.5 )
+# #plt.plot(X[-48*3:,3], label='10 SP Exp MA', color='red',  linewidth=0.5 )
+# #plt.plot(X[-48*3:,4], label='48 SP Exp MA', color='red',  linewidth=0.5 )
 # #axs1.grid(True)
 # plt.legend()
 # plt.show()
