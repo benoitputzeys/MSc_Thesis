@@ -13,6 +13,7 @@ def plot_the_loss_curve(x_value,metric):
     axs.set_ylabel("Loss (Mean Absolute Error)", size = 14)
     axs.tick_params(axis="both", labelsize=14)
     axs.plot(x_value, metric, color = "blue")
+    axs.grid(True)
     fig.show()
     fig.savefig("Electricity_Generation_Prediction/ANN/Figures/ANN_Loss.pdf", bbox_inches='tight')
 
@@ -24,12 +25,16 @@ def create_model(dim, learning_rate):
 
     # Input shape corresponds to the number of columns (the features day, month and year) of the dataframe,
     # excpet for the output label, the temperature.
-    my_model.add(Dense(units=50, kernel_initializer='uniform', input_dim = dim, activation='relu'))
-    my_model.add(Dropout(0.2))
-    my_model.add(Dense(units=50, kernel_initializer='uniform', activation='relu'))
-    my_model.add(Dropout(0.2))
-    my_model.add(Dense(units=25, kernel_initializer='uniform', activation='relu'))
-    my_model.add(Dropout(0.2))
+    my_model.add(Dense(units=300, kernel_initializer='uniform', input_dim = dim, activation='relu'))
+    my_model.add(Dropout(0.35))
+    my_model.add(Dense(units=275, kernel_initializer='uniform', activation='relu'))
+    my_model.add(Dropout(0.35))
+    my_model.add(Dense(units=250, kernel_initializer='uniform', activation='relu'))
+    my_model.add(Dropout(0.35))
+    my_model.add(Dense(units=250, kernel_initializer='uniform', activation='relu'))
+    my_model.add(Dropout(0.35))
+    my_model.add(Dense(units=75, kernel_initializer='uniform', activation='relu'))
+    my_model.add(Dropout(0.35))
     my_model.add(Dense(units=1, kernel_initializer='uniform', activation='linear'))
 
     opt = keras.optimizers.Adam(lr=learning_rate)
