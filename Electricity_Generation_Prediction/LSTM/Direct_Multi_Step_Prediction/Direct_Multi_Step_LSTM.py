@@ -40,31 +40,31 @@ y_train = y_scaler.fit_transform(y_train)
 # Create the model.
 ########################################################################################################################
 
-# # Define the hyperparameters.
-# learning_rate = 0.001
-# number_of_epochs = 160
-# batch_size = 23
-#
-# # Create the model.
-# my_model = create_model(X_train, learning_rate)
-#
-# # Extract the loss per epoch to plot the learning progress.
-# hist_list = pd.DataFrame()
-#
-# tscv = TimeSeriesSplit()
-# for train_index, test_index in tscv.split(X_train):
-#      X_train_split, X_test_split = X_train[train_index], X_train[test_index]
-#      y_train_split, y_test_split = y_train[train_index], y_train[test_index]
-#      X_train_split = np.reshape(X_train_split, (X_train_split.shape[0],X_train_split.shape[1],1))
-#      hist_split = train_model(my_model, X_train_split, y_train_split, number_of_epochs, batch_size)
-#      hist_list = hist_list.append(hist_split)
-#
-# # Plot the loss per epoch.
-# metric = "mean_absolute_error"
-# plot_the_loss_curve(np.linspace(1,len(hist_list), len(hist_list) ), hist_list[metric])
-#
-# my_model.save("Electricity_Generation_Prediction/LSTM/Direct_Multi_Step_Prediction/Model_1.h5")
-my_model = keras.models.load_model("Electricity_Generation_Prediction/LSTM/Direct_Multi_Step_Prediction/Model_1.h5")
+# Define the hyperparameters.
+learning_rate = 0.001
+number_of_epochs = 160
+batch_size = 31
+
+# Create the model.
+my_model = create_model(X_train, learning_rate)
+
+# Extract the loss per epoch to plot the learning progress.
+hist_list = pd.DataFrame()
+
+tscv = TimeSeriesSplit()
+for train_index, test_index in tscv.split(X_train):
+     X_train_split, X_test_split = X_train[train_index], X_train[test_index]
+     y_train_split, y_test_split = y_train[train_index], y_train[test_index]
+     X_train_split = np.reshape(X_train_split, (X_train_split.shape[0],X_train_split.shape[1],1))
+     hist_split = train_model(my_model, X_train_split, y_train_split, number_of_epochs, batch_size)
+     hist_list = hist_list.append(hist_split)
+
+# Plot the loss per epoch.
+metric = "mean_absolute_error"
+plot_the_loss_curve(np.linspace(1,len(hist_list), len(hist_list) ), hist_list[metric])
+
+my_model.save("Electricity_Generation_Prediction/LSTM/Direct_Multi_Step_Prediction/DMST_LSTM_Prediction.h5")
+#my_model = keras.models.load_model("Electricity_Generation_Prediction/LSTM/Direct_Multi_Step_Prediction/DMST_LSTM_Prediction.h5")
 
 ########################################################################################################################
 # Predicting the generation.
@@ -132,191 +132,12 @@ loc = plticker.MultipleLocator(base=48) # Puts ticks at regular intervals
 axs2[0].xaxis.set_major_locator(loc), axs2[1].xaxis.set_major_locator(loc)
 fig2.autofmt_xdate(rotation=0)
 axs2[0].legend(loc=(1.02,0.65)),
-
 plt.xticks(np.arange(1,482, 48), ["14:00\n07/22","14:00\n07/23","14:00\n07/24",
                                   "14:00\n07/25","14:00\n07/26","14:00\n07/27",
                                   "14:00\n07/28","14:00\n07/29","14:00\n07/30",
                                   "14:00\n07/31","14:00\n08/01"])
-
 fig2.show()
 fig2.savefig("Electricity_Generation_Prediction/LSTM/Figures/DMST_Prediction.pdf", bbox_inches='tight')
-
-########################################################################################################################
-# Compute the standard deviation of the errors from the training set.
-########################################################################################################################
-
-X = pd.read_csv('Data_Preprocessing/For_336_SP_Step_Prediction/X.csv', delimiter=',')
-settlement_period_week = X["Settlement Period"]+(48*X["Day of Week"])
-
-dates_train = dates.iloc[:len(X_train)]
-dates_test = dates.iloc[-len(X_test):]
-train_set = y_train
-settlement_period_train = settlement_period_week[-len(X_test)*2-len(X_train):-len(X_test)*2]
-
-# Create a dataframe that contains the SPs (1-336) and the load values.
-error_train = pd.DataFrame({'SP':settlement_period_train, 'Error_Train': (pred_train-train_set)})
-
-# Plot the projected errors onto a single week to see the variation in the timeseries.
-fig3, axs3=plt.subplots(1,1,figsize=(12,6))
-axs3.scatter(error_train["SP"],
-             error_train["Error_Train"],
-             alpha=0.05, label = "Projected Errors", color = "red")
-axs3.set_ylabel("Error during training, GW", size = 14)
-axs3.set_xlabel("Settlement Period", size = 14)
-axs3.grid(True)
-axs3.legend()
-fig3.show()
-fig3.savefig("Electricity_Generation_Prediction/LSTM/Figures/DMST_Error_Scatter_Plot_Train_Set_Pred.pdf", bbox_inches='tight')
-
-# Compute the mean and variation for each x.
-training_stats = pd.DataFrame({'Index':np.linspace(1,336,336),
-                               'Mean':np.linspace(1,336,336),
-                               'Stddev':np.linspace(1,336,336)})
-
-for i in range(1,337):
-    training_stats.iloc[i-1,1]=np.mean(error_train[error_train["SP"]==i].iloc[:,-1])
-    training_stats.iloc[i-1,2]=np.std(error_train[error_train["SP"]==i].iloc[:,-1])
-
-# Plot the mean and standard deviation of the errors that are made on the training set.
-fig4, axs4=plt.subplots(1,1,figsize=(12,6))
-axs4.plot(training_stats.iloc[:,0],
-          training_stats.iloc[:,1],
-          color = "orange", label = "Mean of all projected errors from LSTM")
-axs4.fill_between(training_stats.iloc[:,0],
-                  (training_stats.iloc[:,1]-training_stats.iloc[:,2]),
-                  (training_stats.iloc[:,1]+training_stats.iloc[:,2]),
-                  alpha=0.2, color = "orange", label = "+- 1x Standard Deviation")
-axs4.set_ylabel("Standard deviation, electricity load, GW", size = 14)
-axs4.set_xlabel("Hour / Weekday", size = 14)
-axs4.set_xticks(np.arange(1,385, 24))
-axs4.set_xticklabels(["00:00\nMonday","12:00",
-                       "00:00\nTuesday","12:00",
-                       "00:00\nWednesday", "12:00",
-                       "00:00\nThursday", "12:00",
-                       "00:00\nFriday","12:00",
-                       "00:00\nSaturday", "12:00",
-                       "00:00\nSunday","12:00",
-                       "00:00"])
-axs4.grid(b=True, which='major'), axs4.grid(b=True, which='minor',alpha = 0.2)
-axs4.tick_params(axis = "both", labelsize = 12)
-axs4.minorticks_on()
-axs4.legend(fontsize=14)
-axs4.grid(True)
-fig4.show()
-fig4.savefig("Electricity_Generation_Prediction/LSTM/Figures/DMST_Mean_and_Stddev_of_Error_Train_Set_Pred.pdf", bbox_inches='tight')
-
-stddev = training_stats["Stddev"]
-
-fig5, axs5=plt.subplots(2,1,figsize=(12,6))
-# First plot contains the prediction, the true values from the test and training set and the standard deviation.
-axs5[0].plot(dates.iloc[-len(X_test)-48*3:-len(X_test)],
-             y_train[-48*3:],
-             label = "Training Set", alpha = 1, color = "blue")
-axs5[0].plot(dates.iloc[-len(X_test):-len(X_test)+48*7],
-             pred_test[:48*7],
-             label = "LSTM Pred.", color = "orange")
-axs5[0].plot(dates.iloc[-len(X_test):-len(X_test)+48*7],
-             y_test[:48*7],
-             label = "Test Set", alpha = 1, color = "black")
-# Use the blue band from Thursday 14:00 to Sunday 23:30 (corresponds to an interval of 164 SPs)
-axs5[0].fill_between(dates.iloc[-len(X_test):-len(X_test)+164],
-                    pred_test[:164]+stddev[-164:],
-                    pred_test[:164]-stddev[-164:],
-                    alpha = 0.2, color = "orange")
-# Use the blue band from Monday 00:00 (SP = 1) to Thursday 13:30 (SP=164)
-axs5[0].fill_between(dates.iloc[-len(X_test)+164:-len(X_test)+48*7],
-                    pred_test[164:48*7]+stddev[:172],
-                    pred_test[164:48*7]-stddev[:172],
-                    label = "+-1 x\nStandard Deviation", alpha = 0.2, color = "orange")
-axs5[0].axvline(dates.iloc[-len(X_test)], linestyle="--", color = "black")
-axs5[0].set_ylabel('Load, GW',size = 14)
-axs5[0].plot(30,30,label = "Error", color = "red")
-
-# Second plot contains the errors.
-axs5[1].plot(dates.iloc[-len(X_test)-48*3:-len(X_test)+48*7],
-             error_test_plot,
-             alpha = 1, color = "red")
-axs5[1].axvline(dates.iloc[-len(X_test)],
-                linestyle="--", color = "black")
-axs5[1].set_xlabel('2019',size = 14)
-axs5[1].set_ylabel('Error, GW',size = 14)
-
-# Include additional details such as tick intervals, rotation, legend positioning and grid on.
-axs5[0].grid(True), axs5[1].grid(True)
-loc = plticker.MultipleLocator(base=48) # Puts ticks at regular intervals
-axs5[0].xaxis.set_major_locator(loc), axs5[1].xaxis.set_major_locator(loc)
-fig5.autofmt_xdate(rotation=0)
-axs5[0].legend(loc=(1.02,0.48)),
-
-plt.xticks(np.arange(1,482, 48), ["14:00\n07/22","14:00\n07/23","14:00\n07/24",
-                                  "14:00\n07/25","14:00\n07/26","14:00\n07/27",
-                                  "14:00\n07/28","14:00\n07/29","14:00\n07/30",
-                                  "14:00\n07/31","14:00\n08/01"])
-
-fig5.show()
-fig5.savefig("Electricity_Generation_Prediction/LSTM/Figures/DMST_Pred_w_Uncertainty.pdf", bbox_inches='tight')
-
-# Prediction on training set.
-fig6, axs6=plt.subplots(3,1,figsize=(12,10))
-# First plot contains the prediction, the true values from the test and training set and the standard deviation.
-axs6[0].plot(dates_train[154:48*7*3+154+1],
-             y_train[154:48*7*3+154+1],linewidth = 0.5,
-             label = "Training Set", alpha = 1, color = "blue")
-axs6[0].plot(dates_train[154:48*7*3+154+1],
-             pred_train[154:48*7*3+154+1], linewidth = 0.5,
-             label = "LSTM Pred.", color = "orange")
-axs6[0].set_ylabel('Load, GW',size = 14)
-axs6[0].plot(30,30,label = "Error", color = "red")
-loc1 = plticker.MultipleLocator(base=48*7) # this locator puts ticks at regular intervals
-axs6[0].xaxis.set_major_locator(loc1)
-axs6[0].set_xticks(np.arange(1,4*336, 336))
-axs6[0].set_xticklabels(["2017/10/16",
-                       "2017/10/23",
-                       "2017/10/30",
-                       "2017/11/06",
-                       ])
-# Second plot contains the errors.
-axs6[1].plot(dates_train[154:48*7*3+154+1],
-             error_train.iloc[154:48*7*3+154+1,-1],linewidth = 0.5,
-             alpha = 1, color = "red")
-axs6[1].set_ylabel('Error, GW',size = 14)
-axs6[1].xaxis.set_major_locator(loc1)
-axs6[1].set_xticks(np.arange(1,4*336, 336))
-axs6[1].set_xticklabels(["2017/10/16",
-                       "2017/10/23",
-                       "2017/10/30",
-                       "2017/11/06",
-                       ])
-
-# Third plot contains the errors projected on a single week
-axs6[2].scatter(error_train["SP"],
-             error_train["Error_Train"],linewidth = 0.01,
-             alpha=0.05, color = "red")
-axs6[2].set_ylabel("Projected Error\nduring training, GW", size = 14)
-
-# Include additional details such as tick intervals, rotation, legend positioning and grid on.
-axs6[2].grid(True), axs6[1].grid(True), axs6[0].grid(True)
-loc2 = plticker.MultipleLocator(base=24) # this locator puts ticks at regular intervals
-axs6[2].xaxis.set_major_locator(loc2)
-axs6[2].set_xticks(np.arange(1,385, 24))
-axs6[2].set_xticklabels(["00:00\nMonday","12:00",
-                       "00:00\nTuesday","12:00",
-                       "00:00\nWednesday", "12:00",
-                       "00:00\nThursday", "12:00",
-                       "00:00\nFriday","12:00",
-                       "00:00\nSaturday", "12:00",
-                       "00:00\nSunday","12:00",
-                       "00:00"])
-axs6[2].grid(b=True, which='major'), axs6[2].grid(b=True, which='minor',alpha = 0.2)
-axs6[2].tick_params(axis = "both")
-axs6[1].tick_params(axis = "both",labelsize = 12)
-axs6[0].tick_params(axis = "both",labelsize = 12)
-axs6[0].legend(loc=(1.02,0.75))
-axs6[2].minorticks_on()
-axs6[2].grid(True)
-
-fig6.show()
-fig6.savefig("Electricity_Generation_Prediction/LSTM/Figures/DMST_Projection_Explained.pdf", bbox_inches='tight')
 
 ########################################################################################################################
 # Save the results in a csv file.
@@ -333,7 +154,8 @@ df_errors.to_csv("Compare_Models/Direct_Multi_Step_Probability_Results/Probabili
 df_errors.to_csv("Compare_Models/Direct_Multi_Step_Results/LSTM.csv")
 
 df_pred_test = pd.DataFrame({"Test_Prediction":pred_test})
+df_pred_train = pd.DataFrame({"Train_Prediction":pred_train})
 df_pred_test.to_csv("Electricity_Generation_Prediction/LSTM/Direct_Multi_Step_Prediction/Pred_Test.csv")
-training_stats.to_csv('Compare_Models/Direct_Multi_Step_Probability_Results/Probability_Based_on_Training/LSTM_mean_errors_stddevs.csv')
+df_pred_train.to_csv("Electricity_Generation_Prediction/LSTM/Direct_Multi_Step_Prediction/Pred_Train.csv")
 
 

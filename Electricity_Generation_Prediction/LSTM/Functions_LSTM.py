@@ -1,6 +1,7 @@
 import pandas as pd
 from matplotlib import pyplot as plt
 import numpy as np
+import keras
 
 # Importing the Keras libraries and packages
 from keras.models import Sequential
@@ -16,35 +17,21 @@ def create_model(input_variable, learning_rate):
     # Initialise the NN as a sequence of layers as opposed to a computational graph.
     my_model = Sequential()
 
-    # Because predicting the temperature is pretty complex, you need to have a high dimensionality too thus 50
-    # for the number of neurons. If the number of neurons is too small in each of the LSTM layers, the model would not
-    # capture very well the upward and downward trend.
-    my_model.add(LSTM(units=50, return_sequences=True, input_shape=(input_variable.shape[1],1), kernel_initializer='uniform'))
-    my_model.add(Dropout(0.2))
-
-    # Adding a second LSTM layer and Dropout regularisation
-    # No need to specify any input shape here because we have already defined that we have 50 neurons in the
-    # previous layer.
-    my_model.add(LSTM(units=50,return_sequences=True,  kernel_initializer='uniform'))
-    my_model.add(Dropout(0.2))
-
-    # Adding a fourth LSTM layer and Dropout regularisation
-    # This is the last LSTM layer that is  added! Thus the return sequences is set to  false.
-    my_model.add(LSTM(units = 25, kernel_initializer='uniform'))
-    my_model.add(Dropout(0.2))
-
-    # Adding the output layer
-    # We are not adding an LSTM layer. We are fully connecting the outward layer to the previous LSTM layer.
-    # As a result, we use a DENSE layer to make this full connection.
+    my_model.add(LSTM(units=150, return_sequences=True, input_shape=(input_variable.shape[1],1), kernel_initializer='uniform'))
+    my_model.add(Dropout(0.35))
+    my_model.add(LSTM(units=125,return_sequences=True,  kernel_initializer='uniform'))
+    my_model.add(Dropout(0.35))
+    my_model.add(LSTM(units=125,return_sequences=True,  kernel_initializer='uniform'))
+    my_model.add(Dropout(0.35))
+    my_model.add(LSTM(units=100,return_sequences=True,  kernel_initializer='uniform'))
+    my_model.add(Dropout(0.35))
+    my_model.add(LSTM(units = 50, kernel_initializer='uniform'))
+    my_model.add(Dropout(0.35))
     my_model.add(Dense(units=1, kernel_initializer='uniform'))
 
     # Compiling the RNN
-    # For RNN and also in the Keras documentation, an RMSprop is recommended.
-    # But experimenting with other optimizers, one can also use the adam optimizer.
-    # The adam optimizer is actually always a good choice and very powerfull too!
-    # In general, the most commonly used optimizers are adam and RMSprop
-    optimizer = RMSprop(lr=learning_rate)
-    my_model.compile(optimizer=optimizer, loss='mae', metrics=['mean_squared_error','mean_absolute_error','mean_absolute_percentage_error'])
+    opt = keras.optimizers.Adam(lr=learning_rate)
+    my_model.compile(optimizer=opt, loss='mae', metrics=['mean_squared_error','mean_absolute_error','mean_absolute_percentage_error'])
 
     return my_model
 
