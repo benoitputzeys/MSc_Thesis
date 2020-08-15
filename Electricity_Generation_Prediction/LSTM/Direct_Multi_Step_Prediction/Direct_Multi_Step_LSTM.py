@@ -41,9 +41,9 @@ y_train = y_scaler.fit_transform(y_train)
 ########################################################################################################################
 
 # Define the hyperparameters.
-learning_rate = 0.001
-number_of_epochs = 160
-batch_size = 31
+learning_rate = 0.005
+number_of_epochs = 40
+batch_size = 19
 
 # Create the model.
 my_model = create_model(X_train, learning_rate)

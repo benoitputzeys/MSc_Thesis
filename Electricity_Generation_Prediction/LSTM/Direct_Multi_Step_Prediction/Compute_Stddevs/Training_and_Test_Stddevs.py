@@ -211,7 +211,7 @@ axs7.set_xticklabels(["00:00\nMonday","12:00",
                        "00:00\nSaturday", "12:00",
                        "00:00\nSunday","12:00",
                        "00:00"])
-axs7.grid(b=True, which='major'), axs4.grid(b=True, which='minor',alpha = 0.2)
+axs7.grid(b=True, which='major'), axs7.grid(b=True, which='minor',alpha = 0.2)
 axs7.tick_params(axis = "both", labelsize = 12)
 axs7.minorticks_on()
 axs7.legend(fontsize=14)

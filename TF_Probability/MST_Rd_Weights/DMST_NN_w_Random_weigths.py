@@ -7,6 +7,7 @@ from sklearn.preprocessing import StandardScaler
 import pandas as pd
 import matplotlib.ticker as plticker
 import keras
+from sklearn.model_selection import train_test_split, TimeSeriesSplit
 
 ########################################################################################################################
 # Get data and data preprocessing.
@@ -41,15 +42,24 @@ y_train = y_scaler.fit_transform(y_train)
 # Create the model.
 ########################################################################################################################
 
-epochs =4000
+epochs = 800
 learning_rate = 0.001
 batches = 19
 # Build the model.
 model = build_model(X_train.shape[1],learning_rate)
-# Run training session.
-model.fit(X_train,y_train, epochs=epochs, batch_size=batches, verbose=2)
+
+# Extract the loss per epoch to plot the learning progress.
+hist_list = pd.DataFrame()
+
+tscv = TimeSeriesSplit()
+for train_index, test_index in tscv.split(X_train):
+     X_train_split, X_test_split = X_train[train_index], X_train[test_index]
+     y_train_split, y_test_split = y_train[train_index], y_train[test_index]
+     hist_split = model.fit(X_train_split, y_train_split, epochs = epochs, batch_size = batches, verbose = 2)
+
 # Describe model.
 model.summary()
+
 # Plot the learning progress.
 fig1, axs1=plt.subplots(1,1,figsize=(4,4))
 axs1.plot(model.history.history["mean_absolute_error"], color = "blue")

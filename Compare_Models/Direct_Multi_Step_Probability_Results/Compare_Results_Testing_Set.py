@@ -28,18 +28,18 @@ RF_mean_stddev_test = pd.read_csv("Compare_Models/Direct_Multi_Step_Probability_
 SVR_mean_stddev_test = pd.read_csv("Compare_Models/Direct_Multi_Step_Probability_Results/Probability_Based_on_Training/SVR_mean_errors_stddevs_test.csv")
 
 # Load the results of the different models in a dataframe.
-training_errors = ([DT_error.iloc[:,1:4],
-                    Naive_error.iloc[:,1:4],
+training_errors = ([Naive_error.iloc[:,1:4],
+                    DT_error.iloc[:,1:4],
                     NN_error.iloc[:, 1:4],
-                    LSTM_error.iloc[:,1:4],
                     RF_error.iloc[:,1:4],
-                    SVR_error.iloc[:, 1:4]])
-test_errors = ([DT_error.iloc[:,-3:],
-                Naive_error.iloc[:,-3:],
+                    SVR_error.iloc[:, 1:4],
+                    LSTM_error.iloc[:, 1:4]])
+test_errors = ([Naive_error.iloc[:,-3:],
+                DT_error.iloc[:,-3:],
                 NN_error.iloc[:,-3:],
-                LSTM_error.iloc[:, -3:],
                 RF_error.iloc[:,-3:],
-                SVR_error.iloc[:, -3:]])
+                SVR_error.iloc[:, -3:],
+                LSTM_error.iloc[:, -3:]])
 
 df_training_errors = pd.concat(training_errors, axis = 0)
 df_test_errors = pd.concat(test_errors, axis = 0)
@@ -51,20 +51,20 @@ df_test_errors = pd.concat(test_errors, axis = 0)
 # Create histograms for RMSE, MSE and MAE for the training set.
 fig2, axes2 = plt.subplots(1,3,figsize=(12,6))
 fig2.suptitle("Training Set Errors", fontsize =14)
-axes2[0].bar(['DT','Naive','NN','LSTM','RF','SVR'],df_training_errors.iloc[:,0], color='blue')
+axes2[0].bar(['Naive','DT','NN','RF','SVR','LSTM'],df_training_errors.iloc[:,0], color='blue')
 axes2[0].set_ylabel('MSE, GW^2', size = 14)
-axes2[0].set_xticklabels(rotation=90, labels = ['DT','Naive','NN','LSTM','RF','SVR'])
+axes2[0].set_xticklabels(rotation=0, labels = ['Naive','DT','NN','RF','SVR','LSTM'])
 axes2[0].grid(True)
 
-axes2[1].bar(['DT','Naive','NN','LSTM','RF','SVR'],df_training_errors.iloc[:,1], color='blue')
+axes2[1].bar(['Naive','DT','NN','LSTM','RF','SVR'],df_training_errors.iloc[:,1], color='blue')
 axes2[1].set_ylabel('MAE, GW', size = 14)
-axes2[1].set_xticklabels(rotation=90, labels = ['DT','Naive','NN','LSTM','RF','SVR'])
+axes2[1].set_xticklabels(rotation=0, labels = ['Naive','DT','NN','RF','SVR','LSTM'])
 axes2[1].grid(True)
 
-axes2[2].bar(['DT','Naive','NN','LSTM','RF','SVR'],df_training_errors.iloc[:,2], color='blue')
+axes2[2].bar(['Naive','DT','NN','RF','SVR','LSTM'],df_training_errors.iloc[:,2], color='blue')
 axes2[2].set_ylabel('RMSE, GW', size = 14)
 axes2[2].grid(True)
-axes2[2].set_xticklabels(rotation=90, labels = ['DT','Naive','NN','LSTM','RF','SVR'])
+axes2[2].set_xticklabels(rotation=0, labels = ['Naive','DT','NN','RF','SVR','LSTM'])
 fig2.subplots_adjust(top = 0.25, wspace = 200)
 fig2.show()
 fig2.savefig("Compare_Models/Direct_Multi_Step_Probability_Results/Figures/Training_Set_Errors.pdf", bbox_inches='tight')
@@ -72,20 +72,20 @@ fig2.savefig("Compare_Models/Direct_Multi_Step_Probability_Results/Figures/Train
 # Create histograms for RMSE, MSE and MAE for the test set.
 fig3, axes3 = plt.subplots(1,3,figsize=(12,6))
 fig3.suptitle("Test Set Errors",fontsize =14)
-axes3[0].bar(['DT','Naive','NN','LSTM','RF','SVR'],df_test_errors.iloc[:,0], color='blue')
+axes3[0].bar(['Naive','DT','NN','RF','SVR','LSTM'],df_test_errors.iloc[:,0], color='blue')
 axes3[0].set_ylabel('MSE, GW^2', size = 14)
-axes3[0].set_xticklabels(rotation=90, labels = ['DT','Naive','NN','LSTM','RF','SVR'])
+axes3[0].set_xticklabels(rotation=0, labels = ['Naive','DT','NN','RF','SVR','LSTM'])
 axes3[0].grid(True)
 
-axes3[1].bar(['DT','Naive','NN','LSTM','RF','SVR'], df_test_errors.iloc[:,1], color='blue')
+axes3[1].bar(['Naive','DT','NN','LSTM','RF','SVR'], df_test_errors.iloc[:,1], color='blue')
 axes3[1].set_ylabel('MAE, GW', size = 14)
-axes3[1].set_xticklabels(rotation=90, labels = ['DT','Naive','NN','LSTM','RF','SVR'])
+axes3[1].set_xticklabels(rotation=0, labels = ['Naive','DT','NN','RF','SVR','LSTM'])
 axes3[1].grid(True)
 
-axes3[2].bar(['DT','Naive','NN','LSTM','RF','SVR'],df_test_errors.iloc[:,2], color='blue')
+axes3[2].bar(['Naive','DT','NN','RF','SVR','LSTM'],df_test_errors.iloc[:,2], color='blue')
 axes3[2].set_ylabel('RMSE, GW', size = 14)
 axes3[2].grid(True)
-axes3[2].set_xticklabels(rotation=90, labels = ['DT','Naive','NN','LSTM','RF','SVR'])
+axes3[2].set_xticklabels(rotation=0, labels = ['Naive','DT','NN','RF','SVR','LSTM'])
 fig3.subplots_adjust(top = 0.25, wspace = 200)
 fig3.show()
 fig3.savefig("Compare_Models/Direct_Multi_Step_Probability_Results/Figures/Test_Set_Errors.pdf", bbox_inches='tight')

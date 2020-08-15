@@ -17,16 +17,12 @@ def create_model(input_variable, learning_rate):
     # Initialise the NN as a sequence of layers as opposed to a computational graph.
     my_model = Sequential()
 
-    my_model.add(LSTM(units=150, return_sequences=True, input_shape=(input_variable.shape[1],1), kernel_initializer='uniform'))
-    my_model.add(Dropout(0.35))
-    my_model.add(LSTM(units=125,return_sequences=True,  kernel_initializer='uniform'))
-    my_model.add(Dropout(0.35))
-    my_model.add(LSTM(units=125,return_sequences=True,  kernel_initializer='uniform'))
-    my_model.add(Dropout(0.35))
-    my_model.add(LSTM(units=100,return_sequences=True,  kernel_initializer='uniform'))
-    my_model.add(Dropout(0.35))
-    my_model.add(LSTM(units = 50, kernel_initializer='uniform'))
-    my_model.add(Dropout(0.35))
+    my_model.add(LSTM(units=25, return_sequences=True, input_shape=(input_variable.shape[1],1), kernel_initializer='uniform'))
+    my_model.add(Dropout(0.25))
+    my_model.add(LSTM(units=25,return_sequences=True,  kernel_initializer='uniform'))
+    my_model.add(Dropout(0.25))
+    my_model.add(LSTM(units = 10, kernel_initializer='uniform'))
+    my_model.add(Dropout(0.25))
     my_model.add(Dense(units=1, kernel_initializer='uniform'))
 
     # Compiling the RNN
