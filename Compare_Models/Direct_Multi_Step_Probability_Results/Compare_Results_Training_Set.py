@@ -93,7 +93,7 @@ fig3.savefig("Compare_Models/Direct_Multi_Step_Probability_Results/Figures/Test_
 
 ########################################################################################################################
 # Compare the mean and standard deviations of errors of the different models between their predictions and the
-# true values of the training. In thius big comparison, the decision tree is not included as the RF should be the
+# true values of the training. In this big comparison, the decision tree is not included as the RF should be the
 # superior choice.
 ########################################################################################################################
 
@@ -132,7 +132,7 @@ axes4[3].fill_between(x_axis,
                    alpha = 0.2, color='orange')
 axes4[3].set_ylim([-5.4,5.4])
 
-axes4[0].set_ylabel('NN Error, GW', size = 12), axes4[1].set_ylabel('LSTM Error, GW', size = 12), axes4[2].set_ylabel('RF Error, GW', size = 12), axes4[3].set_ylabel('SVR Error, GW', size = 12)
+axes4[0].set_ylabel('NN Error, GW', size = 12), axes4[1].set_ylabel('LSTM error, GW', size = 12), axes4[2].set_ylabel('RF Error, GW', size = 12), axes4[3].set_ylabel('SVR Error, GW', size = 12)
 axes4[0].set_xticks(np.arange(1,385, 24)), axes4[1].set_xticks(np.arange(1,385, 24)), axes4[2].set_xticks(np.arange(1,385, 24)), axes4[3].set_xticks(np.arange(1,385, 24))
 
 axes4[0].set_xticklabels([]), axes4[1].set_xticklabels([]), axes4[2].set_xticklabels([])
@@ -157,18 +157,16 @@ fig4.savefig("Compare_Models/Direct_Multi_Step_Probability_Results/Figures/Train
 ########################################################################################################################
 
 fig5, axes5 = plt.subplots(1,1,figsize=(12,6))
-# axes5.plot(x_axis, NN_mean_stddev.iloc[:,-2],
-#            label= "Mean Error of the NN prediction on the Training Set", color='orange')
 axes5.fill_between(x_axis,
                    (+NN_mean_stddev_training.iloc[:,-1]),
                    (zeros),
-                   label= "S. Dev. of the errors of the NN prediction on the Training Set",
+                   label= "S. dev. of the errors of the NN prediction on the training set",
                    alpha = 0.2, color='orange')
 axes5.fill_between(x_axis,
                   (+Training_mean_stddev_training.iloc[:,-1]),
                   (zeros),
-                  label= "S. Dev. in the Training Set", alpha=0.2, color = "blue")
-axes5.plot(x_axis,abs(NN_mean_stddev_training.iloc[:,-2]),label= "Error in the Training Set", color = "orange")
+                  label= "S. dev. in the training set", alpha=0.2, color = "blue")
+axes5.plot(x_axis,abs(NN_mean_stddev_training.iloc[:,-2]),label= "Absolute error in the training Set", color = "orange")
 axes5.set_ylabel('Standard deviation, electricity load, GW', size = 14)
 axes5.set_xticks(np.arange(1,385, 24))
 axes5.set_xticklabels(["00:00\nMonday","12:00",
@@ -199,13 +197,13 @@ fig6, axes6 = plt.subplots(1,1,figsize=(12,6))
 axes6.fill_between(x_axis,
                    (+LSTM_mean_stddev_training.iloc[:,-1]),
                    (zeros),
-                   label= "S. Dev. of the errors of the LSTM prediction on the Training Set",
+                   label= "S. dev. of the errors of the LSTM prediction on the training set",
                    alpha = 0.2, color='orange')
 axes6.fill_between(x_axis,
                   (+Training_mean_stddev_training.iloc[:,-1]),
                   (zeros),
-                  label= "S. Dev. in the Training Set", alpha=0.2, color = "blue")
-axes6.plot(x_axis,abs(LSTM_mean_stddev_training.iloc[:,-2]),label= "Error in the Training Set", color = "orange")
+                  label= "S. dev. in the training set", alpha=0.2, color = "blue")
+axes6.plot(x_axis,abs(LSTM_mean_stddev_training.iloc[:,-2]),label= "Absolute error in the training set", color = "orange")
 axes6.set_ylabel('Standard deviation, electricity load, GW', size = 14)
 axes6.set_xticks(np.arange(1,385, 24))
 axes6.set_xticklabels(["00:00\nMonday","12:00",
@@ -236,13 +234,13 @@ fig77, axes77 = plt.subplots(1,1,figsize=(12,6))
 axes77.fill_between(x_axis,
                    (+DT_mean_stddev_training.iloc[:,-1]),
                    (zeros),
-                   label= "S. Dev. of the errors of the DT prediction on the Training Set",
+                   label= "S. dev. of the errors of the DT prediction on the training set",
                    alpha = 0.2, color='orange')
 axes77.fill_between(x_axis,
                   (+Training_mean_stddev_training.iloc[:,-1]),
                    (zeros),
-                   label= "S. Dev. in the Training Set", alpha=0.2, color = "blue")
-axes77.plot(x_axis,abs(DT_mean_stddev_training.iloc[:,-2]),label= "Error in the Training Set", color = "orange")
+                   label= "S. dev. in the training set", alpha=0.2, color = "blue")
+axes77.plot(x_axis,abs(DT_mean_stddev_training.iloc[:,-2]),label= "Absolute error in the training set", color = "orange")
 axes77.set_ylabel('Standard deviation, electricity load, GW', size = 14)
 axes77.set_xticks(np.arange(1,385, 24))
 axes77.set_xticklabels(["00:00\nMonday","12:00",
@@ -273,13 +271,13 @@ fig7, axes7 = plt.subplots(1,1,figsize=(12,6))
 axes7.fill_between(x_axis,
                    (+RF_mean_stddev_training.iloc[:,-1]),
                    (zeros),
-                   label= "S. Dev. of the errors of the RF prediction on the Training Set",
+                   label= "S. dev. of the errors of the RF prediction on the training set",
                    alpha = 0.2, color='orange')
 axes7.fill_between(x_axis,
                   (+Training_mean_stddev_training.iloc[:,-1]),
                    (zeros),
-                   label= "S. Dev. in the Training Set", alpha=0.2, color = "blue")
-axes7.plot(x_axis,abs(RF_mean_stddev_training.iloc[:,-2]),label= "Error in the Training Set", color = "orange")
+                   label= "S. dev. in the training set", alpha=0.2, color = "blue")
+axes7.plot(x_axis,abs(RF_mean_stddev_training.iloc[:,-2]),label= "Absolute error in the training set", color = "orange")
 axes7.set_ylabel('Standard deviation, electricity load, GW', size = 14)
 axes7.set_xticks(np.arange(1,385, 24))
 axes7.set_xticklabels(["00:00\nMonday","12:00",
@@ -310,13 +308,13 @@ fig8, axes8 = plt.subplots(1,1,figsize=(12,6))
 axes8.fill_between(x_axis,
                    (+SVR_mean_stddev_training.iloc[:,-1]),
                    (zeros),
-                   label= "S. Dev. of the errors of the SVR prediction on the Training Set",
+                   label= "S. dev. of the errors of the SVR prediction on the training set",
                    alpha = 0.2, color='orange')
 axes8.fill_between(x_axis,
                   (+Training_mean_stddev_training.iloc[:,-1]),
                    (zeros),
-                   label= "S. Dev. in the Training Set", alpha=0.2, color = "blue")
-axes8.plot(x_axis,abs(SVR_mean_stddev_training.iloc[:,-2]),label= "Error in the Training Set", color = "orange")
+                   label= "S. dev. in the training set", alpha=0.2, color = "blue")
+axes8.plot(x_axis,abs(SVR_mean_stddev_training.iloc[:,-2]),label= "Absolute error in the training set", color = "orange")
 axes8.set_ylabel('Standard deviation, electricity load, GW', size = 14)
 axes8.set_xticks(np.arange(1,385, 24))
 axes8.set_xticklabels(["00:00\nMonday","12:00",
@@ -347,13 +345,13 @@ fig9, axes9 = plt.subplots(1,1,figsize=(12,6))
 axes9.fill_between(x_axis,
                    (+NN_Rd_weigths_mean_stddev_train.iloc[:,-1]),
                    (zeros),
-                   label= "S. Dev. of the errors of the NN (Rd. Weights) prediction on the Training Set",
+                   label= "S. dev. of the errors of the NN (rd. weights) prediction on the training Set",
                    alpha = 0.2, color='orange')
 axes9.fill_between(x_axis,
                   (+Training_mean_stddev_training.iloc[:,-1]),
                    (zeros),
-                   label= "S. Dev. in the Training Set", alpha=0.2, color = "blue")
-axes9.plot(x_axis,abs(NN_Rd_weigths_mean_stddev_train.iloc[:,-2]),label= "Error in the Training Set", color = "orange")
+                   label= "S. dev. in the training set", alpha=0.2, color = "blue")
+axes9.plot(x_axis,abs(NN_Rd_weigths_mean_stddev_train.iloc[:,-2]),label= "Absolute error in the training set", color = "orange")
 axes9.set_ylabel('Standard deviation, electricity load, GW', size = 14)
 axes9.set_xticks(np.arange(1,385, 24))
 axes9.set_xticklabels(["00:00\nMonday","12:00",

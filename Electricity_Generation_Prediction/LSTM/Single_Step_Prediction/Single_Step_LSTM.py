@@ -56,7 +56,7 @@ for train_index, test_index in tscv.split(X_train):
      hist_split = train_model(my_model, X_train_split, y_train_split, number_of_epochs, batch_size)
      hist_list = hist_list.append(hist_split)
 
-my_model.save("Electricity_Generation_Prediction/LSTM/Model_1.h5")
+my_model.save("Electricity_Generation_Prediction/LSTM/SST_LSTM_Prediction.h5")
 
 # Plot the loss per epoch.
 metric = "mean_absolute_error"

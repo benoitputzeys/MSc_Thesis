@@ -34,8 +34,8 @@ dates = dates[-len(X_train)-len(X_test)*2:-len(X_test)]
 # Import the predicitons.
 ########################################################################################################################
 
-pred_test = pd.read_csv('Electricity_Generation_Prediction\Random_Forest\Direct_Multi_Step_Prediction\Pred_Test.csv', delimiter=',')
-pred_train = pd.read_csv('Electricity_Generation_Prediction\Random_Forest\Direct_Multi_Step_Prediction\Pred_Train.csv', delimiter=',')
+pred_test = pd.read_csv('Electricity_Generation_Prediction/LSTM/Direct_Multi_Step_Prediction/Pred_Test.csv', delimiter=',')
+pred_train = pd.read_csv('Electricity_Generation_Prediction/LSTM/Direct_Multi_Step_Prediction/Pred_Train.csv', delimiter=',')
 pred_train = pred_train.iloc[:,-1]
 pred_test = pred_test.iloc[:,-1]
 
@@ -59,7 +59,7 @@ fig3, axs3=plt.subplots(1,1,figsize=(12,6))
 axs3.scatter(error_train["SP"],
              error_train["Error_Train"],
              alpha=0.05, label = "Projected Errors", color = "red")
-axs3.set_ylabel("RF error during training, GW", size = 14)
+axs3.set_ylabel("LSTM error during training, GW", size = 14)
 axs3.set_xlabel("Settlement Period", size = 14)
 axs3.grid(True)
 axs3.legend()
@@ -83,7 +83,7 @@ axs4.fill_between(training_stats.iloc[:,0],
                   (training_stats.iloc[:,1]-training_stats.iloc[:,2]),
                   (training_stats.iloc[:,1]+training_stats.iloc[:,2]),
                   alpha=0.2, color = "orange", label = "+- 1x Standard Deviation")
-axs4.set_ylabel("RF error during training, GW", size = 14)
+axs4.set_ylabel("LSTM error during training, GW", size = 14)
 
 # Include additional details such as tick intervals, legend positioning and grid on.
 axs4.set_xticks(np.arange(1,385, 24))
@@ -100,7 +100,7 @@ axs4.tick_params(axis = "both", labelsize = 12)
 axs4.minorticks_on()
 axs4.legend(fontsize=14)
 fig4.show()
-fig4.savefig("Electricity_Generation_Prediction/Random_Forest/Figures/DMST_Mean_and_Stddev_of_Error_Train_Set_Pred.pdf", bbox_inches='tight')
+fig4.savefig("Electricity_Generation_Prediction/LSTM/Figures/DMST_Mean_and_Stddev_of_Error_Train_Set_Pred.pdf", bbox_inches='tight')
 
 ########################################################################################################################
 # Make the prediction with the orange band, the confidence interval.
@@ -118,7 +118,7 @@ axs5[0].plot(dates.iloc[-len(X_test)-48*3:-len(X_test)],
              label = "Training Set", alpha = 1, color = "blue")
 axs5[0].plot(dates.iloc[-len(X_test):-len(X_test)+48*7],
              pred_test[:48*7],
-             label = "RF Pred.", color = "orange")
+             label = "LSTM Pred.", color = "orange")
 axs5[0].plot(dates.iloc[-len(X_test):-len(X_test)+48*7],
              y_test[:48*7],
              label = "Test Set", alpha = 1, color = "black")
@@ -158,7 +158,7 @@ plt.xticks(np.arange(1,482, 48), ["14:00\n07/22","14:00\n07/23","14:00\n07/24",
                                   "14:00\n07/28","14:00\n07/29","14:00\n07/30",
                                   "14:00\n07/31","14:00\n08/01"])
 fig5.show()
-fig5.savefig("Electricity_Generation_Prediction/Random_Forest/Figures/DMST_Pred_w_Uncertainty.pdf", bbox_inches='tight')
+fig5.savefig("Electricity_Generation_Prediction/LSTM/Figures/DMST_Pred_w_Uncertainty.pdf", bbox_inches='tight')
 
 ########################################################################################################################
 # Compute the standard deviation of the errors from the test set.
@@ -175,7 +175,7 @@ fig6, axs6=plt.subplots(1,1,figsize=(12,6))
 axs6.scatter(error_test["SP"],
              error_test["Error_Test"],
              alpha=0.05, label = "Projected Errors", color = "red")
-axs6.set_ylabel("RF error during test set, GW", size = 14)
+axs6.set_ylabel("LSTM error during test set, GW", size = 14)
 axs6.set_xlabel("Settlement Period", size = 14)
 axs6.grid(True)
 axs6.legend()
@@ -199,7 +199,7 @@ axs7.fill_between(test_stats.iloc[:,0],
                   (test_stats.iloc[:,1]-test_stats.iloc[:,2]),
                   (test_stats.iloc[:,1]+test_stats.iloc[:,2]),
                   alpha=0.2, color = "orange", label = "+- 1x Standard Deviation")
-axs7.set_ylabel("RF error during test set, GW", size = 14)
+axs7.set_ylabel("LSTM error during test set, GW", size = 14)
 
 # Include additional details such as tick intervals, legend positioning and grid on.
 axs7.set_xticks(np.arange(1,385, 24))
@@ -211,17 +211,82 @@ axs7.set_xticklabels(["00:00\nMonday","12:00",
                        "00:00\nSaturday", "12:00",
                        "00:00\nSunday","12:00",
                        "00:00"])
-axs7.grid(b=True, which='major'), axs4.grid(b=True, which='minor',alpha = 0.2)
+axs7.grid(b=True, which='major'), axs7.grid(b=True, which='minor',alpha = 0.2)
 axs7.tick_params(axis = "both", labelsize = 12)
 axs7.minorticks_on()
 axs7.legend(fontsize=14)
 fig7.show()
-fig7.savefig("Electricity_Generation_Prediction/Random_Forest/Figures/DMST_Mean_and_Stddev_of_Error_Test_Set_Pred.pdf", bbox_inches='tight')
+fig7.savefig("Electricity_Generation_Prediction/LSTM/Figures/DMST_Mean_and_Stddev_of_Error_Test_Set_Pred.pdf", bbox_inches='tight')
 
 ########################################################################################################################
 # Save the results in a csv file.
 ########################################################################################################################
 
-training_stats.to_csv("Compare_Models/Direct_Multi_Step_Probability_Results/Probability_Based_on_Training/RF_mean_errors_stddevs_train.csv")
-test_stats.to_csv("Compare_Models/Direct_Multi_Step_Probability_Results/Probability_Based_on_Training/RF_mean_errors_stddevs_test.csv")
+training_stats.to_csv("Compare_Models/Direct_Multi_Step_Probability_Results/Probability_Based_on_Training/LSTM_mean_errors_stddevs_train.csv")
+test_stats.to_csv("Compare_Models/Direct_Multi_Step_Probability_Results/Probability_Based_on_Training/LSTM_mean_errors_stddevs_test.csv")
 
+########################################################################################################################
+# Make a figure to show how the standard deviation is computed.
+########################################################################################################################
+
+# Prediction on training set.
+fig8, axs8=plt.subplots(3,1,figsize=(12,10))
+# First plot contains the prediction, the true values from the test and training set and the standard deviation.
+axs8[0].plot(dates_train[154:48*7*3+154+1],
+             y_train[154:48*7*3+154+1],
+             label = "Training Set", alpha = 1, color = "blue")
+axs8[0].plot(dates_train[154:48*7*3+154+1],
+             pred_train[154:48*7*3+154+1],
+             label = "LSTM Pred.", color = "orange")
+axs8[0].set_ylabel('Load, GW',size = 14)
+axs8[0].plot(30,30,label = "Error", color = "red")
+loc1 = plticker.MultipleLocator(base=48*7) # this locator puts ticks at regular intervals
+axs8[0].xaxis.set_major_locator(loc1)
+axs8[0].set_xticks(np.arange(1,4*336, 336))
+axs8[0].set_xticklabels(["2017/10/16",
+                       "2017/10/23",
+                       "2017/10/30",
+                       "2017/11/06",
+                       ])
+# Second plot contains the errors.
+axs8[1].plot(dates_train[154:48*7*3+154+1],
+             error_train.iloc[154:48*7*3+154+1,-1],
+             alpha = 1, color = "red")
+axs8[1].set_ylabel('Error, GW',size = 14)
+axs8[1].xaxis.set_major_locator(loc1)
+axs8[1].set_xticks(np.arange(1,4*336, 336))
+axs8[1].set_xticklabels(["2017/10/16",
+                       "2017/10/23",
+                       "2017/10/30",
+                       "2017/11/06",
+                       ])
+
+# Third plot contains the errors projected on a single week
+axs8[2].scatter(error_train["SP"],
+             error_train["Error_Train"],linewidth = 0.01,
+             alpha=0.05, color = "red")
+axs8[2].set_ylabel("Projected Error\nduring training, GW", size = 14)
+
+# Include additional details such as tick intervals, rotation, legend positioning and grid on.
+axs8[2].grid(True), axs8[1].grid(True), axs8[0].grid(True)
+loc2 = plticker.MultipleLocator(base=24) # this locator puts ticks at regular intervals
+axs8[2].xaxis.set_major_locator(loc2)
+axs8[2].set_xticks(np.arange(1,385, 24))
+axs8[2].set_xticklabels(["00:00\nMonday","12:00",
+                       "00:00\nTuesday","12:00",
+                       "00:00\nWednesday", "12:00",
+                       "00:00\nThursday", "12:00",
+                       "00:00\nFriday","12:00",
+                       "00:00\nSaturday", "12:00",
+                       "00:00\nSunday","12:00",
+                       "00:00"])
+axs8[2].grid(b=True, which='major'), axs8[2].grid(b=True, which='minor',alpha = 0.2)
+axs8[2].tick_params(axis = "both")
+axs8[1].tick_params(axis = "both",labelsize = 12)
+axs8[0].tick_params(axis = "both",labelsize = 12)
+axs8[0].legend(loc=(1.02,0.75))
+axs8[2].minorticks_on()
+axs8[2].grid(True)
+
+fig8.show()
+fig8.savefig("Electricity_Generation_Prediction/LSTM/Figures/DMST_Projection_Explained.pdf", bbox_inches='tight')

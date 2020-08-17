@@ -60,7 +60,7 @@ for i in range(0,48*7):
 
     prev_value = result_future[-2]
     new_row = [[prev_value[0], 0, 0, 0, 0, 0, 0]]
-    new_row = DataFrame(new_row, columns=["0","1","2","3","4","5","6"])
+    new_row = DataFrame(new_row, columns=["0","1","2","3","4","5", "6"])
 
     X_future_features = pd.concat([X_future_features,new_row])
     rolling_mean_10 = X_future_features["0"].rolling(window=10).mean().values[-1]
@@ -116,13 +116,13 @@ error_test_plot[-336:] = error_test[:48*7]
 fig2, axs2=plt.subplots(2,1,figsize=(12,6))
 axs2[0].plot(dates.iloc[-len(X_test)-48*3:-len(X_test)],
              y_train[-48*3:,0],
-             label = "Training Set", alpha = 1, color = "black")
+             label = "Training Set", alpha = 1, color = "blue")
 axs2[0].plot(dates.iloc[-len(X_test):-len(X_test)+48*7],
              result_future[:48*7,0],
              label = "LSTM Recursive\nPrediction with SP", color = "orange")
 axs2[0].plot(dates.iloc[-len(X_test):-len(X_test)+48*7],
              y_test[:48*7],
-             label = "Test Set ", alpha = 1, color = "blue")
+             label = "Test Set ", alpha = 1, color = "black")
 axs2[0].axvline(dates.iloc[-len(X_test)], linestyle="--", color = "black")
 axs2[0].set_ylabel('Load, GW',size = 14)
 axs2[0].plot(30,30,label = "Error", color = "red")

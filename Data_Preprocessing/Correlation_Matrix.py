@@ -9,17 +9,17 @@ X = X.set_index("Time")
 y = pd.read_csv('Data_Preprocessing/For_336_SP_Step_Prediction/y.csv', delimiter=',')
 y = y.set_index("Time")
 
-X = X.iloc[:,:-6]
+#X = X.iloc[:,:-6]
 
 # Combine the actual load with the given features in X.
 X["Actual Load"]=y
-X = X.rename(columns={"Load_Past": "Load from\n1 Week ago",
+X = X.rename(columns={"Load_Past": "Load from 1 Week ago",
                   "Transmission_Past": "Net Transmission\ninto GB",
-                  "Simple_Moving_Average_10_SP": "SMA\n(10 SP)",
-                  "Simple_Moving_Average_48_SP": "SMA\n(48 SP)",
-                  "Simple_Moving_Average_336_SP": "SMA\n(336 SP)",
-                  "Exp_Moving_Average_10_SP": "EMA\n(10 SP)",
-                  "Exp_Moving_Average_48_SP": "EMA\n(48 SP)",
+                  "Simple_Moving_Average_10_SP": "SMA (10 SP)",
+                  "Simple_Moving_Average_48_SP": "SMA (48 SP)",
+                  "Simple_Moving_Average_336_SP": "SMA (336 SP)",
+                  "Exp_Moving_Average_10_SP": "EMA (10 SP)",
+                  "Exp_Moving_Average_48_SP": "EMA (48 SP)",
                   })
 
 
@@ -28,8 +28,8 @@ correlation_matrix = X.corr()
 
 # Plot the correlation matrix heat map using seabor.
 fig, ax = plt.subplots(figsize=(10,10))
-sn.heatmap(correlation_matrix, annot=True,linewidths=.5, ax=ax, annot_kws={"size":14}, cmap="Blues", fmt='.2f')
-ax.tick_params(axis = "both", labelsize = 14),
+sn.heatmap(correlation_matrix, annot=True,linewidths=.5, ax=ax, annot_kws={"size":12}, cmap="Blues", fmt='.2f')
+ax.tick_params(axis = "both", labelsize = 12),
 fig.show()
-fig.savefig("Data_Preprocessing/Figures/Correlation_Matrix_Chosen_Features.pdf", bbox_inches='tight')
+fig.savefig("Data_Preprocessing/Figures/Correlation_Matrix.pdf", bbox_inches='tight')
 

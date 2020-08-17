@@ -235,7 +235,7 @@ axs2.fill_between(dates[len(y_train):len(y_train)+48*7],load_forecast_mean-2*loa
 axs2.axvline(dates[len(y_train):48*7], linestyle="--", color = "black")
 axs2.title("SARIMA model with probabilistic prediction")
 axs2.set_xlabel("Settelement Periods")
-axs2.set_ylabel("Load [MW]")
+axs2.set_ylabel("Load, MW")
 axs2.legend(loc = "lower left")
 loc = plticker.MultipleLocator(base=4800) # this locator puts ticks at regular intervals
 axs2.xaxis.set_major_locator(loc)
@@ -271,12 +271,12 @@ print("-"*200)
 # Save the results in a csv file.
 ########################################################################################################################
 
-import csv
-with open('TF_Probability/Results/SARIMA_error.csv', 'w', newline='', ) as file:
-    writer = csv.writer(file)
-    writer.writerow(["Method","MSE","MAE","RMSE"])
-    writer.writerow(["SARIMA",
-                     str(np.mean(errors**2)),
-                     str(np.mean(errors)),
-                     str(np.sqrt(np.mean(errors**2)))
-                     ])
+# import csv
+# with open('TF_Probability/Results/SARIMA_error.csv', 'w', newline='', ) as file:
+#     writer = csv.writer(file)
+#     writer.writerow(["Method","MSE","MAE","RMSE"])
+#     writer.writerow(["SARIMA",
+#                      str(np.mean(errors**2)),
+#                      str(np.mean(errors)),
+#                      str(np.sqrt(np.mean(errors**2)))
+#                      ])

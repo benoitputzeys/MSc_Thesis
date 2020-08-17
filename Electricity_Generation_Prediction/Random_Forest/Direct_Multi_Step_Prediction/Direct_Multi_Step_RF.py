@@ -44,7 +44,7 @@ y_train = y_scaler.fit_transform(y_train)
 ########################################################################################################################
 
 # Fit the Random Forest to our data
-regressor = RandomForestRegressor(n_estimators=100, random_state=0,max_depth=7)
+regressor = RandomForestRegressor(n_estimators=100, random_state=0, max_depth=7)
 regressor.fit(X_train, y_train)
 
 ########################################################################################################################

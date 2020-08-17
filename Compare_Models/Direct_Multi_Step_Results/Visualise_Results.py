@@ -12,7 +12,7 @@ SVR = pd.read_csv("Compare_Models/Direct_Multi_Step_Results/SVR.csv")
 # Load the results of the different models in a dataframe.
 frames = ([Naive, DT, ANN, Random_Forest, SVR, LSTM])
 df = pd.concat(frames, axis = 0)
-string = (['DT', 'Naive', 'ANN','LSTM','RF','SVR'])
+string = (['Naive','DT','NN','RF','SVR','LSTM'])
 
 # Create histograms for RMSE, MSE and MAE of the Training Set
 fig2, axes2 = plt.subplots(1,3,figsize=(12,6))

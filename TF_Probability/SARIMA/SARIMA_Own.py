@@ -62,21 +62,12 @@ dates = dates[-len(X_train)-len(X_test)*2:-len(X_test)]
 dates_train = dates[:len(X_train)]
 dates_test = dates[-len(X_test):]
 
-#Plot the training set
-fig1, axs1=plt.subplots(1,1,figsize=(12,6))
-axs1.plot(dates_train,
-          y_train,
-          label="training data", color = "blue", linewidth = 0.5)
-axs1.set_ylabel("Load [MW]")
-axs1.set_xlabel("Settlement Periods")
-loc = plticker.MultipleLocator(base=48*70) # this locator puts ticks at regular intervals
-axs1.xaxis.set_major_locator(loc)
-axs1.grid(True)
-fig1.autofmt_xdate(rotation = 12)
-fig1.show()
+########################################################################################################################
+# Build the model.
+########################################################################################################################
 
 #Decompose the data into daily and seasonal components
-#Does not really have an upwards trend.
+#Does not really have an upwards trend if only 2 weeks are considered as training.
 #trend = sts.LocalLinearTrend(observed_time_series=observed_time_series)
 seasonal_day = tfp.sts.Seasonal(
     num_seasons=48,
@@ -122,6 +113,10 @@ axs3.grid(True)
 fig3.show()
 fig3.savefig("TF_Probability/SARIMA/Figures/Loss_Curve.pdf", bbox_inches='tight')
 
+########################################################################################################################
+# Make a prediction.
+########################################################################################################################
+
 # Draw samples from the variational posterior.
 q_samples_load_ = variational_posteriors.sample(50)
 
@@ -137,26 +132,15 @@ load_forecast_dist = tfp.sts.forecast(
 load_forecast_mean = load_forecast_dist.mean().numpy().reshape(-1,)
 load_forecast_scale =  load_forecast_dist.stddev().numpy().reshape(-1,)
 
-# # Optional: One can draw individual samples from the prediction. On a sidenote, one can reconstruct the standard deviation
-# # by taking a lot of samples and computing the mean and average of them.
-# num_samples=10
-# load_forecast_samples = load_forecast_dist.sample(num_samples).numpy()
-# mean_recons = np.zeros((336,1))
-# for i in range(336):
-#     mean_recons[i,0] = np.mean(load_forecast_samples[:,i])
-
 error_test_plot = np.zeros((len(X_test),1))
 error_test_plot = np.array((load_forecast_mean-y_test.iloc[:,0])/1000).reshape(-1,1)
-#error_test_plot[-336:] = np.array((load_forecast_mean[-48*7:]-y_test.iloc[-48*7:,0])/1000).reshape(-1,1)
 
 # Plot the actual values, the forecast and the standard deviation.
 fig2, axs2=plt.subplots(2,1,figsize=(12,10))
-#axs2[0].plot(dates_train[-48*3:],
-#          y_train[-48 * 3:]/1000,
-#          color="blue", label='Training Set')
+
 axs2[0].plot(dates_test,
           y_test/1000,
-          color="black", label = "Last Week Test Set \n(True Values)")
+          color="black", label = "Test Set")
 axs2[0].plot(dates_test,
           load_forecast_mean/1000,
           color="orange",label='SARIMA Forecast with \n+- 1 x Standard Deviation')
@@ -164,11 +148,11 @@ axs2[0].fill_between(dates_test,
                   (load_forecast_mean-load_forecast_scale)/1000,
                   (load_forecast_mean+load_forecast_scale)/1000, color="orange", alpha=0.2)
 axs2[0].set_xlabel("Dates",size = 14)
-axs2[0].set_ylabel("Load [GW]",size = 14)
+axs2[0].set_ylabel("Load, GW",size = 14)
 
 axs2[1].plot(dates_test,error_test_plot, color="red", label='Training Set')
 axs2[1].set_xlabel("Dates",size = 14)
-axs2[1].set_ylabel("Error [GW]",size = 14)
+axs2[1].set_ylabel("Error, GW",size = 14)
 
 #axs2[0].axvline(dates_train[-1], linestyle="--", color = "black")
 #axs2[1].axvline(dates_train[-1], linestyle="--", color = "black")
@@ -183,24 +167,8 @@ fig2.autofmt_xdate(rotation = 12)
 fig2.show()
 fig2.savefig("TF_Probability/SARIMA/Figures/Pred_Test.pdf", bbox_inches='tight')
 
-# Necessary ??
-# # Build a dict mapping components to distributions over
-# # their contribution to the observed signal.
-# component_dists = sts.decompose_by_component(
-#     load_model,
-#     observed_time_series=y_train,
-#     parameter_samples=q_samples_load_)
-#
-# load_component_means_, load_component_stddevs_ = (
-#     {k.name: c.mean() for k, c in component_dists.items()},
-#     {k.name: c.stddev() for k, c in component_dists.items()})
-#
-# _ = plot_components(X_axis, load_component_means_, load_component_stddevs_,
-#                     x_locator=None, x_formatter=None)
-# plt.show()
-
 ########################################################################################################################
-# Save the results in a csv file.
+# Plot the error per settlement period.
 ########################################################################################################################
 
 settlement_period_test = X["Settlement Period"][-len(X_test)*2:-len(X_test)].values+(48*DoW[-len(X_test)*2:-len(X_test)]).values
@@ -223,13 +191,12 @@ fig5, axs5=plt.subplots(1,1,figsize=(12,6))
 # Plot the mean and standard deviation of the errors that are made on the test set.
 axs5.plot(test_stats.iloc[:,0],
           test_stats.iloc[:,1],
-          color = "orange", label = "Mean of all projected errors (Test Set)")
+          color = "orange", label = "Mean of all projected errors")
 axs5.fill_between(test_stats.iloc[:,0],
                   (test_stats.iloc[:,1]-test_stats.iloc[:,2]),
                   (test_stats.iloc[:,1]+test_stats.iloc[:,2]),
                   alpha=0.2, color = "orange", label = "+- 1x Standard Deviation")
-axs5.set_ylabel("Error Test Set [GW]", size = 14)
-axs5.set_xlabel("Settlement Period / Weekday", size = 14)
+axs5.set_ylabel("Error Test Set, GW", size = 14)
 axs5.set_xticks(np.arange(1,385, 48))
 axs5.set_xticklabels(["1 / Monday", "49 / Tuesday", "97 / Wednesday", "145 / Thursday", "193 / Friday","241 / Saturday", "289 / Sunday",""])
 axs5.legend()
@@ -240,22 +207,22 @@ fig5.savefig("TF_Probability/SARIMA/Figures/Projected_Error_Test.pdf", bbox_inch
 # Calculate the errors from the mean to the actual vaules.
 print("-"*200)
 errors = abs(mean_errors)/1000
-print("The mean absolute error of the test set is %0.2f [GW]" % np.mean(errors))
-print("The mean squared error of the test set is %0.2f [GW]" % np.mean(errors**2))
-print("The root mean squared error of the test set is %0.2f [GW]" % np.sqrt(np.mean(errors**2)))
+print("The mean absolute error of the test set is %0.2f GW" % np.mean(errors))
+print("The mean squared error of the test set is %0.2f GW" % np.mean(errors**2))
+print("The root mean squared error of the test set is %0.2f GW" % np.sqrt(np.mean(errors**2)))
 print("-"*200)
 
 ########################################################################################################################
 # Save the results in a csv file.
 ########################################################################################################################
 
-import csv
-with open('Compare_Models/Direct_Multi_Step_Probability_Results/Probability_Based_on_Model/SARIMA_error.csv', 'w', newline='', ) as file:
-    writer = csv.writer(file)
-    writer.writerow(["Method","MSE","MAE","RMSE"])
-    writer.writerow(["SARIMA",
-                     str(np.mean(errors**2)),
-                     str(np.mean(errors)),
-                     str(np.sqrt(np.mean(errors**2)))
-                     ])
-test_stats.to_csv("Compare_Models/Direct_Multi_Step_Probability_Results/Probability_Based_on_Model/SARIMA_mean_errors_stddevs.csv")
+# import csv
+# with open('Compare_Models/Direct_Multi_Step_Probability_Results/Probability_Based_on_Model/SARIMA_error.csv', 'w', newline='', ) as file:
+#     writer = csv.writer(file)
+#     writer.writerow(["Method","MSE","MAE","RMSE"])
+#     writer.writerow(["SARIMA",
+#                      str(np.mean(errors**2)),
+#                      str(np.mean(errors)),
+#                      str(np.sqrt(np.mean(errors**2)))
+#                      ])
+# test_stats.to_csv("Compare_Models/Direct_Multi_Step_Probability_Results/Probability_Based_on_Model/SARIMA_mean_errors_stddevs.csv")

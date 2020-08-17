@@ -24,9 +24,6 @@ annual_components= sm.tsa.seasonal_decompose(adjusted_nd, period=48*365)
 # Delete values because NaN values come up when computing the trend.
 daily_seasonality = daily_components.seasonal
 weekly_seasonality = weekly_components.seasonal
-# trend = weekly_components.trend
-# trend[:168] = weekly_components.trend[169]
-# trend[-168:] = weekly_components.trend.iloc[-169]
 
 settlement_period = X["Settlement Period"]+(48*X["Day of Week"])
 
@@ -43,29 +40,6 @@ mean_each_week.iloc[-1]=mean_each_week.iloc[-2]
 
 # The residual is anything that cannot be decomposed into the daily, weekly or mean components.
 residual = series - daily_seasonality - weekly_seasonality - mean_each_week
-
-# Plot the individual components but also the actual series.
-fig, axs=plt.subplots(4,1,figsize=(12,10))
-axs[0].plot(dates[36000:38020],daily_seasonality[36000:38020], color = "blue")
-axs[0].set_ylabel("Daily S., GW", size = 14)
-axs[1].plot(dates[36000:38020],weekly_seasonality[36000:38020], color = "blue")
-axs[1].set_ylabel("Weekly S., GW", size = 14)
-axs[2].plot(dates[36000:38020],mean_each_week[36000:38020], color = "blue")
-axs[2].set_ylabel("Weekly Average \nGW", size = 14)
-axs[3].plot(dates[36000:38020], residual[36000:38020] , color = "blue")
-axs[3].set_ylabel("Residual, GW", size = 14)
-axs[3].set_xlabel("Date (2018)", size = 18)
-loc = plticker.MultipleLocator(base=48*7) # Puts ticks at regular intervals
-axs[0].xaxis.set_major_locator(loc), axs[1].xaxis.set_major_locator(loc), axs[2].xaxis.set_major_locator(loc), axs[3].xaxis.set_major_locator(loc)
-axs[0].grid(True), axs[1].grid(True), axs[2].grid(True), axs[3].grid(True)
-fig.autofmt_xdate(rotation = 0)
-axs[3].tick_params(axis = "both", labelsize = 14), axs[2].tick_params(axis = "both", labelsize = 14), axs[1].tick_params(axis = "both", labelsize = 14), axs[0].tick_params(axis = "both", labelsize = 14)
-plt.xticks(np.arange(1,2020, 336), ["01/20","01/27","02/03",
-                                  "02/10","02/17","02/24",
-                                  "03/03"])
-
-fig.show()
-fig.savefig("Electricity_Generation_Prediction/Historic_Load/Figures/Decomposition_Zoomed_In.pdf", bbox_inches='tight')
 
 # Plot the weekly average
 fig, axs=plt.subplots(1,1,figsize=(15,6))
@@ -84,33 +58,7 @@ plt.xticks(np.arange(1,len(dates), 48*130), ["2016-01","2016-05","2016-09",
 fig.show()
 fig.savefig("Electricity_Generation_Prediction/Historic_Load/Figures/Weekly_Average.pdf", bbox_inches='tight')
 
-# # Plot the whole decomposition of the whole actual series.
-# fig, axs=plt.subplots(4,1,figsize=(12,10))
-# axs[0].plot(daily_seasonality, color = "blue", linewidth = 0.5)
-# axs[0].set_ylabel("Daily S. [GW]", size = 14)
-# axs[1].plot(weekly_seasonality, color = "blue", linewidth = 0.5)
-# axs[1].set_ylabel("Weekly S. [GW]", size = 14)
-# axs[2].plot(mean_each_week, color = "blue")
-# axs[2].set_ylabel("Weekly Average \n[GW]", size = 14)
-# axs[3].plot(dates, residual , color = "blue", linewidth = 0.5)
-# axs[3].set_ylabel("Residual [GW]", size = 14)
-# axs[3].set_xlabel("Date", size = 18)
-# loc = plticker.MultipleLocator(base=48*125) # this locator puts ticks at regular intervals
-# axs[0].grid(True)
-# axs[1].xaxis.set_major_locator(loc)
-# axs[1].grid(True)
-# axs[2].xaxis.set_major_locator(loc)
-# axs[2].grid(True)
-# axs[3].xaxis.set_major_locator(loc)
-# axs[3].grid(True)
-# fig.autofmt_xdate(rotation = 12)
-# axs[0].tick_params(axis = "both", labelsize = 14)
-# axs[1].tick_params(axis = "both", labelsize = 14)
-# axs[2].tick_params(axis = "both", labelsize = 14)
-# axs[3].tick_params(axis = "both", labelsize = 14)
-# fig.show()
-#
-# Christmas?
+# Decomposition around Christmas
 fig, axs=plt.subplots(4,1,figsize=(12,10))
 axs[0].plot(dates[33500:36020],daily_seasonality[33500:36020], color = "blue")
 axs[0].set_ylabel("Daily S., GW", size = 14)
@@ -126,63 +74,46 @@ axs[0].xaxis.set_major_locator(loc), axs[1].xaxis.set_major_locator(loc), axs[2]
 axs[0].grid(True), axs[1].grid(True), axs[2].grid(True), axs[3].grid(True)
 axs[0].tick_params(axis = "both", labelsize = 14), axs[1].tick_params(axis = "both", labelsize = 14), axs[2].tick_params(axis = "both", labelsize = 14), axs[3].tick_params(axis = "both", labelsize = 14)
 fig.autofmt_xdate(rotation = 0)
-plt.xticks(np.arange(1,2520, 48*7), ["2017/11/28","12/05","12/12",
-                                  "12/19","12/26","2018/01/02","01/09","01/16"])
+plt.xticks(np.arange(1,2520, 48*7), ["2017/11/28",
+                                     "12/05",
+                                     "12/12",
+                                     "12/19","12/26",
+                                     "2018/01/02",
+                                     "01/09",
+                                     "01/16"])
 fig.show()
 fig.savefig("Electricity_Generation_Prediction/Historic_Load/Figures/Decomposition_around_Christmas.pdf", bbox_inches='tight')
-
-# To check if the decomposition is correct, the reconstruction should give the initial series.
-# In order to calculate the trend, the decomposition requires to set a section of the first and last segment of the series to NaN
-# Get rid of these sections to continue the calculations.
-reconstruction = daily_seasonality + weekly_seasonality + mean_each_week + residual
-
-# Plot the reconstruction, the actual series and the error between the 2.
-fig1, axs1=plt.subplots(3,1,figsize=(12,8))
-axs1[0].plot(dates[-48*7*2:-48*7+5],reconstruction[-48*7*2:-48*7+5], color = "blue")
-axs1[0].set_ylabel("Modified Timeseries \nGW", size = 12)
-axs1[1].plot(dates[-48*7*2:-48*7+5],series[-48*7*2:-48*7+5], color = "blue")
-axs1[1].set_ylabel("Original Timeseries \nGW", size = 12)
-axs1[2].plot(dates[-48*7*2:-48*7+5],(reconstruction-series)[-48*7*2:-48*7+5]/1000, color = "blue")
-axs1[2].set_ylabel("Error, GW", size = 12)
-axs1[2].set_xlabel("Date", size = 18)
-loc = plticker.MultipleLocator(base=48) # this locator puts ticks at regular intervals
-axs1[0].xaxis.set_major_locator(loc), axs1[1].xaxis.set_major_locator(loc), axs1[2].xaxis.set_major_locator(loc)
-axs1[0].grid(True), axs1[1].grid(True), axs1[2].grid(True)
-axs1[0].tick_params(axis = "both", labelsize = 12), axs1[1].tick_params(axis = "both", labelsize = 12), axs1[2].tick_params(axis = "both", labelsize = 12)
-fig1.autofmt_xdate(rotation = 7)
-fig1.show()
 
 # Create a modified reconstruction of the series where only the daily, weekly and residual components are considered.
 modified_timeseries = daily_seasonality + weekly_seasonality + residual
 
-# Plot the modified reconstruction.
-fig2, axs2=plt.subplots(3,1,figsize=(12,10))
-axs2[0].plot(dates[-48*7-500:-500+5], modified_timeseries[-48*7-500:-500+5], color = "blue")
-axs2[0].set_ylabel("Modified Timeseries \nGW", size = 14)
-axs2[1].plot(dates[-48*7-500:-500+5], series[-48*7-500:-500+5], color = "blue")
-axs2[1].set_ylabel("Original Timeseries \nGW", size = 14)
-axs2[2].plot(dates[-48*7-500:-500+5],(modified_timeseries-series)[-48*7-500:-500+5], color = "blue")
-axs2[2].set_ylabel("Error, GW", size = 14)
-axs2[2].set_xlabel("Date", size = 18)
-loc = plticker.MultipleLocator(base=48) # this locator puts ticks at regular intervals
-axs2[0].xaxis.set_major_locator(loc), axs2[1].xaxis.set_major_locator(loc), axs2[2].xaxis.set_major_locator(loc)
-axs2[0].grid(True), axs2[1].grid(True), axs2[2].grid(True)
-axs2[0].tick_params(axis = "both", labelsize = 14), axs2[1].tick_params(axis = "both", labelsize = 14), axs2[2].tick_params(axis = "both", labelsize = 14)
-fig2.autofmt_xdate(rotation = 9)
-fig2.show()
-fig2.savefig("Electricity_Generation_Prediction/Historic_Load/Figures/Modified_Timeseries_and_Errors.pdf", bbox_inches='tight')
-
-settlement_period = X["Settlement Period"]+(48*X["Day of Week"])
+# # Plot the modified reconstruction to show the jump when going from one week to the next
+# fig2, axs2=plt.subplots(3,1,figsize=(12,10))
+# axs2[0].plot(dates[-48*7-500:-500+5], modified_timeseries[-48*7-500:-500+5], color = "blue")
+# axs2[0].set_ylabel("Modified Timeseries \nGW", size = 14)
+# axs2[1].plot(dates[-48*7-500:-500+5], series[-48*7-500:-500+5], color = "blue")
+# axs2[1].set_ylabel("Original Timeseries \nGW", size = 14)
+# axs2[2].plot(dates[-48*7-500:-500+5],(modified_timeseries-series)[-48*7-500:-500+5], color = "blue")
+# axs2[2].set_ylabel("Error, GW", size = 14)
+# axs2[2].set_xlabel("Date", size = 18)
+# loc = plticker.MultipleLocator(base=48) # this locator puts ticks at regular intervals
+# axs2[0].xaxis.set_major_locator(loc), axs2[1].xaxis.set_major_locator(loc), axs2[2].xaxis.set_major_locator(loc)
+# axs2[0].grid(True), axs2[1].grid(True), axs2[2].grid(True)
+# axs2[0].tick_params(axis = "both", labelsize = 14), axs2[1].tick_params(axis = "both", labelsize = 14), axs2[2].tick_params(axis = "both", labelsize = 14)
+# fig2.autofmt_xdate(rotation = 9)
+# fig2.show()
+# fig2.savefig("Electricity_Generation_Prediction/Historic_Load/Figures/Modified_Timeseries_and_Errors.pdf", bbox_inches='tight')
 
 # Create a dataframe that contains the correct indices (1-336) and the load values.
 modified_timeseries = pd.DataFrame({'SP':settlement_period, 'Load':modified_timeseries.values})
 # Only use the training set data
-modified_timeseries_train = modified_timeseries.iloc[31238:62476]
+modified_timeseries_train = modified_timeseries.iloc[0:62476]
+modified_timeseries_test = modified_timeseries.iloc[62476:62476+7810]
 
 # Plot the projected loads onto a single week to see the variation in the timeseries.
 fig3, axs3=plt.subplots(2,1,figsize=(12,10))
-axs3[0].plot(dates.iloc[31238+10+48*3:31238+48*7*4+10+48*3+1],
-             modified_timeseries_train.iloc[10+48*3:48*7*4+10+48*3+1,-1],
+axs3[0].plot(dates.iloc[31238+10+48*3:31238+48*7*3+10+48*3+1],
+             modified_timeseries_train.iloc[10+48*3:48*7*3+10+48*3+1,-1],
             alpha = 1, color = "blue")
 axs3[0].set_ylabel('Electricity Load Training Set, GW',size = 14)
 
@@ -193,7 +124,11 @@ axs3[1].grid(True)
 loc = plticker.MultipleLocator(base=48*7) # Puts ticks at regular intervals
 axs3[0].xaxis.set_major_locator(loc)
 axs3[1].legend(loc = "upper right",fontsize = 14)
-axs3[0].set_xticklabels(["2017/10/16","2017/10/16","2017/10/23","2017/10/30","2017/11/06","2017/11/13"])
+axs3[0].set_xticklabels(["2017/10/16",
+                         "2017/10/16",
+                         "2017/10/23",
+                         "2017/10/30",
+                         "2017/11/06"])
 loc = plticker.MultipleLocator(base=24) # Puts ticks at regular intervals
 plt.xticks(np.arange(1,385, 24), ["00:00 \nMonday", "12:00",
                                   "00:00 \nTuesday", "12:00",
@@ -208,7 +143,7 @@ axs3[0].grid(True), axs3[1].grid(True)
 axs3[1].grid(b=True, which='major'), axs3[1].grid(b=True, which='minor',alpha = 0.2)
 axs3[0].tick_params(axis = "both", labelsize = 12), axs3[1].tick_params(axis = "both", labelsize = 12)
 fig3.show()
-fig3.savefig("Electricity_Generation_Prediction/Historic_Load/Figures/Explained_Projected_Load.pdf", bbox_inches='tight')
+fig3.savefig("Electricity_Generation_Prediction/Historic_Load/Figures/Explained_Projected_Load_3_Weeks.pdf", bbox_inches='tight')
 
 # Compute the mean and variation for each x.
 df_stats = pd.DataFrame({'Index':np.linspace(1,336,336), 'Mean':np.linspace(1,336,336), 'Stddev':np.linspace(1,336,336)})
@@ -341,3 +276,46 @@ print("The mean of example 2 is %.2f" % np.mean(example_2.iloc[:,-1]),"GW and th
 df_stats.to_csv("Compare_Models/Direct_Multi_Step_Probability_Results/Probability_Based_on_Training/Historic_mean_and_stddevs_train.csv")
 
 
+#
+# ########################################################################################################################
+# # Compare the variability of the training and the test set
+# ########################################################################################################################
+#
+# modified_timeseries_test = modified_timeseries.iloc[62476:62476+7810]
+#
+# # Compute the mean and variation for each x.
+# df_stats_test = pd.DataFrame({'Index':np.linspace(1,336,336), 'Mean':np.linspace(1,336,336), 'Stddev':np.linspace(1,336,336)})
+#
+# for i in range(1,337):
+#     df_stats_test.iloc[i-1,1]=np.mean(modified_timeseries_test[modified_timeseries_test["SP"]==i].iloc[:,-1])
+#     df_stats_test.iloc[i-1,2]=np.std(modified_timeseries_test[modified_timeseries_test["SP"]==i].iloc[:,-1])
+#
+# zeros = np.zeros((336,))
+#
+# # Plot the mean and variation for each x.
+# fig9, axs9=plt.subplots(1,1,figsize=(12,6))
+# axs9.fill_between(df_stats.iloc[:,0],
+#                   zeros,
+#                   +df_stats_test.iloc[:,2],
+#                   alpha=0.2, color = "blue", label = "1 x Standard Deviation Test Set")
+# axs9.fill_between(df_stats.iloc[:,0],
+#                   zeros,
+#                   df_stats.iloc[:,2],
+#                   alpha=0.2, color = "black", label = "1 x Standard Deviation Training Set")
+# axs9.set_ylabel("Electricity Load Training and Test Set, GW", size = 14)
+# loc = plticker.MultipleLocator(base=48) # Puts ticks at regular intervals
+# plt.xticks(np.arange(1,385, 24), ["00:00 \nMonday", "12:00",
+#                                   "00:00 \nTuesday", "12:00",
+#                                   "00:00 \nWednesday", "12:00",
+#                                   "00:00 \nThursday", "12:00",
+#                                   "00:00 \nFriday", "12:00",
+#                                   "00:00 \nSaturday", "12:00",
+#                                   "00:00 \nSunday","12:00",
+#                                   "00:00"])
+# axs9.legend(fontsize = 12)
+# axs9.minorticks_on()
+# axs9.grid(b=True, which='major'), axs9.grid(b=True, which='minor',alpha = 0.2)
+# axs9.tick_params(axis = "both", labelsize = 12)
+# axs9.grid(True)
+# fig9.show()
+# fig9.savefig("Electricity_Generation_Prediction/Historic_Load/Figures/Mean_and_Stddev_Train_vs_Test.pdf", bbox_inches='tight')
