@@ -9,7 +9,7 @@ import tensorflow_probability as tfp
 from tensorflow_probability import distributions as tfd
 from tensorflow_probability import sts
 from sklearn.model_selection import train_test_split, TimeSeriesSplit
-from Electricity_Generation_Prediction.LSTM.Functions_LSTM import plot_the_loss_curve, train_model, create_model, plot_generation, plot_prediction_zoomed_in
+from Load_Prediction.LSTM.Functions_LSTM import plot_the_loss_curve, train_model, create_model, plot_generation, plot_prediction_zoomed_in
 from sklearn.preprocessing import StandardScaler
 import pandas as pd
 from sklearn.metrics import mean_absolute_error, mean_squared_error

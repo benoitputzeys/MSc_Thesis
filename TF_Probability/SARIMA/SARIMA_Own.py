@@ -46,7 +46,7 @@ X = pd.read_csv('Data_Preprocessing/For_336_SP_Step_Prediction/X.csv', delimiter
 DoW = X["Day of Week"]
 X = X.set_index("Time")
 dates = X.iloc[:,-1]
-X = X.iloc[:,:-5]
+X = X.iloc[:,:-6]
 
 y = pd.read_csv('Data_Preprocessing/For_336_SP_Step_Prediction/y.csv', delimiter=',')
 y = y.set_index("Time")
@@ -105,13 +105,13 @@ def train():
 elbo_loss_curve = train()
 
 # Plot how the training converges.
-fig3, axs3=plt.subplots(1,1)
-axs3.plot(elbo_loss_curve, color = "blue")
-axs3.set_xlabel("Iterations")
-axs3.set_ylabel("Loss")
-axs3.grid(True)
-fig3.show()
-fig3.savefig("TF_Probability/SARIMA/Figures/Loss_Curve.pdf", bbox_inches='tight')
+fig1, axs1=plt.subplots(1,1)
+axs1.plot(elbo_loss_curve, color = "blue")
+axs1.set_xlabel("Iterations")
+axs1.set_ylabel("Loss")
+axs1.grid(True)
+fig1.show()
+fig1.savefig("TF_Probability/SARIMA/Figures/Loss_Curve.pdf", bbox_inches='tight')
 
 ########################################################################################################################
 # Make a prediction.
@@ -187,22 +187,22 @@ for i in range(1,337):
     test_stats.iloc[i-1,2]=np.mean(error_test[error_test["SP"]==i].iloc[:,2])
 
 # Plot the projected errors onto a single week to see the variation in the timeseries.
-fig5, axs5=plt.subplots(1,1,figsize=(12,6))
+fig3, axs3=plt.subplots(1,1,figsize=(12,6))
 # Plot the mean and standard deviation of the errors that are made on the test set.
-axs5.plot(test_stats.iloc[:,0],
+axs3.plot(test_stats.iloc[:,0],
           test_stats.iloc[:,1],
           color = "orange", label = "Mean of all projected errors")
-axs5.fill_between(test_stats.iloc[:,0],
+axs3.fill_between(test_stats.iloc[:,0],
                   (test_stats.iloc[:,1]-test_stats.iloc[:,2]),
                   (test_stats.iloc[:,1]+test_stats.iloc[:,2]),
                   alpha=0.2, color = "orange", label = "+- 1x Standard Deviation")
-axs5.set_ylabel("Error Test Set, GW", size = 14)
-axs5.set_xticks(np.arange(1,385, 48))
-axs5.set_xticklabels(["1 / Monday", "49 / Tuesday", "97 / Wednesday", "145 / Thursday", "193 / Friday","241 / Saturday", "289 / Sunday",""])
-axs5.legend()
-axs5.grid(True)
-fig5.show()
-fig5.savefig("TF_Probability/SARIMA/Figures/Projected_Error_Test.pdf", bbox_inches='tight')
+axs3.set_ylabel("Error Test Set, GW", size = 14)
+axs3.set_xticks(np.arange(1,385, 48))
+axs3.set_xticklabels(["1 / Monday", "49 / Tuesday", "97 / Wednesday", "145 / Thursday", "193 / Friday","241 / Saturday", "289 / Sunday",""])
+axs3.legend()
+axs3.grid(True)
+fig3.show()
+fig3.savefig("TF_Probability/SARIMA/Figures/Projected_Error_Test.pdf", bbox_inches='tight')
 
 # Calculate the errors from the mean to the actual vaules.
 print("-"*200)
