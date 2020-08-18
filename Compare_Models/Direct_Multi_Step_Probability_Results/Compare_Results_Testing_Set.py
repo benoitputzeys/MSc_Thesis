@@ -18,7 +18,7 @@ LSTM_error = pd.read_csv("Compare_Models/Direct_Multi_Step_Probability_Results/P
 SVR_error = pd.read_csv("Compare_Models/Direct_Multi_Step_Probability_Results/Probability_Based_on_Training/SVR_error.csv")
 Naive_error = pd.read_csv("Compare_Models/Direct_Multi_Step_Probability_Results/Probability_Based_on_Training/Naive_error.csv")
 
-Historic_mean_stddev_training = pd.read_csv("Compare_Models/Direct_Multi_Step_Probability_Results/Probability_Based_on_Training/Historic_mean_and_stddevs_train.csv")
+Mean_stddev_test = pd.read_csv("Compare_Models/Direct_Multi_Step_Probability_Results/Probability_Based_on_Training/Mean_and_stddevs_test.csv")
 
 # Stddevs based on the testing
 NN_mean_stddev_test = pd.read_csv("Compare_Models/Direct_Multi_Step_Probability_Results/Probability_Based_on_Training/NN_mean_errors_stddevs_test.csv")
@@ -163,9 +163,9 @@ axes5.fill_between(x_axis,
                    label= "S. dev. of the errors of the NN prediction on the test set",
                    alpha = 0.2, color='orange')
 axes5.fill_between(x_axis,
-                  (+Historic_mean_stddev_training.iloc[:,-1]),
+                  (+Mean_stddev_test.iloc[:,-1]),
                   (zeros),
-                  label= "S. dev. in the training set", alpha=0.2, color = "blue")
+                  label= "S. dev. in the test set", alpha=0.2, color = "black")
 axes5.plot(x_axis,abs(NN_mean_stddev_test.iloc[:,-2]),label= "Error in the test set", color = "orange")
 axes5.set_ylabel('Standard deviation, electricity load, GW', size = 14)
 axes5.set_xticks(np.arange(1,385, 24))
@@ -198,9 +198,9 @@ axes6.fill_between(x_axis,
                    label= "S. dev. of the errors of the LSTM prediction on the test set",
                    alpha = 0.2, color='orange')
 axes6.fill_between(x_axis,
-                  (+Historic_mean_stddev_training.iloc[:,-1]),
+                  (+Mean_stddev_test.iloc[:,-1]),
                   (zeros),
-                  label= "S. Dev. in the training Set", alpha=0.2, color = "blue")
+                  label= "S. dev. in the test Set", alpha=0.2, color = "black")
 axes6.plot(x_axis,abs(LSTM_mean_stddev_test.iloc[:,-2]),label= "Error in the test set", color = "orange")
 axes6.set_ylabel('Standard deviation, electricity load, GW', size = 14)
 axes6.set_xticks(np.arange(1,385, 24))
@@ -227,17 +227,15 @@ fig6.savefig("Compare_Models/Direct_Multi_Step_Probability_Results/Figures/Test_
 ########################################################################################################################
 
 fig77, axes77 = plt.subplots(1,1,figsize=(12,6))
-# axes7.plot(x_axis, RF_mean_stddev.iloc[:,-2],
-#            label= "Mean Error of the \nRF prediction on \nthe Training Set\n", color='orange')
 axes77.fill_between(x_axis,
                    (+DT_mean_stddev_test.iloc[:,-1]),
                    (zeros),
                    label= "S. dev. of the errors of the DT prediction on the test set",
                    alpha = 0.2, color='orange')
 axes77.fill_between(x_axis,
-                  (+Historic_mean_stddev_training.iloc[:,-1]),
+                  (+Mean_stddev_test.iloc[:,-1]),
                    (zeros),
-                   label= "S. dev. in the training set", alpha=0.2, color = "blue")
+                   label= "S. dev. in the test set", alpha=0.2, color = "black")
 axes77.plot(x_axis,abs(DT_mean_stddev_test.iloc[:,-2]),label= "Error in the test set", color = "orange")
 axes77.set_ylabel('Standard deviation, electricity load, GW', size = 14)
 axes77.set_xticks(np.arange(1,385, 24))
@@ -273,9 +271,9 @@ axes7.fill_between(x_axis,
                    label= "S. dev. of the errors of the RF prediction on the test set",
                    alpha = 0.2, color='orange')
 axes7.fill_between(x_axis,
-                  (+Historic_mean_stddev_training.iloc[:,-1]),
+                  (+Mean_stddev_test.iloc[:,-1]),
                    (zeros),
-                   label= "S. dev. in the training set", alpha=0.2, color = "blue")
+                   label= "S. dev. in the test set", alpha=0.2, color = "black")
 axes7.plot(x_axis,abs(RF_mean_stddev_test.iloc[:,-2]),label= "Error in the test set", color = "orange")
 axes7.set_ylabel('Standard deviation, electricity load, GW', size = 14)
 axes7.set_xticks(np.arange(1,385, 24))
@@ -311,9 +309,9 @@ axes8.fill_between(x_axis,
                    label= "S. dev. of the errors of the SVR prediction on the test set",
                    alpha = 0.2, color='orange')
 axes8.fill_between(x_axis,
-                  (+Historic_mean_stddev_training.iloc[:,-1]),
+                  (+Mean_stddev_test.iloc[:,-1]),
                    (zeros),
-                   label= "S. dev. in the training set", alpha=0.2, color = "blue")
+                   label= "S. dev. in the test set", alpha=0.2, color = "black")
 axes8.plot(x_axis,abs(SVR_mean_stddev_test.iloc[:,-2]),label= "Error in the training set", color = "orange")
 axes8.set_ylabel('Standard deviation, electricity load, GW', size = 14)
 axes8.set_xticks(np.arange(1,385, 24))
@@ -349,9 +347,9 @@ axes10.fill_between(x_axis,
                    label= "S. dev. of the errors of the NN (rd. weights) prediction on the test set",
                    alpha = 0.2, color='orange')
 axes10.fill_between(x_axis,
-                  (+Historic_mean_stddev_training.iloc[:,-1]),
+                  (+Mean_stddev_test.iloc[:,-1]),
                     (zeros),
-                    label= "S. dev. in the training set", alpha=0.2, color = "blue")
+                    label= "S. dev. in the training set", alpha=0.2, color = "black")
 axes10.plot(x_axis,abs(NN_Rd_weigths_mean_stddev_test.iloc[:,-2]),label= "Error in the test set", color = "orange")
 axes10.set_ylabel('Standard deviation, electricity load, GW', size = 14)
 axes10.set_xticks(np.arange(1,385, 24))
