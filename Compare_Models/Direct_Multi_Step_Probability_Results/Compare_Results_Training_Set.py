@@ -14,6 +14,7 @@ SARIMA_mean_stddev = pd.read_csv("Compare_Models/Direct_Multi_Step_Probability_R
 NN_error = pd.read_csv("Compare_Models/Direct_Multi_Step_Probability_Results/Probability_Based_on_Training/NN_error.csv")
 DT_error = pd.read_csv("Compare_Models/Direct_Multi_Step_Probability_Results/Probability_Based_on_Training/DT_error.csv")
 RF_error = pd.read_csv("Compare_Models/Direct_Multi_Step_Probability_Results/Probability_Based_on_Training/RF_error.csv")
+RF_error_OVERFIT = pd.read_csv("Compare_Models/Direct_Multi_Step_Probability_Results/Probability_Based_on_Training/RF_error_OVERFIT.csv")
 LSTM_error = pd.read_csv("Compare_Models/Direct_Multi_Step_Probability_Results/Probability_Based_on_Training/LSTM_error.csv")
 SVR_error = pd.read_csv("Compare_Models/Direct_Multi_Step_Probability_Results/Probability_Based_on_Training/SVR_error.csv")
 Naive_error = pd.read_csv("Compare_Models/Direct_Multi_Step_Probability_Results/Probability_Based_on_Training/Naive_error.csv")
@@ -22,6 +23,7 @@ Naive_error = pd.read_csv("Compare_Models/Direct_Multi_Step_Probability_Results/
 NN_mean_stddev_training = pd.read_csv("Compare_Models/Direct_Multi_Step_Probability_Results/Probability_Based_on_Training/NN_mean_errors_stddevs_train.csv")
 LSTM_mean_stddev_training = pd.read_csv("Compare_Models/Direct_Multi_Step_Probability_Results/Probability_Based_on_Training/LSTM_mean_errors_stddevs_train.csv")
 RF_mean_stddev_training = pd.read_csv("Compare_Models/Direct_Multi_Step_Probability_Results/Probability_Based_on_Training/RF_mean_errors_stddevs_train.csv")
+RF_mean_stddev_training_OVERFIT = pd.read_csv("Compare_Models/Direct_Multi_Step_Probability_Results/Probability_Based_on_Training/RF_mean_errors_stddevs_train_OVERFIT.csv")
 DT_mean_stddev_training = pd.read_csv("Compare_Models/Direct_Multi_Step_Probability_Results/Probability_Based_on_Training/DT_mean_errors_stddevs_train.csv")
 SVR_mean_stddev_training = pd.read_csv("Compare_Models/Direct_Multi_Step_Probability_Results/Probability_Based_on_Training/SVR_mean_errors_stddevs_train.csv")
 Training_mean_stddev_training = pd.read_csv("Compare_Models/Direct_Multi_Step_Probability_Results/Probability_Based_on_Training/Historic_mean_and_stddevs_train.csv")
@@ -192,8 +194,6 @@ fig5.savefig("Compare_Models/Direct_Multi_Step_Probability_Results/Figures/Train
 ########################################################################################################################
 
 fig6, axes6 = plt.subplots(1,1,figsize=(12,6))
-# axes6.plot(x_axis, LSTM_mean_stddev.iloc[:,-2],
-#            label= "Mean Error of the LSTM prediction on the Training Set", color='orange')
 axes6.fill_between(x_axis,
                    (+LSTM_mean_stddev_training.iloc[:,-1]),
                    (zeros),
@@ -229,8 +229,6 @@ fig6.savefig("Compare_Models/Direct_Multi_Step_Probability_Results/Figures/Train
 ########################################################################################################################
 
 fig77, axes77 = plt.subplots(1,1,figsize=(12,6))
-# axes7.plot(x_axis, RF_mean_stddev.iloc[:,-2],
-#            label= "Mean Error of the \nRF prediction on \nthe Training Set\n", color='orange')
 axes77.fill_between(x_axis,
                    (+DT_mean_stddev_training.iloc[:,-1]),
                    (zeros),
@@ -371,3 +369,39 @@ axes9.tick_params(axis = "both", labelsize = 11)
 axes9.set_ylim([0,5.4])
 fig9.show()
 fig9.savefig("Compare_Models/Direct_Multi_Step_Probability_Results/Figures/Training_Set/NN_Rd_Weights_Stddev_of_Error_Train.pdf", bbox_inches='tight')
+
+########################################################################################################################
+# Compare the mean and standard deviations of errors of the RF that OVERFITS between predictions and true values of the training set.
+########################################################################################################################
+
+fig10, axes10 = plt.subplots(1,1,figsize=(12,6))
+axes10.fill_between(x_axis,
+                   (+RF_mean_stddev_training_OVERFIT.iloc[:,-1]),
+                   (zeros),
+                   label= "S. dev. of the errors of the RF (overfitted) prediction on the training set",
+                   alpha = 0.2, color='orange')
+axes10.fill_between(x_axis,
+                  (+Training_mean_stddev_training.iloc[:,-1]),
+                   (zeros),
+                   label= "S. dev. in the training set", alpha=0.2, color = "blue")
+axes10.plot(x_axis,abs(RF_mean_stddev_training_OVERFIT.iloc[:,-2]),label= "Absolute error in the training set", color = "orange")
+axes10.set_ylabel('Standard deviation, electricity load, GW', size = 14)
+axes10.set_xticks(np.arange(1,385, 24))
+axes10.set_xticklabels(["00:00\nMonday","12:00",
+                       "00:00\nTuesday","12:00",
+                       "00:00\nWednesday", "12:00",
+                       "00:00\nThursday", "12:00",
+                       "00:00\nFriday","12:00",
+                       "00:00\nSaturday", "12:00",
+                       "00:00\nSunday","12:00",
+                       "00:00"])
+axes10.grid(True)
+axes10.minorticks_on()
+axes10.grid(b=True, which='major')
+axes10.grid(b=True, which='minor',alpha = 0.2)
+axes10.legend(fontsize=14)
+axes10.tick_params(axis = "both", labelsize = 11)
+axes10.set_ylim([0,5.4])
+fig10.show()
+fig10.savefig("Compare_Models/Direct_Multi_Step_Probability_Results/Figures/Training_Set/RF_Stddev_of_Error_Train_OVERFIT.pdf", bbox_inches='tight')
+
