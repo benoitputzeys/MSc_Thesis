@@ -26,4 +26,4 @@ axs.plot(x_axis, stats.norm.pdf(x_axis, mu_posterior, sigma_posterior), linewidt
 axs.set_xticks([]), axs.set_yticks([])
 axs.legend(fontsize=14)
 fig.show()
-fig.savefig("TF_Probability/MST_Rd_Weights/Figures/Visual_Intuition_Prior_and_Posterior.pdf", bbox_inches='tight')
+fig.savefig("TF_Probability/NN_Random_Weights/Figures/Visual_Intuition_Prior_and_Posterior.pdf", bbox_inches='tight')

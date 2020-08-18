@@ -2,7 +2,7 @@ from matplotlib import pylab as plt
 import numpy as np
 from sklearn.model_selection import train_test_split
 from numpy import genfromtxt
-from TF_Probability.MST_Rd_Weights.Functions import build_model
+from TF_Probability.NN_Random_Weights.Functions import build_model
 from sklearn.preprocessing import StandardScaler
 import pandas as pd
 import matplotlib.ticker as plticker
@@ -67,11 +67,11 @@ axs1.set_ylabel('Loss')
 axs1.set_xlabel('Epochs')
 axs1.grid(True)
 fig1.show()
-fig1.savefig("TF_Probability/MST_Rd_Weights/Figures/Loss_Epochs.pdf", bbox_inches='tight')
+fig1.savefig("TF_Probability/NN_Random_Weights/Figures/Loss_Epochs.pdf", bbox_inches='tight')
 
 # Save or load the model
-model.save("TF_Probability/MST_Rd_Weights/DMST_NN_w_Rd_Weights.h5")
-#model = keras.models.load_model("TF_Probability/MST_Rd_Weights/DMST_NN_w_Rd_Weights.h5")
+model.save("TF_Probability/NN_Random_Weights/DMST_NN_w_Rd_Weights.h5")
+#model = keras.models.load_model("TF_Probability/NN_Random_Weights/DMST_NN_w_Rd_Weights.h5")
 
 ########################################################################################################################
 # Predicting the generation.
@@ -143,7 +143,7 @@ plt.xticks(np.arange(1,339, 48), ["14:00\n07/11","14:00\n07/12","14:00\n07/13",
                                   "14:00\n07/14","14:00\n07/15","14:00\n07/16",
                                   "14:00\n07/17","14:00\n07/18"])
 fig2.show()
-fig2.savefig("TF_Probability/MST_Rd_Weights/Figures/DMST_Train_Set_Pred.pdf", bbox_inches='tight')
+fig2.savefig("TF_Probability/NN_Random_Weights/Figures/DMST_Train_Set_Pred.pdf", bbox_inches='tight')
 
 ########################################################################################################################
 # Calculate the stddev from the 350 predictions.
@@ -196,7 +196,7 @@ plt.xticks(np.arange(1,482, 48), ["14:00\n07/22","14:00\n07/23","14:00\n07/24",
                                   "14:00\n07/28","14:00\n07/29","14:00\n07/30",
                                   "14:00\n07/31","14:00\n08/01"])
 fig3.show()
-fig3.savefig("TF_Probability/MST_Rd_Weights/Figures/DMST_Test_Set_Pred.pdf", bbox_inches='tight')
+fig3.savefig("TF_Probability/NN_Random_Weights/Figures/DMST_Test_Set_Pred.pdf", bbox_inches='tight')
 
 ########################################################################################################################
 # Calculate the errors on the training and the test set.
@@ -242,7 +242,7 @@ axs4[1].hist(error_column_test, bins = 50, color = "blue")
 axs4[1].set_xlabel("Prediction Error on Test Set [GW]", size = 14)
 axs4[1].set_ylabel("Count", size = 14)
 fig4.show()
-fig4.savefig("TF_Probability/MST_Rd_Weights/Figures/DMST_Histograms_Train_and_Test_Set_Error_Pred.pdf", bbox_inches='tight')
+fig4.savefig("TF_Probability/NN_Random_Weights/Figures/DMST_Histograms_Train_and_Test_Set_Error_Pred.pdf", bbox_inches='tight')
 
 ########################################################################################################################
 # Plot the mean and standard deviation per week for the training and test set.
@@ -324,7 +324,7 @@ axs5[1].set_xticklabels(["00:00\nMonday","12:00",
 axs5[0].legend(fontsize=12), axs5[1].legend(fontsize=12)
 axs5[0].tick_params(axis = "both", labelsize = 12), axs5[1].tick_params(axis = "both", labelsize = 12)
 fig5.show()
-fig5.savefig("TF_Probability/MST_Rd_Weights/Figures/DMST_Mean_and_Stddev_of_Error_Train_and_Test_Set_Pred.pdf", bbox_inches='tight')
+fig5.savefig("TF_Probability/NN_Random_Weights/Figures/DMST_Mean_and_Stddev_of_Error_Train_and_Test_Set_Pred.pdf", bbox_inches='tight')
 
 ########################################################################################################################
 # Plot the standard deviation per week for the test and training set.
@@ -371,7 +371,7 @@ axs7[0].tick_params(axis = "both", labelsize = 12), axs7[1].tick_params(axis = "
 axs7[0].set_ylim([0,5.4]), axs7[1].set_ylim([0,5.4])
 
 fig7.show()
-fig7.savefig("TF_Probability/MST_Rd_Weights/Figures/Stddev_of_Error_Test_and_Traing_Set_Pred.pdf", bbox_inches='tight')
+fig7.savefig("TF_Probability/NN_Random_Weights/Figures/Stddev_of_Error_Test_and_Traing_Set_Pred.pdf", bbox_inches='tight')
 
 ########################################################################################################################
 # Save the results in a csv file.
