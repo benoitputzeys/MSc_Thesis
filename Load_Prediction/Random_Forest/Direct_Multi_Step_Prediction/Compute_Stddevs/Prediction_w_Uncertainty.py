@@ -148,7 +148,7 @@ axs5[1].set_ylabel('Error, GW',size = 14)
 # Include additional details such as tick intervals, rotation, legend positioning and grid on.
 axs5[1].grid(True)
 axs5[0].grid(True)
-loc = plticker.MultipleLocator(base=47)
+loc = plticker.MultipleLocator(base=48)
 axs5[0].xaxis.set_major_locator(loc) # Put ticks at regular intervals
 axs5[1].xaxis.set_major_locator(loc)
 fig5.autofmt_xdate(rotation=0)

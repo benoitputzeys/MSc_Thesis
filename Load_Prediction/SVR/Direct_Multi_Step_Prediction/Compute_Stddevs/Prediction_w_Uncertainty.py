@@ -34,8 +34,8 @@ dates = dates[-len(X_train)-len(X_test)*2:-len(X_test)]
 # Import the predicitons.
 ########################################################################################################################
 
-pred_test = pd.read_csv('Load_Prediction\SVR_Prediction\Direct_Multi_Step_Prediction\Pred_Test.csv', delimiter=',')
-pred_train = pd.read_csv('Load_Prediction\SVR_Prediction\Direct_Multi_Step_Prediction\Pred_Train.csv', delimiter=',')
+pred_test = pd.read_csv('Load_Prediction/SVR/Direct_Multi_Step_Prediction/Pred_Test.csv', delimiter=',')
+pred_train = pd.read_csv('Load_Prediction/SVR/Direct_Multi_Step_Prediction/Pred_Train.csv', delimiter=',')
 pred_train = pred_train.iloc[:,-1]
 pred_test = pred_test.iloc[:,-1]
 
@@ -148,7 +148,7 @@ axs5[1].set_ylabel('Error, GW',size = 14)
 # Include additional details such as tick intervals, rotation, legend positioning and grid on.
 axs5[1].grid(True)
 axs5[0].grid(True)
-loc = plticker.MultipleLocator(base=47)
+loc = plticker.MultipleLocator(base=48)
 axs5[0].xaxis.set_major_locator(loc) # Put ticks at regular intervals
 axs5[1].xaxis.set_major_locator(loc)
 fig5.autofmt_xdate(rotation=0)

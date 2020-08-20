@@ -73,9 +73,9 @@ axs[0].set_ylabel("Daily S., GW", size = 14)
 axs[1].plot(dates[33500:36020],weekly_seasonality[33500:36020], color = "blue")
 axs[1].set_ylabel("Weekly S., GW", size = 14)
 axs[2].plot(dates[33500:36020],mean_each_week[33500:36020], color = "blue")
-axs[2].set_ylabel("Weekly Average \nGW", size = 14)
+axs[2].set_ylabel("Weekly Avg., GW\n", size = 14)
 axs[3].plot(dates[33500:36020], residual[33500:36020] , color = "blue")
-axs[3].set_ylabel("Residual, [GW]", size = 14)
+axs[3].set_ylabel("Residual, GW", size = 14)
 axs[3].set_xlabel("Date", size = 18)
 loc = plticker.MultipleLocator(base=48*7) # this locator puts ticks at regular intervals
 axs[0].xaxis.set_major_locator(loc), axs[1].xaxis.set_major_locator(loc), axs[2].xaxis.set_major_locator(loc), axs[3].xaxis.set_major_locator(loc)
@@ -99,31 +99,11 @@ fig.savefig("Load_Prediction/Historic_Load/Figures/Decomposition_around_Christma
 # Create a modified reconstruction of the series where only the daily, weekly and residual components are considered.
 modified_timeseries = daily_seasonality + weekly_seasonality + residual
 
-# # Plot the modified reconstruction to show the jump when going from one week to the next
-# fig2, axs2=plt.subplots(3,1,figsize=(12,10))
-# axs2[0].plot(dates[-48*7-500:-500+5], modified_timeseries[-48*7-500:-500+5], color = "blue")
-# axs2[0].set_ylabel("Modified Timeseries \nGW", size = 14)
-# axs2[1].plot(dates[-48*7-500:-500+5], series[-48*7-500:-500+5], color = "blue")
-# axs2[1].set_ylabel("Original Timeseries \nGW", size = 14)
-# axs2[2].plot(dates[-48*7-500:-500+5],(modified_timeseries-series)[-48*7-500:-500+5], color = "blue")
-# axs2[2].set_ylabel("Error, GW", size = 14)
-# axs2[2].set_xlabel("Date", size = 18)
-# loc = plticker.MultipleLocator(base=48) # this locator puts ticks at regular intervals
-# axs2[0].xaxis.set_major_locator(loc), axs2[1].xaxis.set_major_locator(loc), axs2[2].xaxis.set_major_locator(loc)
-# axs2[0].grid(True), axs2[1].grid(True), axs2[2].grid(True)
-# axs2[0].tick_params(axis = "both", labelsize = 14), axs2[1].tick_params(axis = "both", labelsize = 14), axs2[2].tick_params(axis = "both", labelsize = 14)
-# fig2.autofmt_xdate(rotation = 9)
-# fig2.show()
-# fig2.savefig("Load_Prediction/Historic_Load/Figures/Modified_Timeseries_and_Errors.pdf", bbox_inches='tight')
-
-# Create a dataframe that contains the correct indices (1-336) and the load values.
+# Create a dataframe that contains the indices (1-336) and the load values.
 modified_timeseries = pd.DataFrame({'SP':settlement_period, 'Load':modified_timeseries.values})
 
 # Use the training set data
-modified_timeseries_train = modified_timeseries.iloc[0:62476]
-
-# Use the test set data
-modified_timeseries_test = modified_timeseries.iloc[62476:62476+7810]
+modified_timeseries_train = modified_timeseries.iloc[31238:62476]
 
 # Plot the projected loads onto a single week to see the variation in the timeseries.
 fig3, axs3=plt.subplots(2,1,figsize=(12,10))
@@ -157,7 +137,6 @@ axs3[0].minorticks_on(),axs3[1].minorticks_on(),
 axs3[0].grid(True), axs3[1].grid(True)
 axs3[1].grid(b=True, which='major'), axs3[1].grid(b=True, which='minor',alpha = 0.2)
 axs3[0].tick_params(axis = "both", labelsize = 12), axs3[1].tick_params(axis = "both", labelsize = 12)
-plt.subplots_adjust(hspace=17)
 fig3.show()
 fig3.savefig("Load_Prediction/Historic_Load/Figures/Explained_Projected_Load_3_Weeks.pdf", bbox_inches='tight')
 
@@ -207,7 +186,7 @@ fig5, axs5=plt.subplots(1,1,figsize=(12,6))
 axs5.fill_between(df_stats.iloc[:,0],
                   (zeros),
                   (+df_stats.iloc[:,2]),
-                  alpha=0.2, color = "blue", label = "+- 1 x Standard Deviation")
+                  alpha=0.2, color = "blue", label = "Standard deviation in the training set")
 axs5.set_ylabel("Electricity Load Training Set, GW", size = 14)
 loc = plticker.MultipleLocator(base=48) # Puts ticks at regular intervals
 plt.xticks(np.arange(1,385, 24), ["00:00 \nMonday", "12:00",
@@ -249,7 +228,7 @@ axs6.grid(True)
 fig6.show()
 
 ########################################################################################################################
-# Use the "template" show the probability distribution of 2 SPs. Plot the histograms too
+# Use the "template" to show the probability distribution of 2 SPs. Plot the histograms too!
 ########################################################################################################################
 
 # Plot the mean and variation for each x. Together with the location of 2 examples
@@ -300,9 +279,32 @@ axs8[1].set_axisbelow(True)
 fig8.show()
 fig8.savefig("Load_Prediction/Historic_Load/Figures/Histograms_Examples_1_2.pdf", bbox_inches='tight')
 
+mean_ex_1 = np.mean(example_1.iloc[:,-1])
+mean_ex_2 = np.mean(example_2.iloc[:,-1])
+stddev_ex_1 = np.std(example_1.iloc[:,-1])
+stddev_ex_2 = np.std(example_2.iloc[:,-1])
+
 # Print their mean and standard deviation
-print("The mean of example 1 is %.2f" % np.mean(example_1.iloc[:,-1]),"GW and the standard deviation is %.2f" % np.std(example_1.iloc[:,-1]),"[GW]." )
-print("The mean of example 2 is %.2f" % np.mean(example_2.iloc[:,-1]),"GW and the standard deviation is %.2f" % np.std(example_2.iloc[:,-1]),"[GW]." )
+print("The mean of example 1 is %.2f" % mean_ex_1,"GW and the standard deviation is %.2f" % stddev_ex_1,"GW." )
+print("The mean of example 2 is %.2f" % mean_ex_2,"GW and the standard deviation is %.2f" % stddev_ex_2,"GW." )
+
+ex_1_num_in_region_1_stev = len(example_1[((mean_ex_1-stddev_ex_1)<example_1.iloc[:,-1]) & (example_1.iloc[:,-1] <(mean_ex_1+stddev_ex_1))])
+ex_1_num_in_region_2_stev = len(example_1[((mean_ex_1-2*stddev_ex_1)<example_1.iloc[:,-1]) & (example_1.iloc[:,-1]<(mean_ex_1+2*stddev_ex_1))])
+ex_2_num_in_region_1_stev = len(example_2[((mean_ex_2-stddev_ex_2)<example_2.iloc[:,-1]) & (example_2.iloc[:,-1] <(mean_ex_2+stddev_ex_2))])
+ex_2_num_in_region_2_stev = len(example_2[((mean_ex_2-2*stddev_ex_2)<example_2.iloc[:,-1]) & (example_2.iloc[:,-1]<(mean_ex_2+2*stddev_ex_2))])
+
+print("*"*100)
+print("Example 1: Percentage of observations in a region of a standard deviation from the mean:",
+      round(100*ex_1_num_in_region_1_stev/len(example_1),2),"%.")
+print("Example 1: Percentage of observations in a region of a 2x standard deviation from the mean:",
+      round(100*ex_1_num_in_region_2_stev/len(example_1),2),"%.")
+print("*"*100)
+print("Example 2: Percentage of observations in a region of a standard deviation from the mean:",
+      round(100*ex_2_num_in_region_1_stev/len(example_2),2),"%.")
+print("Example 2: Percentage of observations in a region of a 2x standard deviation from the mean:",
+      round(100*ex_1_num_in_region_2_stev/len(example_2),2),"%.")
+print("*"*100)
+
 
 ########################################################################################################################
 # Save the results from the training set for further analysis.
@@ -314,6 +316,7 @@ df_stats.to_csv("Compare_Models/Direct_Multi_Step_Probability_Results/Probabilit
 # Compare the variability of the test set and compare it to the variability of the training set.
 ########################################################################################################################
 
+# Use the test set data
 modified_timeseries_test = modified_timeseries.iloc[62476:62476+7810]
 
 # Compute the mean and variation for each x.
@@ -323,12 +326,6 @@ for i in range(1,337):
     df_stats_test.iloc[i-1,1]=np.mean(modified_timeseries_test[modified_timeseries_test["SP"]==i].iloc[:,-1])
     df_stats_test.iloc[i-1,2]=np.std(modified_timeseries_test[modified_timeseries_test["SP"]==i].iloc[:,-1])
 
-plt.plot(df_stats_test.iloc[:,0],df_stats_test.iloc[:,1], color = "blue")
-plt.fill_between(df_stats_test.iloc[:,0],
-                 df_stats_test.iloc[:,1]-df_stats_test.iloc[:,2],
-                 df_stats_test.iloc[:,1]+df_stats_test.iloc[:,2], alpha = 0.2, color = "blue")
-plt.show()
-
 zeros = np.zeros((336,))
 
 # Plot the mean and variation for each x.
@@ -336,11 +333,11 @@ fig9, axs9=plt.subplots(1,1,figsize=(12,6))
 axs9.fill_between(df_stats.iloc[:,0],
                   zeros,
                   +df_stats_test.iloc[:,2],
-                  alpha=0.2, color = "black", label = "1 x Standard Deviation Test Set")
+                  alpha=0.2, color = "black", label = "Standard deviation in the test set")
 axs9.fill_between(df_stats.iloc[:,0],
                   zeros,
                   df_stats.iloc[:,2],
-                  alpha=0.2, color = "blue", label = "1 x Standard Deviation Training Set")
+                  alpha=0.2, color = "blue", label = "Standard deviation in the training set")
 axs9.set_ylabel("Electricity Load Training and Test Set, GW", size = 14)
 loc = plticker.MultipleLocator(base=48) # Puts ticks at regular intervals
 plt.xticks(np.arange(1,385, 24), ["00:00 \nMonday", "12:00",

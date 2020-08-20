@@ -52,14 +52,33 @@ axs3[1].set_ylabel("Count", size = 14)
 fig3.show()
 fig3.savefig("Load_Prediction/Benchmark_Models/Figures/Previous_Week_Histograms_Train_and_Test.pdf", bbox_inches='tight')
 
-mean_train = np.mean((X_train.iloc[:,0]- y_train.iloc[:,0]))
-stddev_train = np.std((X_train.iloc[:,0]- y_train.iloc[:,0]))
-mean_test = np.mean((X_test.iloc[:,0]- y_test.iloc[:,0]))
-stddev_test = np.std((X_test.iloc[:,0]- y_test.iloc[:,0]))
+error_train = (X_train.iloc[:,0]- y_train.iloc[:,0])
+error_test = (X_test.iloc[:,0]- y_test.iloc[:,0])
+mean_train = np.mean(error_train)
+stddev_train = np.std(error_train)
+mean_test = np.mean(error_test)
+stddev_test = np.std(error_test)
+
+ex_1_num_in_region_1_stev = len(error_train[((mean_train-stddev_train)<error_train) & (error_train <(mean_train+stddev_train))])
+ex_1_num_in_region_2_stev = len(error_train[((mean_train-2*stddev_train)<error_train) & (error_train<(mean_train+2*stddev_train))])
+ex_2_num_in_region_1_stev = len(error_test[((mean_test-stddev_test)<error_test) & (error_test <(mean_test+stddev_test))])
+ex_2_num_in_region_2_stev = len(error_test[((mean_test-2*stddev_test)<error_test) & (error_test<(mean_test+2*stddev_test))])
 
 # Print their mean and standard deviation
+print("*"*100)
 print("The mean of the training sets is %.2f" %mean_train, "MW and the standard deviation is %.2f" % stddev_train,"MW." )
 print("The mean of the test set is %.2f" %mean_test,"MW and the standard deviation is %.2f" %stddev_test,"MW." )
+print("*"*100)
+print("Training Set: Percentage of observations in a region of a standard deviation from the mean:",
+      round(100*ex_1_num_in_region_1_stev/len(X_train),2),"%.")
+print("Training Set: Percentage of observations in a region of a 2x standard deviation from the mean:",
+      round(100*ex_1_num_in_region_2_stev/len(X_train),2),"%.")
+print("*"*100)
+print("Test Set: Percentage of observations in a region of a standard deviation from the mean:",
+      round(100*ex_2_num_in_region_1_stev/len(X_test),2),"%.")
+print("Test Set: Percentage of observations in a region of a 2x standard deviation from the mean:",
+      round(100*ex_2_num_in_region_2_stev/len(X_test),2),"%.")
+print("*"*100)
 
 # Naive prediction
 pred_test = X_test.iloc[:,0]
