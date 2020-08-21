@@ -129,7 +129,7 @@ fig2.savefig("Load_Prediction/Random_Forest/Figures/DMST_Prediction.pdf", bbox_i
 # Save the results in a csv file.
 ########################################################################################################################
 
-pd.DataFrame({"RF_Time": [elapsed_time]}).to_csv("Compare_Models/Direct_Multi_Step_Results/Time_to_Train/RF.csv")
+pd.DataFrame({"RF_Time": [elapsed_time]}).to_csv("Compare_Models/Direct_Multi_Step_Probability_Results/Time_to_Train/RF.csv")
 
 df_errors = pd.DataFrame({"MSE_Train": [mean_squared_error(y_train,pred_train)],
                           "MAE_Train": [mean_absolute_error(y_train,pred_train)],

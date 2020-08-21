@@ -380,7 +380,7 @@ fig7.savefig("TF_Probability/NN_Random_Weights/Figures/Stddev_of_Error_Test_and_
 # Save the results in a csv file.
 ########################################################################################################################
 
-pd.DataFrame({"NN_Rd_Weights_Time": [elapsed_time]}).to_csv("Compare_Models/Direct_Multi_Step_Results/Time_to_Train/NN_Rd_Weights.csv")
+pd.DataFrame({"NN_Rd_Weights_Time": [elapsed_time]}).to_csv("Compare_Models/Direct_Multi_Step_Probability_Results/Time_to_Train/NN_Rd_Weights.csv")
 
 # Calculate the errors from the mean to the actual vaules.
 print("-"*200)

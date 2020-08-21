@@ -125,7 +125,7 @@ fig2.savefig("Load_Prediction/Decision_Tree/Figures/DMST_Pred.pdf", bbox_inches=
 # Save the results in a csv file.
 ########################################################################################################################
 
-pd.DataFrame({"DT_Time": [elapsed_time]}).to_csv("Compare_Models/Direct_Multi_Step_Results/Time_to_Train/DT.csv")
+pd.DataFrame({"DT_Time": [elapsed_time]}).to_csv("Compare_Models/Direct_Multi_Step_Probability_Results/Time_to_Train/DT.csv")
 
 df_errors = pd.DataFrame({"MSE_Train": [mean_squared_error(y_train,pred_train)],
                           "MAE_Train": [mean_absolute_error(y_train,pred_train)],

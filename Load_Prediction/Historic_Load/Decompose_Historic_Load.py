@@ -60,9 +60,9 @@ axs.xaxis.set_major_locator(loc)
 axs.tick_params(axis = "both", labelsize = 14)
 fig.autofmt_xdate(rotation = 0)
 plt.xticks(np.arange(1,len(dates), 48*130), ["2016-01","2016-05","2016-09",
-                                  "2017-01","2017-06","2017-11",
-                                  "2018-02","2018-06","2018-11",
-                                  "2019-03","2019-07","2019-12","2020-04"])
+                                             "2017-01","2017-06","2017-11",
+                                             "2018-02","2018-06","2018-11",
+                                             "2019-03","2019-07","2019-12","2020-04"])
 fig.show()
 fig.savefig("Load_Prediction/Historic_Load/Figures/Weekly_Average.pdf", bbox_inches='tight')
 
@@ -361,5 +361,35 @@ fig9.savefig("Load_Prediction/Historic_Load/Figures/Mean_and_Stddev_Train_vs_Tes
 ########################################################################################################################
 
 df_stats_test.to_csv("Compare_Models/Direct_Multi_Step_Probability_Results/Probability_Based_on_Training/Mean_and_stddevs_test.csv")
+
+########################################################################################################################
+# Plot the standard deviation of the test set.
+########################################################################################################################
+
+# Compare the mean and standard deviations of errors of the SVR between predictions and true values of the training set.
+fig10, axes10 = plt.subplots(1,1,figsize=(12,6))
+axes10.fill_between(df_stats_test.iloc[:,0],
+                    zeros,
+                    df_stats_test.iloc[:,-1],
+                    label= "Standard deviation in the test set", alpha=0.2, color = "black")
+axes10.set_ylabel('Standard deviation, electricity load, GW', size = 14)
+axes10.set_xticks(np.arange(1,385, 24))
+axes10.set_xticklabels(["00:00\nMonday","12:00",
+                       "00:00\nTuesday","12:00",
+                       "00:00\nWednesday", "12:00",
+                       "00:00\nThursday", "12:00",
+                       "00:00\nFriday","12:00",
+                       "00:00\nSaturday", "12:00",
+                       "00:00\nSunday","12:00",
+                       "00:00"])
+axes10.grid(True)
+axes10.minorticks_on()
+axes10.grid(b=True, which='major')
+axes10.grid(b=True, which='minor',alpha = 0.2)
+axes10.legend(fontsize=14)
+axes10.tick_params(axis = "both", labelsize = 11)
+axes10.set_ylim([0,3.65])
+fig10.show()
+fig10.savefig("Load_Prediction/Historic_Load/Figures/Variability_Test.pdf", bbox_inches='tight')
 
 
