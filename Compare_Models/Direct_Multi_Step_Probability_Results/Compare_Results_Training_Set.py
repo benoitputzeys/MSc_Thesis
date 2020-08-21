@@ -168,7 +168,7 @@ axes5.fill_between(x_axis,
                   (+Training_mean_stddev_training.iloc[:,-1]),
                   (zeros),
                   label= "S. dev. in the training set", alpha=0.2, color = "blue")
-axes5.plot(x_axis,abs(NN_mean_stddev_training.iloc[:,-2]),label= "Absolute error in the training Set", color = "orange")
+#axes5.plot(x_axis,abs(NN_mean_stddev_training.iloc[:,-2]),label= "Mean absolute error in the training Set", color = "orange")
 axes5.set_ylabel('Standard deviation, electricity load, GW', size = 14)
 axes5.set_xticks(np.arange(1,385, 24))
 axes5.set_xticklabels(["00:00\nMonday","12:00",
@@ -203,7 +203,7 @@ axes6.fill_between(x_axis,
                   (+Training_mean_stddev_training.iloc[:,-1]),
                   (zeros),
                   label= "S. dev. in the training set", alpha=0.2, color = "blue")
-axes6.plot(x_axis,abs(LSTM_mean_stddev_training.iloc[:,-2]),label= "Absolute error in the training set", color = "orange")
+#axes6.plot(x_axis,abs(LSTM_mean_stddev_training.iloc[:,-2]),label= "Absolute error in the training set", color = "orange")
 axes6.set_ylabel('Standard deviation, electricity load, GW', size = 14)
 axes6.set_xticks(np.arange(1,385, 24))
 axes6.set_xticklabels(["00:00\nMonday","12:00",
@@ -238,7 +238,7 @@ axes77.fill_between(x_axis,
                   (+Training_mean_stddev_training.iloc[:,-1]),
                    (zeros),
                    label= "S. dev. in the training set", alpha=0.2, color = "blue")
-axes77.plot(x_axis,abs(DT_mean_stddev_training.iloc[:,-2]),label= "Absolute error in the training set", color = "orange")
+#axes77.plot(x_axis,abs(DT_mean_stddev_training.iloc[:,-2]),label= "Absolute error in the training set", color = "orange")
 axes77.set_ylabel('Standard deviation, electricity load, GW', size = 14)
 axes77.set_xticks(np.arange(1,385, 24))
 axes77.set_xticklabels(["00:00\nMonday","12:00",
@@ -275,7 +275,7 @@ axes7.fill_between(x_axis,
                   (+Training_mean_stddev_training.iloc[:,-1]),
                    (zeros),
                    label= "S. dev. in the training set", alpha=0.2, color = "blue")
-axes7.plot(x_axis,abs(RF_mean_stddev_training.iloc[:,-2]),label= "Absolute error in the training set", color = "orange")
+#axes7.plot(x_axis,abs(RF_mean_stddev_training.iloc[:,-2]),label= "Absolute error in the training set", color = "orange")
 axes7.set_ylabel('Standard deviation, electricity load, GW', size = 14)
 axes7.set_xticks(np.arange(1,385, 24))
 axes7.set_xticklabels(["00:00\nMonday","12:00",
@@ -312,7 +312,7 @@ axes8.fill_between(x_axis,
                   (+Training_mean_stddev_training.iloc[:,-1]),
                    (zeros),
                    label= "S. dev. in the training set", alpha=0.2, color = "blue")
-axes8.plot(x_axis,abs(SVR_mean_stddev_training.iloc[:,-2]),label= "Absolute error in the training set", color = "orange")
+#axes8.plot(x_axis,abs(SVR_mean_stddev_training.iloc[:,-2]),label= "Absolute error in the training set", color = "orange")
 axes8.set_ylabel('Standard deviation, electricity load, GW', size = 14)
 axes8.set_xticks(np.arange(1,385, 24))
 axes8.set_xticklabels(["00:00\nMonday","12:00",
@@ -349,7 +349,7 @@ axes9.fill_between(x_axis,
                   (+Training_mean_stddev_training.iloc[:,-1]),
                    (zeros),
                    label= "S. dev. in the training set", alpha=0.2, color = "blue")
-axes9.plot(x_axis,abs(NN_Rd_weigths_mean_stddev_train.iloc[:,-2]),label= "Absolute error in the training set", color = "orange")
+#axes9.plot(x_axis,abs(NN_Rd_weigths_mean_stddev_train.iloc[:,-2]),label= "Absolute error in the training set", color = "orange")
 axes9.set_ylabel('Standard deviation, electricity load, GW', size = 14)
 axes9.set_xticks(np.arange(1,385, 24))
 axes9.set_xticklabels(["00:00\nMonday","12:00",
@@ -384,7 +384,7 @@ axes10.fill_between(x_axis,
                   (+Training_mean_stddev_training.iloc[:,-1]),
                    (zeros),
                    label= "S. dev. in the training set", alpha=0.2, color = "blue")
-axes10.plot(x_axis,abs(RF_mean_stddev_training_OVERFIT.iloc[:,-2]),label= "Absolute error in the training set", color = "orange")
+#axes10.plot(x_axis,abs(RF_mean_stddev_training_OVERFIT.iloc[:,-2]),label= "Absolute error in the training set", color = "orange")
 axes10.set_ylabel('Standard deviation, electricity load, GW', size = 14)
 axes10.set_xticks(np.arange(1,385, 24))
 axes10.set_xticklabels(["00:00\nMonday","12:00",
