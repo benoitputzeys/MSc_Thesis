@@ -1,12 +1,10 @@
 from matplotlib import pylab as plt
 import numpy as np
-from sklearn.model_selection import train_test_split
-from numpy import genfromtxt
 from TF_Probability.NN_Random_Weights.Functions import build_model
 from sklearn.preprocessing import StandardScaler
 import pandas as pd
 import matplotlib.ticker as plticker
-import keras
+import time
 from sklearn.model_selection import train_test_split, TimeSeriesSplit
 
 ########################################################################################################################
@@ -51,11 +49,16 @@ model = build_model(X_train.shape[1],learning_rate)
 # Extract the loss per epoch to plot the learning progress.
 hist_list = pd.DataFrame()
 
+# Measure the time to train the model.
+start_time = time.time()
+
 tscv = TimeSeriesSplit()
 for train_index, test_index in tscv.split(X_train):
      X_train_split, X_test_split = X_train[train_index], X_train[test_index]
      y_train_split, y_test_split = y_train[train_index], y_train[test_index]
      hist_split = model.fit(X_train_split, y_train_split, epochs = epochs, batch_size = batches, verbose = 2)
+
+elapsed_time = time.time() - start_time
 
 # Describe model.
 model.summary()
@@ -234,12 +237,12 @@ error_column_train = predictions_and_errors_train[:,1]
 fig4, axs4=plt.subplots(1,2,figsize=(12,6))
 axs4[0].grid(True)
 axs4[0].hist(error_column_train, bins = 50, color = "blue")
-axs4[0].set_xlabel("Prediction Error on Training Set [GW]", size = 14)
+axs4[0].set_xlabel("Prediction Error on Training Set, GW", size = 14)
 axs4[0].set_ylabel("Count", size = 14)
 
 axs4[1].grid(True)
 axs4[1].hist(error_column_test, bins = 50, color = "blue")
-axs4[1].set_xlabel("Prediction Error on Test Set [GW]", size = 14)
+axs4[1].set_xlabel("Prediction Error on Test Set, GW", size = 14)
 axs4[1].set_ylabel("Count", size = 14)
 fig4.show()
 fig4.savefig("TF_Probability/NN_Random_Weights/Figures/DMST_Histograms_Train_and_Test_Set_Error_Pred.pdf", bbox_inches='tight')
@@ -376,6 +379,8 @@ fig7.savefig("TF_Probability/NN_Random_Weights/Figures/Stddev_of_Error_Test_and_
 ########################################################################################################################
 # Save the results in a csv file.
 ########################################################################################################################
+
+pd.DataFrame({"NN_Rd_Weights_Time": [elapsed_time]}).to_csv("Compare_Models/Direct_Multi_Step_Results/Time_to_Train/NN_Rd_Weights.csv")
 
 # Calculate the errors from the mean to the actual vaules.
 print("-"*200)

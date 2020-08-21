@@ -6,7 +6,7 @@ from sklearn.preprocessing import StandardScaler
 import pandas as pd
 from sklearn.metrics import mean_absolute_error, mean_squared_error
 import matplotlib.ticker as plticker
-import keras
+import time
 
 ########################################################################################################################
 # Get data and data preprocessing.
@@ -51,6 +51,9 @@ my_model = create_model(X_train, learning_rate)
 # Extract the loss per epoch to plot the learning progress.
 hist_list = pd.DataFrame()
 
+# Measure the time to train the model.
+start_time = time.time()
+
 tscv = TimeSeriesSplit()
 for train_index, test_index in tscv.split(X_train):
      X_train_split, X_test_split = X_train[train_index], X_train[test_index]
@@ -58,6 +61,8 @@ for train_index, test_index in tscv.split(X_train):
      X_train_split = np.reshape(X_train_split, (X_train_split.shape[0],X_train_split.shape[1],1))
      hist_split = train_model(my_model, X_train_split, y_train_split, number_of_epochs, batch_size)
      hist_list = hist_list.append(hist_split)
+
+elapsed_time = time.time() - start_time
 
 # Plot the loss per epoch.
 metric = "mean_absolute_error"
@@ -143,6 +148,8 @@ fig2.savefig("Load_Prediction/LSTM/Figures/DMST_Prediction.pdf", bbox_inches='ti
 # Save the results in a csv file.
 ########################################################################################################################
 
+pd.DataFrame({"LSTM_Time": [elapsed_time]}).to_csv("Compare_Models/Direct_Multi_Step_Results/Time_to_Train/LSTM.csv")
+
 df_errors = pd.DataFrame({"MSE_Train": [mean_squared_error(y_train,pred_train)],
                           "MAE_Train": [mean_absolute_error(y_train,pred_train)],
                           "RMSE_Train": [np.sqrt(mean_squared_error(y_train,pred_train))],
@@ -153,9 +160,6 @@ df_errors = pd.DataFrame({"MSE_Train": [mean_squared_error(y_train,pred_train)],
 df_errors.to_csv("Compare_Models/Direct_Multi_Step_Probability_Results/Probability_Based_on_Training/LSTM_error.csv")
 df_errors.to_csv("Compare_Models/Direct_Multi_Step_Results/LSTM.csv")
 
-df_pred_test = pd.DataFrame({"Test_Prediction":pred_test})
-df_pred_train = pd.DataFrame({"Train_Prediction":pred_train})
-df_pred_test.to_csv("Load_Prediction/LSTM/Direct_Multi_Step_Prediction/Pred_Test.csv")
-df_pred_train.to_csv("Load_Prediction/LSTM/Direct_Multi_Step_Prediction/Pred_Train.csv")
-
+pd.DataFrame({"Test_Prediction":pred_test}).to_csv("Load_Prediction/LSTM/Direct_Multi_Step_Prediction/Pred_Test.csv")
+pd.DataFrame({"Train_Prediction":pred_train}).to_csv("Load_Prediction/LSTM/Direct_Multi_Step_Prediction/Pred_Train.csv")
 

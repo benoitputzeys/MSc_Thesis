@@ -6,9 +6,7 @@ from sklearn.preprocessing import StandardScaler
 import pandas as pd
 from sklearn.metrics import mean_absolute_error, mean_squared_error
 import matplotlib.ticker as plticker
-import keras
-import datetime
-import matplotlib.dates as mdates
+import time
 
 ########################################################################################################################
 # Get data and data preprocessing.
@@ -42,31 +40,36 @@ y_train = y_scaler.fit_transform(y_train)
 # Create the model.
 ########################################################################################################################
 
-## Define the hyperparameters.
-#learning_rate = 0.001
-#number_of_epochs = 160
-#batch_size = 19
-#
-## Create the model.
-#my_model = create_model(7, learning_rate)
-#
-## Extract the loss per epoch to plot the learning progress.
-#hist_list = pd.DataFrame()
-#
-#tscv = TimeSeriesSplit()
-#for train_index, test_index in tscv.split(X_train):
-#     X_train_split, X_test_split = X_train[train_index], X_train[test_index]
-#     y_train_split, y_test_split = y_train[train_index], y_train[test_index]
-#     hist_split = train_model(my_model, X_train_split, y_train_split, number_of_epochs, batch_size)
-#     hist_list = hist_list.append(hist_split)
-#
-#my_model.save("Load_Prediction/ANN/Direct_Multi_Step_Prediction/DMST_ANN_Prediction.h5")
-#
-## Plot the loss per epoch.
-#metric = "mean_absolute_error"
-#plot_the_loss_curve(np.linspace(1,len(hist_list), len(hist_list) ), hist_list[metric])
+# Define the hyperparameters.
+learning_rate = 0.001
+number_of_epochs = 160
+batch_size = 19
 
-my_model = keras.models.load_model("Load_Prediction/ANN/Direct_Multi_Step_Prediction/DMST_ANN_Prediction.h5")
+# Create the model.
+my_model = create_model(7, learning_rate)
+
+# Extract the loss per epoch to plot the learning progress.
+hist_list = pd.DataFrame()
+
+# Measure the time to train the model.
+start_time = time.time()
+tscv = TimeSeriesSplit()
+
+for train_index, test_index in tscv.split(X_train):
+    X_train_split, X_test_split = X_train[train_index], X_train[test_index]
+    y_train_split, y_test_split = y_train[train_index], y_train[test_index]
+    hist_split = train_model(my_model, X_train_split, y_train_split, number_of_epochs, batch_size)
+    hist_list = hist_list.append(hist_split)
+
+elapsed_time = time.time() - start_time
+
+my_model.save("Load_Prediction/ANN/Direct_Multi_Step_Prediction/DMST_ANN_Prediction.h5")
+
+# Plot the loss per epoch.
+metric = "mean_absolute_error"
+plot_the_loss_curve(np.linspace(1,len(hist_list), len(hist_list) ), hist_list[metric])
+
+#my_model = keras.models.load_model("Load_Prediction/ANN/Direct_Multi_Step_Prediction/DMST_ANN_Prediction.h5")
 
 ########################################################################################################################
 # Predicting the generation.
@@ -151,6 +154,8 @@ fig2.savefig("Load_Prediction/ANN/Figures/DMST_Prediction.pdf", bbox_inches='tig
 ########################################################################################################################
 # Save the results in a csv file.
 ########################################################################################################################
+
+pd.DataFrame({"ANN_Time": [elapsed_time]}).to_csv("Compare_Models/Direct_Multi_Step_Results/Time_to_Train/ANN.csv")
 
 df_errors = pd.DataFrame({"MSE_Train": [mean_squared_error(y_train,pred_train)],
                           "MAE_Train": [mean_absolute_error(y_train,pred_train)],

@@ -7,6 +7,7 @@ from sklearn.metrics import mean_absolute_error, mean_squared_error
 import pandas as pd
 from pandas import DataFrame
 import matplotlib.ticker as plticker
+import time
 
 ########################################################################################################################
 # Get data and data preprocessing.
@@ -47,7 +48,11 @@ y_train = y_scaler.fit_transform(y_train)
 # Define the three parameters for the SVR: C, Epsilon and Gamme
 # With gamma = 'scale', SVR uses 1 / (n_features * X.var()) as value of gamma
 regressor = SVR(kernel = 'rbf', C = 1.0, epsilon = 0.1, gamma = 'scale')
+
+# Measure the time to train the model.
+start_time = time.time()
 regressor.fit(X_train, y_train)
+elapsed_time = time.time() - start_time
 
 ########################################################################################################################
 # Predicting the generation on the test set and inverse the scaling.
@@ -130,6 +135,8 @@ fig2.savefig("Load_Prediction/SVR/Figures/DMST_Prediction.pdf", bbox_inches='tig
 # Save the results in a csv file.
 ########################################################################################################################
 
+pd.DataFrame({"SVR_Time": [elapsed_time]}).to_csv("Compare_Models/Direct_Multi_Step_Results/Time_to_Train/SVR.csv")
+
 df_errors = pd.DataFrame({"MSE_Train": [mean_squared_error(y_train,pred_train)],
                           "MAE_Train": [mean_absolute_error(y_train,pred_train)],
                           "RMSE_Train": [np.sqrt(mean_squared_error(y_train,pred_train))],
@@ -140,7 +147,6 @@ df_errors = pd.DataFrame({"MSE_Train": [mean_squared_error(y_train,pred_train)],
 df_errors.to_csv("Compare_Models/Direct_Multi_Step_Probability_Results/Probability_Based_on_Training/SVR_error.csv")
 df_errors.to_csv("Compare_Models/Direct_Multi_Step_Results/SVR.csv")
 
-df_pred_test = pd.DataFrame({"Test_Prediction":pred_test})
-df_pred_train = pd.DataFrame({"Train_Prediction":pred_train})
-df_pred_test.to_csv("Load_Prediction/SVR/Direct_Multi_Step_Prediction/Pred_Test.csv")
-df_pred_train.to_csv("Load_Prediction/SVR/Direct_Multi_Step_Prediction/Pred_Train.csv")
+pd.DataFrame({"Test_Prediction":pred_test}).to_csv("Load_Prediction/SVR/Direct_Multi_Step_Prediction/Pred_Test.csv")
+pd.DataFrame({"Train_Prediction":pred_train}).to_csv("Load_Prediction/SVR/Direct_Multi_Step_Prediction/Pred_Train.csv")
+

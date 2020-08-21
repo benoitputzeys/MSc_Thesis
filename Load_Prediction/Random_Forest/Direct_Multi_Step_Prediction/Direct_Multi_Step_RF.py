@@ -7,6 +7,7 @@ from sklearn.metrics import mean_absolute_error, mean_squared_error
 import pandas as pd
 from pandas import DataFrame
 import matplotlib.ticker as plticker
+import time
 
 ########################################################################################################################
 # Get data and data preprocessing.
@@ -45,7 +46,11 @@ y_train = y_scaler.fit_transform(y_train)
 
 # Fit the Random Forest to our data
 regressor = RandomForestRegressor(n_estimators=100, random_state=0, max_depth=7)
+
+# Measure the time to train the model.
+start_time = time.time()
 regressor.fit(X_train, y_train)
+elapsed_time = time.time() - start_time
 
 ########################################################################################################################
 # Predicting the generation on the test set and inverse the scaling.
@@ -124,6 +129,8 @@ fig2.savefig("Load_Prediction/Random_Forest/Figures/DMST_Prediction.pdf", bbox_i
 # Save the results in a csv file.
 ########################################################################################################################
 
+pd.DataFrame({"RF_Time": [elapsed_time]}).to_csv("Compare_Models/Direct_Multi_Step_Results/Time_to_Train/RF.csv")
+
 df_errors = pd.DataFrame({"MSE_Train": [mean_squared_error(y_train,pred_train)],
                           "MAE_Train": [mean_absolute_error(y_train,pred_train)],
                           "RMSE_Train": [np.sqrt(mean_squared_error(y_train,pred_train))],
@@ -134,7 +141,6 @@ df_errors = pd.DataFrame({"MSE_Train": [mean_squared_error(y_train,pred_train)],
 df_errors.to_csv("Compare_Models/Direct_Multi_Step_Probability_Results/Probability_Based_on_Training/RF_error.csv")
 df_errors.to_csv("Compare_Models/Direct_Multi_Step_Results/RF.csv")
 
-df_pred_test = pd.DataFrame({"Test_Prediction":pred_test})
-df_pred_train = pd.DataFrame({"Train_Prediction":pred_train})
-df_pred_test.to_csv("Load_Prediction/Random_Forest/Direct_Multi_Step_Prediction/Pred_Test.csv")
-df_pred_train.to_csv("Load_Prediction/Random_Forest/Direct_Multi_Step_Prediction/Pred_Train.csv")
+pd.DataFrame({"Test_Prediction":pred_test}).to_csv("Load_Prediction/Random_Forest/Direct_Multi_Step_Prediction/Pred_Test.csv")
+pd.DataFrame({"Train_Prediction":pred_train}).to_csv("Load_Prediction/Random_Forest/Direct_Multi_Step_Prediction/Pred_Train.csv")
+
