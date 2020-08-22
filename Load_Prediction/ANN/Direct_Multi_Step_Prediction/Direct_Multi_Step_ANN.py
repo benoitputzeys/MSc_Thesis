@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split, TimeSeriesSplit
-from Load_Prediction.ANN.Functions_ANN import plot_the_loss_curve, train_model, create_model, plot_prediction_zoomed_in
+from Load_Prediction.ANN.Functions_ANN import train_model, create_model
 from sklearn.preprocessing import StandardScaler
 import pandas as pd
 from sklearn.metrics import mean_absolute_error, mean_squared_error
@@ -42,8 +42,8 @@ y_train = y_scaler.fit_transform(y_train)
 
 # Define the hyperparameters.
 learning_rate = 0.001
-number_of_epochs = 160
-batch_size = 19
+number_of_epochs = 100
+batch_size = 29
 
 # Create the model.
 my_model = create_model(7, learning_rate)
@@ -63,12 +63,20 @@ for train_index, test_index in tscv.split(X_train):
 
 elapsed_time = time.time() - start_time
 
-my_model.save("Load_Prediction/ANN/Direct_Multi_Step_Prediction/DMST_ANN_Prediction.h5")
-
 # Plot the loss per epoch.
 metric = "mean_absolute_error"
-plot_the_loss_curve(np.linspace(1,len(hist_list), len(hist_list) ), hist_list[metric])
+x_axis = np.linspace(1,len(hist_list),len(hist_list))
 
+fig, axs = plt.subplots(1, 1, figsize=(10, 6))
+axs.plot(x_axis, hist_list['mean_absolute_error'], color = "blue")
+axs.set_xlabel('Epoch')
+axs.set_ylabel('Loss')
+axs.legend(['Training set'])
+axs.grid(True)
+fig.show()
+fig.savefig("Load_Prediction/ANN/Figures/ANN_Loss.pdf", bbox_inches='tight')
+
+my_model.save("Load_Prediction/ANN/Direct_Multi_Step_Prediction/DMST_ANN_Prediction.h5")
 #my_model = keras.models.load_model("Load_Prediction/ANN/Direct_Multi_Step_Prediction/DMST_ANN_Prediction.h5")
 
 ########################################################################################################################
@@ -167,9 +175,6 @@ df_errors = pd.DataFrame({"MSE_Train": [mean_squared_error(y_train,pred_train)],
 df_errors.to_csv("Compare_Models/Direct_Multi_Step_Probability_Results/Probability_Based_on_Training/NN_error.csv")
 df_errors.to_csv("Compare_Models/Direct_Multi_Step_Results/ANN.csv")
 
-df_pred_test = pd.DataFrame({"Test_Prediction":pred_test})
-df_pred_train = pd.DataFrame({"Train_Prediction":pred_train})
-df_pred_test.to_csv("Load_Prediction/ANN/Direct_Multi_Step_Prediction/Pred_Test.csv")
-df_pred_train.to_csv("Load_Prediction/ANN/Direct_Multi_Step_Prediction/Pred_Train.csv")
-
+pd.DataFrame({"Test_Prediction":pred_test}).to_csv("Load_Prediction/ANN/Direct_Multi_Step_Prediction/Pred_Test.csv")
+pd.DataFrame({"Train_Prediction":pred_train}).to_csv("Load_Prediction/ANN/Direct_Multi_Step_Prediction/Pred_Train.csv")
 

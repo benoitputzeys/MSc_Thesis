@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split, TimeSeriesSplit
-from Load_Prediction.LSTM.Functions_LSTM import plot_the_loss_curve, train_model, create_model, plot_generation, plot_prediction_zoomed_in
+from Load_Prediction.LSTM.Functions_LSTM import  train_model, create_model
 from sklearn.preprocessing import StandardScaler
 import pandas as pd
 from sklearn.metrics import mean_absolute_error, mean_squared_error
@@ -66,7 +66,16 @@ elapsed_time = time.time() - start_time
 
 # Plot the loss per epoch.
 metric = "mean_absolute_error"
-plot_the_loss_curve(np.linspace(1,len(hist_list), len(hist_list) ), hist_list[metric])
+x_axis = np.linspace(1,len(hist_list),len(hist_list))
+
+fig, axs = plt.subplots(1, 1, figsize=(10, 6))
+axs.plot(x_axis, hist_list['mean_absolute_error'], color = "blue")
+axs.set_xlabel('Epoch')
+axs.set_ylabel('Loss')
+axs.legend(['Training set'])
+axs.grid(True)
+fig.show()
+fig.savefig("Load_Prediction/LSTM/Figures/LSTM_Loss.pdf", bbox_inches='tight')
 
 my_model.save("Load_Prediction/LSTM/Direct_Multi_Step_Prediction/DMST_LSTM_Prediction.h5")
 #my_model = keras.models.load_model("Load_Prediction/LSTM/Direct_Multi_Step_Prediction/DMST_LSTM_Prediction.h5")
