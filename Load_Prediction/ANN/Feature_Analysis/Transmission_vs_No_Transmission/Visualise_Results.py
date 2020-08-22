@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 ########################################################################################################################
 
 # Load the results in respective variables.
-F6_No_Transmission = pd.read_csv("Load_Prediction\ANN\Feature_Analysis\Transmission_vs_No_Transmission\F6_(No_Transmission).csv")
+F6_No_Transmission = pd.read_csv("Load_Prediction/ANN/Feature_Analysis/Transmission_vs_No_Transmission/F6_(No_Transmission).csv")
 F7 = pd.read_csv("Load_Prediction/ANN/Feature_Analysis/F7.csv")
 
 # Load the results in a dataframe.
