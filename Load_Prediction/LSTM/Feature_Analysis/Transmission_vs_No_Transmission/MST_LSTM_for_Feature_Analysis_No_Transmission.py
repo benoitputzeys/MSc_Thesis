@@ -16,7 +16,11 @@ import keras
 X = pd.read_csv('Data_Preprocessing/For_336_SP_Step_Prediction/X.csv', delimiter=',')
 X = X.set_index("Time")
 dates = X.iloc[:,-1]
-X = X.iloc[:,:-1]
+X = X.iloc[:,:-6]
+
+X = pd.DataFrame(X)
+X = X.drop(["Transmission_Past"], axis = 1)
+X = np.array(X)
 
 y = pd.read_csv('Data_Preprocessing/For_336_SP_Step_Prediction/y.csv', delimiter=',')
 y = y.set_index("Time")
@@ -43,8 +47,6 @@ y_train = y_scaler.fit_transform(y_train)
 ########################################################################################################################
 # Create the model.
 ########################################################################################################################
-
-#Different models have to be used to visualise the impact of different features.
 
 # Define the hyperparameters.
 learning_rate = 0.005
@@ -77,21 +79,8 @@ axs.legend(['Training set'])
 axs.grid(True)
 fig.show()
 
-my_model.save("Load_Prediction/LSTM/Feature_Analysis/Models/DMST_LSTM_F7_SP_DoW_D_M_Y.h5")
-
-
-#Different models have to be used to visualise the impact of the different features.
-#Here are all the trained models to analyse the impact of leaving Date-related features out.
-#DMST_LSTM_F7 means all 7 features are used DMST_LSTM_F7_SP means all 7 features are used PLUS the SP as well
-#DMST_LSTM_F7_SP_DoW means all 7 features PLUS the SP PLUS the Day of the Week
-
-#my_model = keras.models.load_model("Load_Prediction/LSTM/Feature_Analysis/Models/DMST_LSTM_F7.h5")
-#my_model = keras.models.load_model("Load_Prediction/LSTM/Feature_Analysis/Models/DMST_LSTM_F7_SP.h5")
-#my_model = keras.models.load_model("Load_Prediction/LSTM/Feature_Analysis/Models/DMST_LSTM_F7_SP_DoW.h5")
-#my_model = keras.models.load_model("Load_Prediction/LSTM/Feature_Analysis/Models/DMST_LSTM_F7_SP_DoW_D.h5")
-#my_model = keras.models.load_model("Load_Prediction/LSTM/Feature_Analysis/Models/DMST_LSTM_F7_SP_DoW_D_M.h5")
-#my_model = keras.models.load_model("Load_Prediction/LSTM/Feature_Analysis/Models/DMST_LSTM_F7_SP_DoW_D_M_Y.h5")
-
+my_model.save("Load_Prediction/LSTM/Feature_Analysis/DMST_LSTM_model_No_Transmission.h5")
+#my_model = keras.models.load_model("Load_Prediction/LSTM/Reature_Analysis/DMST_LSTM_model_No_Transmission.h5")
 
 ########################################################################################################################
 # Predicting the generation.
@@ -111,7 +100,8 @@ y_test = np.array(y_test.iloc[:,-1]).reshape(-1,)
 # Data processing for plotting curves and printing the errors.
 ########################################################################################################################
 
-# Compute the error between the actual generation and the prediction from the LSTM
+# Compute the error between the Actual Generation and the prediction from the NN
+
 print("-"*200)
 error_train = (result_train - y_train)
 print("The mean absolute error of the train set is %0.2f" % mean_absolute_error(y_train,result_train))
@@ -130,10 +120,10 @@ print("-"*200)
 ########################################################################################################################
 
 import csv
-with open('Load_Prediction/LSTM/Feature_Analysis/F7_SP_DoW_D_M_Y.csv', 'w', newline='',) as file:
+with open('Load_Prediction/LSTM/Feature_Analysis/F6_(No_Transmission).csv', 'w', newline='',) as file:
     writer = csv.writer(file)
     writer.writerow(["Method","MSE","MAE","RMSE"])
-    writer.writerow(["F7_SP_DoW_D_M_Y",
+    writer.writerow(["F6_(No_Transmission)",
                      str(mean_squared_error(y_test,result_test)),
                      str(mean_absolute_error(y_test,result_test)),
                      str(np.sqrt(mean_squared_error(y_test,result_test)))
