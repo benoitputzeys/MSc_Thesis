@@ -42,7 +42,7 @@ y_train = y_scaler.fit_transform(y_train)
 
 epochs = 800
 learning_rate = 0.001
-batches = 19
+batches = 29
 # Build the model.
 model = build_model(X_train.shape[1],learning_rate)
 
