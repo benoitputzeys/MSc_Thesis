@@ -64,7 +64,7 @@ elapsed_time = time.time() - start_time
 model.summary()
 
 # Plot the learning progress.
-fig1, axs1=plt.subplots(1,1,figsize=(4,4))
+fig1, axs1=plt.subplots(1,1,figsize=(12,10))
 axs1.plot(model.history.history["mean_absolute_error"], color = "blue")
 axs1.set_ylabel('Loss')
 axs1.set_xlabel('Epochs')
@@ -72,8 +72,8 @@ axs1.grid(True)
 fig1.show()
 fig1.savefig("TF_Probability/NN_Random_Weights/Figures/Loss_Epochs.pdf", bbox_inches='tight')
 
-# Save or load the model
-model.save("TF_Probability/NN_Random_Weights/DMST_NN_w_Rd_Weights.h5")
+# Save or load the model, somehow does not work
+#model.save("TF_Probability/NN_Random_Weights/DMST_NN_w_Rd_Weights.h5")
 #model = keras.models.load_model("TF_Probability/NN_Random_Weights/DMST_NN_w_Rd_Weights.h5")
 
 ########################################################################################################################
@@ -98,7 +98,7 @@ y_train = (y_scaler.inverse_transform(y_train)/1000).reshape(-1,)
 y_test = np.array(y_test.iloc[:,-1]/1000).reshape(-1,)
 
 ########################################################################################################################
-# Data processing for plotting curves and printing the errors.
+# Data processing for plotting curves and printing the errors. TRAINING SET.
 ########################################################################################################################
 
 # Calculate the stddev from the 350 predictions.
@@ -149,7 +149,7 @@ fig2.show()
 fig2.savefig("TF_Probability/NN_Random_Weights/Figures/DMST_Train_Set_Pred.pdf", bbox_inches='tight')
 
 ########################################################################################################################
-# Calculate the stddev from the 350 predictions.
+# Calculate the stddev from the 350 predictions. TESTING SET
 ########################################################################################################################
 
 mean_test = (sum(predictions_test)/350).reshape(-1,1)
@@ -160,6 +160,27 @@ for i in range (len(X_test)):
 error_test = mean_test.reshape(-1,) - y_test
 error_test_plot = np.zeros((48*3+48*7+1,1))
 error_test_plot[-336:] = error_test[:48*7].reshape(-1,1)
+
+# Plot the result with the truth in blue and the predictions in orange.
+fig33, axs33=plt.subplots(1,1,figsize=(12,6))
+axs33.plot(dates.iloc[-len(X_test):-len(X_test)+48*7], predictions_test[:1,:336].T, label = "Prediction samples", alpha = 0.3, color = "orange")
+axs33.plot(dates.iloc[-len(X_test):-len(X_test)+48*7], predictions_test[1:10,:336].T, alpha = 0.3, color = "orange")
+axs33.plot(dates.iloc[-len(X_test):-len(X_test)+48*7+1],y_test[:48*7+1], label = "Test Set", color = "black")
+axs33.set_ylabel('Load, GW', size = 14)
+axs33.set_xlabel('2019',size = 14)
+# Include additional details such as tick intervals
+loc = plticker.MultipleLocator(base=48) # Puts ticks at regular intervals
+axs33.xaxis.set_major_locator(loc),
+axs33.grid(True)
+axs33.tick_params(axis='both', labelsize=12)
+fig33.autofmt_xdate(rotation = 0)
+axs33.legend(loc = (1.02, 0.9))
+plt.xticks(np.arange(1,338, 48), ["14:00\n07/25","14:00\n07/26","14:00\n07/27",
+                                  "14:00\n07/28","14:00\n07/29","14:00\n07/30",
+                                  "14:00\n07/31","14:00\n08/01"])
+fig33.show()
+fig33.savefig("TF_Probability/NN_Random_Weights/Figures/DMST_Sample_Multiple_Predictions.pdf", bbox_inches='tight')
+
 
 # Plot the result with the truth in blue and the predictions in orange.
 fig3, axs3=plt.subplots(2,1,figsize=(12,6))
@@ -185,7 +206,7 @@ axs3[1].plot(dates.iloc[-len(X_test)-48*3:-len(X_test)+48*7+1],
              error_test_plot,
              label = "Error", color = "red")
 axs3[1].axvline(dates.iloc[-len(X_test)], linestyle="--", color = "black")
-axs3[1].set_xlabel('Date (2019)',size = 14)
+axs3[1].set_xlabel('2019',size = 14)
 axs3[1].set_ylabel('Error, GW',size = 14)
 
 # Include additional details such as tick intervals
