@@ -45,7 +45,7 @@ y_train = y_scaler.fit_transform(y_train)
 ########################################################################################################################
 
 # Fit the Decision Tree to our data
-regressor = DecisionTreeRegressor(random_state = 0)
+regressor = DecisionTreeRegressor(random_state = 0, max_depth=7)
 regressor.fit(X_train, y_train)
 
 ########################################################################################################################
@@ -54,27 +54,28 @@ regressor.fit(X_train, y_train)
 
 # Multi-Step prediction
 X_future_features = pd.DataFrame(data=X_train_unscaled.iloc[-335:,:].values,  columns=["0","1","2","3","4","5"])
-result_future = y_scaler.inverse_transform(y_train[-2:])
+result_future = y_scaler.inverse_transform(y_train[-1:])
 
 for i in range(0,48*7):
 
-    prev_value = result_future[-2]
+    prev_value = result_future[-1]
     new_row = [[prev_value[0], 0, 0, 0, 0, 0]]
     new_row = DataFrame(new_row, columns=["0","1","2","3","4","5"])
 
     X_future_features = pd.concat([X_future_features,new_row])
     rolling_mean_10 = X_future_features["0"].rolling(window=10).mean().values[-1]
-    rolling_mean_50 = X_future_features["0"].rolling(window=50).mean().values[-1]
+    rolling_mean_48 = X_future_features["0"].rolling(window=48).mean().values[-1]
     rolling_mean_336 = X_future_features["0"].rolling(window=336).mean().values[-1]
-    exp_20 = X_future_features["0"].ewm(span=20, adjust=False).mean().values[-1]
-    exp_50 = X_future_features["0"].ewm(span=50, adjust=False).mean().values[-1]
+    exp_10 = X_future_features["0"].ewm(span=10, adjust=False).mean().values[-1]
+    exp_48 = X_future_features["0"].ewm(span=48, adjust=False).mean().values[-1]
 
     update_row = [[prev_value,
                    rolling_mean_10,
-                   rolling_mean_50,
+                   rolling_mean_48,
                    rolling_mean_336,
-                   exp_20,
-                   exp_50,
+                   exp_10,
+                   exp_48,
+                   #X_test_unscaled.iloc[i, -1]
                    ]]
 
     update_row = DataFrame(update_row, columns=["0","1","2","3","4","5"])
@@ -83,7 +84,7 @@ for i in range(0,48*7):
     result_future = np.append(result_future, y_scaler.inverse_transform(regressor.predict(x_scaler.transform(update_row).reshape(1,6))))
     result_future = np.reshape(result_future,(-1,1))
 
-result_future = result_future[2:]/1000
+result_future = result_future[1:]/1000
 
 ########################################################################################################################
 # Inverse the scaling.
@@ -119,7 +120,7 @@ axs2[0].plot(dates.iloc[-len(X_test)-48*3:-len(X_test)],
              label = "Training Set", alpha = 1, color = "blue")
 axs2[0].plot(dates.iloc[-len(X_test):-len(X_test)+48*7],
              result_future[:48*7,0],
-             label = "DT Recursive\nPrediction", color = "orange")
+             label = "DT Iterative\nPrediction no SP", color = "orange")
 axs2[0].plot(dates.iloc[-len(X_test):-len(X_test)+48*7],
              y_test[:48*7],
              label = "Test Set", alpha = 1, color = "black")
@@ -147,7 +148,7 @@ plt.xticks(np.arange(1,482, 48), ["14:00\n07/22","14:00\n07/23","14:00\n07/24",
                                   "14:00\n07/31","14:00\n08/01"])
 
 fig2.show()
-fig2.savefig("Load_Prediction/Decision_Tree/Figures/Recursive_Prediction_No_SP.pdf", bbox_inches='tight')
+fig2.savefig("Load_Prediction/Decision_Tree/Figures/Iterative_Prediction_no_SP.pdf", bbox_inches='tight')
 
 ########################################################################################################################
 # Results for recursive prediction are not saved because in general they yield poor results.

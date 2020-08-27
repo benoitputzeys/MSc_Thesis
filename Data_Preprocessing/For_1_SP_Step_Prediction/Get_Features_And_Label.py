@@ -55,8 +55,8 @@ X.iloc[:,:-1] = replace_nan.transform(X.iloc[:,:-1])
 
 y = pd.DataFrame({"Load": df.iloc[:,1]})
 
-X.to_csv("Data_Preprocessing/For_2_SP_Step_Prediction/X.csv")
-y.to_csv("Data_Preprocessing/For_2_SP_Step_Prediction/y.csv")
+X.to_csv("Data_Preprocessing/For_1_SP_Step_Prediction/X.csv")
+y.to_csv("Data_Preprocessing/For_1_SP_Step_Prediction/y.csv")
 
 #
 # plt.plot(X[:,0], label='Electricity Generation 2 SP ago', linewidth=0.5 )

@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split, TimeSeriesSplit
-from Load_Prediction.LSTM.Functions_LSTM import plot_the_loss_curve, train_model, create_model, plot_generation, plot_prediction_zoomed_in
+from Load_Prediction.LSTM.Functions_LSTM import train_model, create_model
 from sklearn.preprocessing import StandardScaler
 import pandas as pd
 from sklearn.metrics import mean_absolute_error, mean_squared_error
@@ -61,10 +61,6 @@ for train_index, test_index in tscv.split(X_train):
 
 my_model.save("Load_Prediction/LSTM/Iterative_Prediction/SST_No_Trans_No_Date.h5")
 
-# Plot the loss per epoch.
-metric = "mean_absolute_error"
-plot_the_loss_curve(np.linspace(1,len(hist_list), len(hist_list) ), hist_list[metric], metric)
-
 #my_model = keras.models.load_model("SST_No_Trans_No_Date.h5")
 
 ########################################################################################################################
@@ -115,7 +111,8 @@ axs2[0].plot(dates.iloc[-len(X_test):-len(X_test)+48*7],
              y_test[:48*7],
              label = "Test Set", alpha = 1, color = "black")
 axs2[0].axvline(dates.iloc[-len(X_test)], linestyle="--", color = "black")
-axs2[0].set_ylabel('Load [GW]',size = 14)
+axs2[0].set_ylabel('Load, GW',size = 14)
+axs2[0].plot(30,30, label = 'Error, GW')
 loc = plticker.MultipleLocator(base=47) # this locator puts ticks at regular intervals
 
 axs2[1].grid(True)
@@ -124,28 +121,15 @@ axs2[1].plot(dates.iloc[-len(X_test)-48*3:-len(X_test)+48*7],
              label = "Error", alpha = 1, color = "red")
 axs2[1].axvline(dates.iloc[-len(X_test)], linestyle="--", color = "black")
 axs2[1].set_xlabel('Date',size = 14)
-axs2[1].set_ylabel('Error [GW]',size = 14)
+axs2[1].set_ylabel('Error, GW',size = 14)
 
 loc = plticker.MultipleLocator(base=47) # this locator puts ticks at regular intervals
 axs2[1].xaxis.set_major_locator(loc)
 axs2[0].xaxis.set_major_locator(loc)
 fig2.autofmt_xdate(rotation=10)
-axs2[1].legend(loc=(1.04,0.9))
-axs2[0].legend(loc=(1.04,0.7))
-
+axs2[1].legend(loc=(1.02,0.9))
 fig2.show()
 
 # ########################################################################################################################
 # # Save the results in a csv file.
 # ########################################################################################################################
-#
-# import csv
-# with open('Compare_Models/Single_Step_Results/LSTM_result.csv', 'w', newline='', ) as file:
-#     writer = csv.writer(file)
-#     writer.writerow(["Method","MSE","MAE","RMSE"])
-#     writer.writerow(["LSTM",
-#                      str(mean_squared_error(y_scaler.inverse_transform(y_test),result_test)),
-#                      str(mean_absolute_error(y_scaler.inverse_transform(y_test),result_test)),
-#                      str(np.sqrt(mean_squared_error(y_scaler.inverse_transform(y_test),result_test)))
-#                      ])
-
