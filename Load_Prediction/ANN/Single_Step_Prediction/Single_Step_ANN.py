@@ -79,8 +79,8 @@ axs.grid(True)
 fig.show()
 
 # Save the model.
-my_model.save("Load_Prediction/ANN/Single_Step_Prediction/SST_ANN.h5")
-#my_model = keras.models.load_model("Load_Prediction/ANN/Single_Step_Prediction/SST_ANN.h5")
+my_model.save("Load_Prediction/ANN/Single_Step_Prediction/Single_Step_ANN_Model.h5")
+#my_model = keras.models.load_model("Load_Prediction/ANN/Single_Step_Prediction/Single_Step_ANN_Model.h5")
 
 ########################################################################################################################
 # Predicting the load and divide by 1000 to express everything in GW.

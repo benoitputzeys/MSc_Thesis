@@ -17,12 +17,13 @@ X = pd.read_csv('Data_Preprocessing/For_336_SP_Step_Prediction/X.csv', delimiter
 X = X.set_index("Time")
 dates = X.iloc[:,-1]
 X = X.iloc[:,:-6]
-
 y = pd.read_csv('Data_Preprocessing/For_336_SP_Step_Prediction/y.csv', delimiter=',')
 y = y.set_index("Time")
 
+# Divide the data into training set (80%) and test set (20%).
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state = 0, shuffle = False)
 
+# Only use half the data for the training and test sets according to the findings in the thesis.
 X_train = X_train[int(len(X_train)*1/2):]
 X_test = X_test[:int(len(X_test)*1/2)]
 y_train = y_train[int(len(y_train)*1/2):]
@@ -48,12 +49,13 @@ batch_size = 19
 # Create the model.
 my_model = create_model(X_train, learning_rate)
 
-# Extract the loss per epoch to plot the learning progress.
+# Create a data frame to extract the loss per epoch to plot the learning progress.
 hist_list = pd.DataFrame()
 
 # Measure the time to train the model.
 start_time = time.time()
 
+# Perform 5-fold cross validation
 tscv = TimeSeriesSplit()
 for train_index, test_index in tscv.split(X_train):
      X_train_split, X_test_split = X_train[train_index], X_train[test_index]
@@ -78,11 +80,12 @@ axs.grid(True)
 fig.show()
 fig.savefig("Load_Prediction/LSTM/Figures/LSTM_Loss.pdf", bbox_inches='tight')
 
+# Load or save the model.
 my_model.save("Load_Prediction/LSTM/Direct_Multi_Step_Prediction/DMST_LSTM_Prediction.h5")
 #my_model = keras.models.load_model("Load_Prediction/LSTM/Direct_Multi_Step_Prediction/DMST_LSTM_Prediction.h5")
 
 ########################################################################################################################
-# Predicting the generation.
+# Predicting the generation. Divide by 1000 to express everything in GW.
 ########################################################################################################################
 
 pred_train = y_scaler.inverse_transform(my_model.predict(np.reshape(X_train, (X_train.shape[0],X_train.shape[1],1))))/1000
@@ -114,12 +117,14 @@ print("The root mean squared error of the test set is %0.2f" % np.sqrt(mean_squa
 print("-"*200)
 
 ########################################################################################################################
-# Plotting curves.
+# Plotting predicted electricity loads.
 ########################################################################################################################
 
+# Create a column vector that contains the error between the prediction and the values of the test set.
 error_test_plot = np.zeros((48*3+48*7,1))
 error_test_plot[-336:] = error_test[:48*7].reshape(-1,1)
-# Plot the result with the truth in red and the predictions in blue.
+
+# Plot the result with the training data in blue and the test data in black. Predictions are shown in orange.
 fig2, axs2=plt.subplots(2,1,figsize=(12,6))
 axs2[0].plot(dates.iloc[-len(X_test)-48*3:-len(X_test)],
              y_train[-48*3:],
@@ -134,6 +139,7 @@ axs2[0].axvline(dates.iloc[-len(X_test)], linestyle="--", color = "black")
 axs2[0].set_ylabel('Load, GW',size = 14)
 axs2[0].plot(30,30,label = "Error", color = "red")
 
+# Second plot contains the errors in red.
 axs2[1].plot(dates.iloc[-len(X_test)-48*3:-len(X_test)+48*7],
              error_test_plot,
              label = "Error", alpha = 1, color = "red")
@@ -152,6 +158,7 @@ plt.xticks(np.arange(1,482, 48), ["14:00\n07/22","14:00\n07/23","14:00\n07/24",
                                   "14:00\n07/28","14:00\n07/29","14:00\n07/30",
                                   "14:00\n07/31","14:00\n08/01"])
 fig2.show()
+# Save the figure.
 fig2.savefig("Load_Prediction/LSTM/Figures/DMST_Prediction.pdf", bbox_inches='tight')
 
 ########################################################################################################################

@@ -17,16 +17,17 @@ X = pd.read_csv('Data_Preprocessing/For_336_SP_Step_Prediction/X.csv', delimiter
 X = X.set_index("Time")
 dates = X.iloc[:,-1]
 X = X.iloc[:,:-5]
-
 y = pd.read_csv('Data_Preprocessing/For_336_SP_Step_Prediction/y.csv', delimiter=',')
 y = y.set_index("Time")
 
+# Divide that data into 80% training set and 20% test set.
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state = 0, shuffle = False)
 
 # Save the unscaled data for later for data representation.
 X_test_unscaled = X_test
 X_train_unscaled = X_train
 
+# Only use half the training data and the test data.
 X_train = X_train[int(len(X_train)*1/2):]
 X_test = X_test[:int(len(X_test)*1/2)]
 y_train = y_train[int(len(y_train)*1/2):]
@@ -79,7 +80,7 @@ y_train = y_scaler.fit_transform(y_train)
 #Different models have to be used to visualise the impact of the different features.
 #Here are all the trained models to analyse the impact of leaving Date-related features out.
 #DMST_ANN_F7 means all 7 features are used DMST_ANN_F7_SP means all 7 features are used PLUS the SP as well
-#DMST_ANN_F7_SP_DoW means all 7 features PLUS the SP PLUS the Day of the Week
+#DMST_ANN_F7_SP_DoW means all 7 features PLUS the SP PLUS the Day of the Week etc.
 
 my_model = keras.models.load_model("Load_Prediction/ANN/Feature_Analysis/Models/DMST_ANN_F7.h5")
 #my_model = keras.models.load_model("Load_Prediction/ANN/Feature_Analysis/Models/DMST_ANN_F7_SP.h5")

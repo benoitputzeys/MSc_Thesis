@@ -17,16 +17,17 @@ X = pd.read_csv('Data_Preprocessing/For_336_SP_Step_Prediction/X.csv', delimiter
 X = X.set_index("Time")
 dates = X.iloc[:,-1]
 X = X.iloc[:,:-1]
-
 y = pd.read_csv('Data_Preprocessing/For_336_SP_Step_Prediction/y.csv', delimiter=',')
 y = y.set_index("Time")
 
+# Partition the data into training set (80%) and test set (20%).
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state = 0, shuffle = False)
 
 # Save the unscaled data for later for data representation.
 X_test_unscaled = X_test
 X_train_unscaled = X_train
 
+# Only take half the training data and half the test data.
 X_train = X_train[int(len(X_train)*1/2):]
 X_test = X_test[:int(len(X_test)*1/2)]
 y_train = y_train[int(len(y_train)*1/2):]
@@ -44,40 +45,42 @@ y_train = y_scaler.fit_transform(y_train)
 # Create the model.
 ########################################################################################################################
 
-#Different models have to be used to visualise the impact of different features.
-
-# Define the hyperparameters.
-learning_rate = 0.005
-number_of_epochs = 40
-batch_size = 19
-
-# Create the model.
-my_model = create_model(X_train, learning_rate)
-
-# Extract the loss per epoch to plot the learning progress.
-hist_list = pd.DataFrame()
-
-tscv = TimeSeriesSplit()
-for train_index, test_index in tscv.split(X_train):
-     X_train_split, X_test_split = X_train[train_index], X_train[test_index]
-     y_train_split, y_test_split = y_train[train_index], y_train[test_index]
-     X_train_split = np.reshape(X_train_split, (X_train_split.shape[0],X_train_split.shape[1],1))
-     hist_split = train_model(my_model, X_train_split, y_train_split, number_of_epochs, batch_size)
-     hist_list = hist_list.append(hist_split)
-
-# Plot the loss per epoch.
-metric = "mean_absolute_error"
-x_axis = np.linspace(1,len(hist_list),len(hist_list))
-
-fig, axs = plt.subplots(1, 1, figsize=(10, 6))
-axs.plot(x_axis, hist_list['mean_absolute_error'], color = "blue")
-axs.set_xlabel('Epoch')
-axs.set_ylabel('Loss')
-axs.legend(['Training set'])
-axs.grid(True)
-fig.show()
-
-my_model.save("Load_Prediction/LSTM/Feature_Analysis/Models/DMST_LSTM_F7_SP_DoW_D_M_Y.h5")
+##Different models have to be used to visualise the impact of different features.
+#
+## Define the hyperparameters.
+#learning_rate = 0.005
+#number_of_epochs = 40
+#batch_size = 19
+#
+## Create the model.
+#my_model = create_model(X_train, learning_rate)
+#
+## Extract the loss per epoch to plot the learning progress.
+#hist_list = pd.DataFrame()
+#
+## Perfirm 5-fold cross validation
+#tscv = TimeSeriesSplit()
+#for train_index, test_index in tscv.split(X_train):
+#     X_train_split, X_test_split = X_train[train_index], X_train[test_index]
+#     y_train_split, y_test_split = y_train[train_index], y_train[test_index]
+#     X_train_split = np.reshape(X_train_split, (X_train_split.shape[0],X_train_split.shape[1],1))
+#     hist_split = train_model(my_model, X_train_split, y_train_split, number_of_epochs, batch_size)
+#     hist_list = hist_list.append(hist_split)
+#
+## Plot the loss per epoch.
+#metric = "mean_absolute_error"
+#x_axis = np.linspace(1,len(hist_list),len(hist_list))
+#
+#fig, axs = plt.subplots(1, 1, figsize=(10, 6))
+#axs.plot(x_axis, hist_list['mean_absolute_error'], color = "blue")
+#axs.set_xlabel('Epoch')
+#axs.set_ylabel('Loss')
+#axs.legend(['Training set'])
+#axs.grid(True)
+#fig.show()
+#
+## Save the model.
+#my_model.save("Load_Prediction/LSTM/Feature_Analysis/Models/DMST_LSTM_F7_SP_DoW_D_M_Y.h5")
 
 
 #Different models have to be used to visualise the impact of the different features.
@@ -90,11 +93,11 @@ my_model.save("Load_Prediction/LSTM/Feature_Analysis/Models/DMST_LSTM_F7_SP_DoW_
 #my_model = keras.models.load_model("Load_Prediction/LSTM/Feature_Analysis/Models/DMST_LSTM_F7_SP_DoW.h5")
 #my_model = keras.models.load_model("Load_Prediction/LSTM/Feature_Analysis/Models/DMST_LSTM_F7_SP_DoW_D.h5")
 #my_model = keras.models.load_model("Load_Prediction/LSTM/Feature_Analysis/Models/DMST_LSTM_F7_SP_DoW_D_M.h5")
-#my_model = keras.models.load_model("Load_Prediction/LSTM/Feature_Analysis/Models/DMST_LSTM_F7_SP_DoW_D_M_Y.h5")
+my_model = keras.models.load_model("Load_Prediction/LSTM/Feature_Analysis/Models/DMST_LSTM_F7_SP_DoW_D_M_Y.h5")
 
 
 ########################################################################################################################
-# Predicting the generation.
+# Predicting the electricity load.
 ########################################################################################################################
 
 result_train = y_scaler.inverse_transform(my_model.predict(np.reshape(X_train, (X_train.shape[0],X_train.shape[1],1))))

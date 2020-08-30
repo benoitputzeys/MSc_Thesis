@@ -18,14 +18,13 @@ X = X.set_index("Time")
 X = X.drop(columns = "Transmission_Past")
 dates = X.iloc[:,-1]
 X = X.iloc[:,:-6]
-
 y = pd.read_csv('Data_Preprocessing/For_1_SP_Step_Prediction/y.csv', delimiter=',')
 y = y.set_index("Time")
 
 # Partition the data into 80% training data and 20% test data.
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state = 0, shuffle = False)
 
-# Only take half the training set.
+# Only take half the training set. See section on the thesis for further explanation
 X_train = X_train[int(len(X_train)*1/2):]
 X_test = X_test[:int(len(X_test)*1/2)]
 y_train = y_train[int(len(y_train)*1/2):]
@@ -55,7 +54,7 @@ regressor.fit(X_train, y_train)
 # Predicting the generation.
 ########################################################################################################################
 
-# Multi-Step prediction where for each 30 mins, the 7 input features have to be created
+# Multi-Step prediction where for each 30 mins, the 7 input features have to be computed
 X_future_features = pd.DataFrame(data=X_train_unscaled.iloc[-335:,:].values,  columns=["0","1","2","3","4","5"])
 result_future = y_scaler.inverse_transform(y_train[-1:])
 
@@ -114,7 +113,7 @@ print("-"*200)
 # Visualising the results
 ########################################################################################################################
 
-# Create a vector that contains the error between the predictionn and the test set values.
+# Create a vector that contains the error between the prediction and the test set values.
 error_test_plot = np.zeros((48*3+48*7,1))
 error_test_plot[-336:] = error_test[:48*7]
 

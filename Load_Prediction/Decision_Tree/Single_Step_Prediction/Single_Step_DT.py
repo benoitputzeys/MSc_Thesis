@@ -17,7 +17,6 @@ X = pd.read_csv('Data_Preprocessing/For_1_SP_Step_Prediction/X.csv', delimiter='
 X = X.set_index("Time")
 dates = X.iloc[:,-1]
 X = X.iloc[:,:-5]
-
 y = pd.read_csv('Data_Preprocessing/For_1_SP_Step_Prediction/y.csv', delimiter=',')
 y = y.set_index("Time")
 
@@ -42,7 +41,7 @@ y_train = y_scaler.fit_transform(y_train)
 # Create the model.
 ########################################################################################################################
 
-# Fit the Decision Tree to our data
+# Fit the Decision Tree to the data, set the maximal depth to 7, bigger depths can lead to overfitting.
 regressor = DecisionTreeRegressor(random_state = 0, max_depth=7)
 regressor.fit(X_train, y_train)
 
@@ -84,7 +83,7 @@ print("-"*200)
 error_test_plot = np.zeros((48*3+48*7,1))
 error_test_plot[-336:] = error_test[:48*7]
 
-# Plot the result with the truth in red and the predictions in blue.
+# Plot the result with the test set in blue, training set in black and errors in red. Predictions are in orange.
 fig2, axs2=plt.subplots(2,1,figsize=(12,6))
 axs2[0].plot(dates.iloc[-len(X_test)-48*3:-len(X_test)],
              y_train[-48*3:,0],

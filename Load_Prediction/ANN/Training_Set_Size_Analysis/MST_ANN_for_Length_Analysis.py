@@ -1,7 +1,5 @@
 import numpy as np
-import matplotlib.pyplot as plt
 import keras
-from Load_Prediction.ANN.Functions_ANN import train_model, create_model
 from sklearn.model_selection import train_test_split, TimeSeriesSplit
 from sklearn.preprocessing import StandardScaler
 import pandas as pd
@@ -20,12 +18,14 @@ X = X.iloc[:,:-6]
 y = pd.read_csv('Data_Preprocessing/For_336_SP_Step_Prediction/y.csv', delimiter=',')
 y = y.set_index("Time")
 
+# Split the data into 80% training and 20% test set.
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state = 0, shuffle = False)
 
 # Save the unscaled data for later for data representation.
 X_test_unscaled = X_test
 X_train_unscaled = X_train
 
+# Set the length of the training set.
 X_train = X_train[int(len(X_train)*1/4):]
 y_train = y_train[int(len(y_train)*1/4):]
 
@@ -78,8 +78,16 @@ y_train = y_scaler.fit_transform(y_train)
 #
 #my_model.save("Load_Prediction/ANN/Training_Set_Size_Analysis/Models/DMST_ANN_34L_Training_Set.h5")
 
+########################################################################################################################
 # Load one of the models from the directory "Models".
+########################################################################################################################
+
 my_model = keras.models.load_model("Load_Prediction/ANN/Training_Set_Size_Analysis/Models/DMST_ANN_1L_Training_Set.h5")
+#my_model = keras.models.load_model("Load_Prediction/ANN/Training_Set_Size_Analysis/Models/DMST_ANN_12L_Training_Set.h5")
+#my_model = keras.models.load_model("Load_Prediction/ANN/Training_Set_Size_Analysis/Models/DMST_ANN_14L_Training_Set.h5")
+#my_model = keras.models.load_model("Load_Prediction/ANN/Training_Set_Size_Analysis/Models/DMST_ANN_25L_Training_Set.h5")
+#my_model = keras.models.load_model("Load_Prediction/ANN/Training_Set_Size_Analysis/Models/DMST_ANN_34L_Training_Set.h5")
+#my_model = keras.models.load_model("Load_Prediction/ANN/Training_Set_Size_Analysis/Models/DMST_ANN_35L_Training_Set.h5")
 
 ########################################################################################################################
 # Predicting the generation.
@@ -97,7 +105,6 @@ y_train = y_scaler.inverse_transform(y_train)
 ########################################################################################################################
 
 # Compute the error between the Actual Generation and the prediction from the NN
-
 print("-"*200)
 error_train = abs(result_train - y_train)
 print("The mean absolute error of the train set is %0.2f" % mean_absolute_error(y_train,result_train))
@@ -114,7 +121,6 @@ print("-"*200)
 ########################################################################################################################
 # Save the results in a csv file.
 ########################################################################################################################
-
 
 import csv
 with open('Load_Prediction\ANN\Training_Set_Size_Analysis\AF_34L.csv', 'w', newline='',) as file:

@@ -6,12 +6,12 @@ import matplotlib.pyplot as plt
 ########################################################################################################################
 
 # Load the results in respective variables.
-F7 = pd.read_csv("Load_Prediction/ANN/Feature_Analysis/F7.csv")
-F7_SP = pd.read_csv("Load_Prediction/ANN/Feature_Analysis/F7_SP.csv")
-F7_SP_DoW = pd.read_csv("Load_Prediction/ANN/Feature_Analysis/F7_SP_DoW.csv")
-F7_SP_DoW_D = pd.read_csv("Load_Prediction/ANN/Feature_Analysis/F7_SP_DoW_D.csv")
-F7_SP_DoW_D_M = pd.read_csv("Load_Prediction/ANN/Feature_Analysis/F7_SP_DoW_D_M.csv")
-F7_SP_DoW_D_M_Y = pd.read_csv("Load_Prediction/ANN/Feature_Analysis/F7_SP_DoW_D_M_Y.csv")
+F7 = pd.read_csv("Load_Prediction/LSTM/Feature_Analysis/F7.csv")
+F7_SP = pd.read_csv("Load_Prediction/LSTM/Feature_Analysis/F7_SP.csv")
+F7_SP_DoW = pd.read_csv("Load_Prediction/LSTM/Feature_Analysis/F7_SP_DoW.csv")
+F7_SP_DoW_D = pd.read_csv("Load_Prediction/LSTM/Feature_Analysis/F7_SP_DoW_D.csv")
+F7_SP_DoW_D_M = pd.read_csv("Load_Prediction/LSTM/Feature_Analysis/F7_SP_DoW_D_M.csv")
+F7_SP_DoW_D_M_Y = pd.read_csv("Load_Prediction/LSTM/Feature_Analysis/F7_SP_DoW_D_M_Y.csv")
 
 # Load the results in a dataframe.
 frames = ([ F7_SP_DoW_D_M_Y, F7_SP_DoW_D_M,F7_SP_DoW_D, F7_SP_DoW,F7_SP, F7])
@@ -34,7 +34,8 @@ axes[2].bar(df.iloc[:,0], df.iloc[:,3]/1000, color='blue')
 axes[2].set_ylabel('RMSE, GW', size = 14)
 axes[2].grid(True)
 axes[2].set_xticklabels(rotation=90, labels = string)
+# Set the contents of the figure before the grid lines.
 axes[0].set_axisbelow(True), axes[1].set_axisbelow(True), axes[2].set_axisbelow(True)
 fig.show()
-fig.savefig("Load_Prediction/ANN/Figures/Histograms_Impact_of_Date_Features.pdf", bbox_inches='tight')
+fig.savefig("Load_Prediction/LSTM/Figures/Histograms_Impact_of_Date_Features.pdf", bbox_inches='tight')
 

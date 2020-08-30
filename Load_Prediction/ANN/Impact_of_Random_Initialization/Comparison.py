@@ -29,4 +29,6 @@ axes2[2].set_ylabel('RMSE, GW', size = 14)
 axes2[2].grid(True)
 axes2[2].set_xticklabels(rotation=0, labels = string)
 fig2.show()
+
+# Save the figure.
 fig2.savefig("Load_Prediction/ANN/Figures/Random_Initialization.pdf", bbox_inches='tight')

@@ -18,20 +18,18 @@ X = pd.read_csv('Data_Preprocessing/For_336_SP_Step_Prediction/X.csv', delimiter
 X = X.set_index("Time")
 dates = X.iloc[:,-1]
 X = X.iloc[:,:-6]
-
 y = pd.read_csv('Data_Preprocessing/For_336_SP_Step_Prediction/y.csv', delimiter=',')
 y = y.set_index("Time")
 
+# Partition the data into 80% training set and 20% test set.
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state = 0, shuffle = False)
 
+# Only include half the training data length and half the test data length. For more information, see the thesis.
 X_train = X_train[int(len(X_train)*1/2):]
 X_test = X_test[:int(len(X_test)*1/2)]
 y_train = y_train[int(len(y_train)*1/2):]
 y_test = y_test[:int(len(y_test)*1/2)]
 dates = dates[-len(X_train)-len(X_test)*2:-len(X_test)]
-
-X_train_unscaled = X_train
-X_test_unscaled = X_test
 
 # Feature Scaling
 x_scaler = StandardScaler()
@@ -44,7 +42,7 @@ y_train = y_scaler.fit_transform(y_train)
 # Create the model.
 ########################################################################################################################
 
-# Fit the SVR to our data
+# Fit the SVR to the data
 # Define the three parameters for the SVR: C, Epsilon and Gamme
 # With gamma = 'scale', SVR uses 1 / (n_features * X.var()) as value of gamma
 regressor = SVR(kernel = 'rbf', C = 1.0, epsilon = 0.1, gamma = 'scale')
@@ -55,7 +53,7 @@ regressor.fit(X_train, y_train)
 elapsed_time = time.time() - start_time
 
 ########################################################################################################################
-# Predicting the generation on the test set and inverse the scaling.
+# Predicting the generation on the test set and inverse the scaling. Divide by 1000 to express everything in GW.
 ########################################################################################################################
 
 pred_train = y_scaler.inverse_transform(regressor.predict(X_train))/1000
@@ -87,15 +85,16 @@ print("The root mean squared error of the test set is %0.2f" % np.sqrt(mean_squa
 print("-"*200)
 
 ########################################################################################################################
-# Visualising the results
+# Plotting curves of the prediction made on the electricity load.
 ########################################################################################################################
 
+# Include a column vector to show the error between the prediction and the test set.
 error_test_plot = np.zeros((48*3+48*7,1))
 error_test_plot[-336:] = error_test[:48*7].reshape(-1,1)
 
-# Plot the result with the truth in black/blue and the predictions in orange.
+# Plot the result with the training set in blue and the test set in black.
+# The predictions are in orange.
 fig2, axs2=plt.subplots(2,1,figsize=(12,6))
-
 # First plot contains the prediction and the true values from the test and training set.
 axs2[0].plot(dates.iloc[-len(X_test)-48*3:-len(X_test)],
              y_train[-48*3:],
@@ -110,7 +109,7 @@ axs2[0].axvline(dates.iloc[-len(X_test)], linestyle="--", color = "black")
 axs2[0].set_ylabel('Load, GW',size = 14)
 axs2[0].plot(30,30, label = "Error", color = "red")
 
-# Second plot contains the errors.
+# Second plot contains the errors in red.
 axs2[1].plot(dates.iloc[-len(X_test)-48*3:-len(X_test)+48*7],
              error_test_plot,
              label = "Error", alpha = 1, color = "red")
@@ -129,10 +128,11 @@ plt.xticks(np.arange(1,482, 48), ["14:00\n07/22","14:00\n07/23","14:00\n07/24",
                                   "14:00\n07/31","14:00\n08/01"])
 axs2[0].legend(loc=(1.02,0.62))
 fig2.show()
+# Save the figure.
 fig2.savefig("Load_Prediction/SVR/Figures/DMST_Prediction.pdf", bbox_inches='tight')
 
 ########################################################################################################################
-# Save the results in a csv file.
+# Save the results in csv files.
 ########################################################################################################################
 
 pd.DataFrame({"SVR_Time": [elapsed_time]}).to_csv("Compare_Models/Direct_Multi_Step_Probability_Results/Time_to_Train/SVR.csv")

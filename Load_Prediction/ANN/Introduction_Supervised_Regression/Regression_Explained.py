@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 
+# Read the data into the variable X.
 X = pd.read_csv('Data_Preprocessing/For_336_SP_Step_Prediction/X.csv', delimiter=',')
 load = X.iloc[-48*3-25:-25,1]/1000
 
@@ -16,5 +17,7 @@ axs1.grid(True)
 axs1.set_xticks([]), axs1.set_yticks([])
 axs1.set(xlim=(-10, 170), ylim=(10,37))
 fig1.show()
+
+# Save the figure
 fig1.savefig("Load_Prediction/ANN/Figures/Regression_Explained.pdf", bbox_inches='tight')
 

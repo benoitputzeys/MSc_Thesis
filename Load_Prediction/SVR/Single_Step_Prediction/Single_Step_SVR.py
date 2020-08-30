@@ -16,7 +16,6 @@ X = pd.read_csv('Data_Preprocessing/For_1_SP_Step_Prediction/X.csv', delimiter='
 X = X.set_index("Time")
 dates = X.iloc[:,-1]
 X = X.iloc[:,:-5]
-
 y = pd.read_csv('Data_Preprocessing/For_1_SP_Step_Prediction/y.csv', delimiter=',')
 y = y.set_index("Time")
 
@@ -44,7 +43,6 @@ y_train = y_scaler.fit_transform(y_train)
 # Fit the SVR to our data
 regressor = SVR(kernel = 'rbf')
 regressor.fit(X_train, y_train)
-
 
 ########################################################################################################################
 # Predicting the load and divide by 1000 to express everything in GW.
@@ -77,7 +75,7 @@ print("The root mean squared error of the test set is %0.2f" % np.sqrt(mean_squa
 print("-"*200)
 
 ########################################################################################################################
-# Visualising the results
+# Visualising the results from the prediction on the electricity load with the SVR
 ########################################################################################################################
 
 # Create a vector that contains the error between the prediction and the test set values.

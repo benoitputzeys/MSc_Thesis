@@ -17,20 +17,20 @@ X = pd.read_csv('Data_Preprocessing/For_336_SP_Step_Prediction/X.csv', delimiter
 X = X.set_index("Time")
 dates = X.iloc[:,-1]
 X = X.iloc[:,:-6]
-
 X = pd.DataFrame(X)
 X = X.drop(["Transmission_Past"], axis = 1)
 X = np.array(X)
-
 y = pd.read_csv('Data_Preprocessing/For_336_SP_Step_Prediction/y.csv', delimiter=',')
 y = y.set_index("Time")
 
+# Partition the data into a training set (80%) and a test set (20%).
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state = 0, shuffle = False)
 
 # Save the unscaled data for later for data representation.
 X_test_unscaled = X_test
 X_train_unscaled = X_train
 
+# Only take half the trianing set and half the test set according to the results from the thesis.
 X_train = X_train[int(len(X_train)*1/2):]
 X_test = X_test[:int(len(X_test)*1/2)]
 y_train = y_train[int(len(y_train)*1/2):]
@@ -56,9 +56,10 @@ batch_size = 19
 # Create the model.
 my_model = create_model(X_train, learning_rate)
 
-# Extract the loss per epoch to plot the learning progress.
+# Crteate a data frame to extract the loss per epoch to plot the learning progress.
 hist_list = pd.DataFrame()
 
+# Perform 5-fold cross validation
 tscv = TimeSeriesSplit()
 for train_index, test_index in tscv.split(X_train):
      X_train_split, X_test_split = X_train[train_index], X_train[test_index]
@@ -79,6 +80,7 @@ axs.legend(['Training set'])
 axs.grid(True)
 fig.show()
 
+# Save or load the model.
 my_model.save("Load_Prediction/LSTM/Feature_Analysis/DMST_LSTM_model_No_Transmission.h5")
 #my_model = keras.models.load_model("Load_Prediction/LSTM/Reature_Analysis/DMST_LSTM_model_No_Transmission.h5")
 
@@ -100,7 +102,7 @@ y_test = np.array(y_test.iloc[:,-1]).reshape(-1,)
 # Data processing for plotting curves and printing the errors.
 ########################################################################################################################
 
-# Compute the error between the Actual Generation and the prediction from the NN
+# Compute the error between the Actual Generation and the prediction from the LSTM
 
 print("-"*200)
 error_train = (result_train - y_train)

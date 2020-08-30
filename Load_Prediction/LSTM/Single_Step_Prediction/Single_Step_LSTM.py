@@ -17,14 +17,13 @@ X = pd.read_csv('Data_Preprocessing/For_1_SP_Step_Prediction/X.csv', delimiter='
 X = X.set_index("Time")
 dates = X.iloc[:,-1]
 X = X.iloc[:,:-5]
-
 y = pd.read_csv('Data_Preprocessing/For_1_SP_Step_Prediction/y.csv', delimiter=',')
 y = y.set_index("Time")
 
 # Partition the data into 80% training data and 20% test data.
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state = 0, shuffle = False)
 
-# Only take half the training set.
+# Only take half the training set according to the findings from the thesis.
 X_train = X_train[int(len(X_train)*1/2):]
 X_test = X_test[:int(len(X_test)*1/2)]
 y_train = y_train[int(len(y_train)*1/2):]
@@ -50,9 +49,10 @@ batch_size = 19
 # Create the model.
 my_model = create_model(X_train, learning_rate)
 
-# Extract the loss per epoch to plot the learning progress.
+# Create a dataframe to extract the loss per epoch to plot the learning progress.
 hist_list = pd.DataFrame()
 
+# Perform 5-fold cross validation
 tscv = TimeSeriesSplit()
 for train_index, test_index in tscv.split(X_train):
      X_train_split, X_test_split = X_train[train_index], X_train[test_index]
@@ -61,11 +61,9 @@ for train_index, test_index in tscv.split(X_train):
      hist_split = train_model(my_model, X_train_split, y_train_split, number_of_epochs, batch_size)
      hist_list = hist_list.append(hist_split)
 
-my_model.save("Load_Prediction/LSTM/Single_Step_LSTM_Model.h5")
-
-x_axis = np.linspace(1,len(hist_list),len(hist_list))
 
 # Plot the loss during training.
+x_axis = np.linspace(1,len(hist_list),len(hist_list))
 fig, axs = plt.subplots(1, 1, figsize=(10, 6))
 axs.plot(x_axis, hist_list['mean_absolute_error'], color = "blue")
 axs.set_xlabel('Epoch')
@@ -73,6 +71,8 @@ axs.set_ylabel('Loss')
 axs.grid(True)
 fig.show()
 
+# Save or load the model.
+my_model.save("Load_Prediction/LSTM/Single_Step_Prediction/Single_Step_LSTM_Model.h5")
 #my_model = keras.models.load_model("SST_No_Trans_No_Date.h5")
 
 ########################################################################################################################
