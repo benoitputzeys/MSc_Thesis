@@ -26,6 +26,7 @@ LSTM_mean_stddev_test = pd.read_csv("Compare_Models/Direct_Multi_Step_Probabilit
 DT_mean_stddev_test = pd.read_csv("Compare_Models/Direct_Multi_Step_Probability_Results/Probability_Based_on_Training/DT_mean_errors_stddevs_test.csv")
 RF_mean_stddev_test = pd.read_csv("Compare_Models/Direct_Multi_Step_Probability_Results/Probability_Based_on_Training/RF_mean_errors_stddevs_test.csv")
 SVR_mean_stddev_test = pd.read_csv("Compare_Models/Direct_Multi_Step_Probability_Results/Probability_Based_on_Training/SVR_mean_errors_stddevs_test.csv")
+DT_mean_stddev_test_OVERFIT = pd.read_csv("Compare_Models/Direct_Multi_Step_Probability_Results/Probability_Based_on_Training/DT_mean_errors_stddevs_test_OVERFIT.csv")
 
 # Load the results of the different models in a dataframe.
 training_errors = ([Naive_error.iloc[:,1:4],
@@ -48,45 +49,49 @@ df_test_errors = pd.concat(test_errors, axis = 0)
 # Histograms for errors on the prediction of the training and test set
 ########################################################################################################################
 
+string = ['Naive','DT','NN','RF','SVR','LSTM']
+
 # Create histograms for RMSE, MSE and MAE for the training set.
 fig2, axes2 = plt.subplots(1,3,figsize=(12,6))
 fig2.suptitle("Training Set Errors", fontsize =14)
-axes2[0].bar(['Naive','DT','NN','RF','SVR','LSTM'],df_training_errors.iloc[:,0], color='blue')
+axes2[0].bar(string, df_training_errors.iloc[:,0], color='blue')
 axes2[0].set_ylabel('MSE, GW^2', size = 14)
-axes2[0].set_xticklabels(rotation=0, labels = ['Naive','DT','NN','RF','SVR','LSTM'])
+axes2[0].set_xticklabels(rotation=0, labels = string)
 axes2[0].grid(True)
 
-axes2[1].bar(['Naive','DT','NN','LSTM','RF','SVR'],df_training_errors.iloc[:,1], color='blue')
+axes2[1].bar(string,df_training_errors.iloc[:,1], color='blue')
 axes2[1].set_ylabel('MAE, GW', size = 14)
-axes2[1].set_xticklabels(rotation=0, labels = ['Naive','DT','NN','RF','SVR','LSTM'])
+axes2[1].set_xticklabels(rotation=0, labels = string)
 axes2[1].grid(True)
 
-axes2[2].bar(['Naive','DT','NN','RF','SVR','LSTM'],df_training_errors.iloc[:,2], color='blue')
+axes2[2].bar(string,df_training_errors.iloc[:,2], color='blue')
 axes2[2].set_ylabel('RMSE, GW', size = 14)
 axes2[2].grid(True)
-axes2[2].set_xticklabels(rotation=0, labels = ['Naive','DT','NN','RF','SVR','LSTM'])
+axes2[2].set_xticklabels(rotation=0, labels = string)
 fig2.subplots_adjust(top = 0.25, wspace = 200)
+axes2[0].set_axisbelow(True), axes2[1].set_axisbelow(True), axes2[2].set_axisbelow(True)
 fig2.show()
 fig2.savefig("Compare_Models/Direct_Multi_Step_Probability_Results/Figures/Training_Set_Errors.pdf", bbox_inches='tight')
 
 # Create histograms for RMSE, MSE and MAE for the test set.
 fig3, axes3 = plt.subplots(1,3,figsize=(12,6))
 fig3.suptitle("Test Set Errors",fontsize =14)
-axes3[0].bar(['Naive','DT','NN','RF','SVR','LSTM'],df_test_errors.iloc[:,0], color='blue')
+axes3[0].bar(string,df_test_errors.iloc[:,0], color='blue')
 axes3[0].set_ylabel('MSE, GW^2', size = 14)
-axes3[0].set_xticklabels(rotation=0, labels = ['Naive','DT','NN','RF','SVR','LSTM'])
+axes3[0].set_xticklabels(rotation=0, labels = string)
 axes3[0].grid(True)
 
 axes3[1].bar(['Naive','DT','NN','LSTM','RF','SVR'], df_test_errors.iloc[:,1], color='blue')
 axes3[1].set_ylabel('MAE, GW', size = 14)
-axes3[1].set_xticklabels(rotation=0, labels = ['Naive','DT','NN','RF','SVR','LSTM'])
+axes3[1].set_xticklabels(rotation=0, labels = string)
 axes3[1].grid(True)
 
-axes3[2].bar(['Naive','DT','NN','RF','SVR','LSTM'],df_test_errors.iloc[:,2], color='blue')
+axes3[2].bar(string,df_test_errors.iloc[:,2], color='blue')
 axes3[2].set_ylabel('RMSE, GW', size = 14)
 axes3[2].grid(True)
-axes3[2].set_xticklabels(rotation=0, labels = ['Naive','DT','NN','RF','SVR','LSTM'])
+axes3[2].set_xticklabels(rotation=0, labels = string)
 fig3.subplots_adjust(top = 0.25, wspace = 200)
+axes3[0].set_axisbelow(True), axes3[1].set_axisbelow(True), axes3[2].set_axisbelow(True)
 fig3.show()
 fig3.savefig("Compare_Models/Direct_Multi_Step_Probability_Results/Figures/Test_Set_Errors.pdf", bbox_inches='tight')
 
@@ -149,6 +154,7 @@ axes4[0].minorticks_on(), axes4[1].minorticks_on(), axes4[2].minorticks_on(), ax
 axes4[0].grid(b=True, which='major'), axes4[1].grid(b=True, which='major'), axes4[2].grid(b=True, which='major'), axes4[3].grid(b=True, which='major')
 axes4[0].grid(b=True, which='minor',alpha = 0.2), axes4[1].grid(b=True, which='minor',alpha = 0.2), axes4[2].grid(b=True, which='minor',alpha = 0.2), axes4[3].grid(b=True, which='minor',alpha = 0.2)
 axes4[0].tick_params(axis = "both", labelsize = 12), axes4[1].tick_params(axis = "both", labelsize = 12), axes4[2].tick_params(axis = "both", labelsize = 12), axes4[3].tick_params(axis = "both", labelsize = 11)
+axes4[0].set_axisbelow(True), axes4[1].set_axisbelow(True), axes4[2].set_axisbelow(True), axes4[3].set_axisbelow(True)
 fig4.show()
 fig4.savefig("Compare_Models/Direct_Multi_Step_Probability_Results/Figures/Test_Set/All_Stddevs_of_Errors_Test.pdf", bbox_inches='tight')
 
@@ -184,6 +190,7 @@ axes5.grid(b=True, which='minor',alpha = 0.2)
 axes5.legend(fontsize=14)
 axes5.tick_params(axis = "both", labelsize = 11)
 axes5.set_ylim([0,5.4])
+axes5.set_axisbelow(True)
 fig5.show()
 fig5.savefig("Compare_Models/Direct_Multi_Step_Probability_Results/Figures/Test_Set/NN_Stddev_of_Error_Test.pdf", bbox_inches='tight')
 
@@ -219,6 +226,7 @@ axes6.grid(b=True, which='minor',alpha = 0.2)
 axes6.legend(fontsize=14)
 axes6.tick_params(axis = "both", labelsize = 11)
 axes6.set_ylim([0,5.4])
+axes6.set_axisbelow(True)
 fig6.show()
 fig6.savefig("Compare_Models/Direct_Multi_Step_Probability_Results/Figures/Test_Set/LSTM_Stddev_of_Error_Test.pdf", bbox_inches='tight')
 
@@ -254,6 +262,7 @@ axes77.grid(b=True, which='minor',alpha = 0.2)
 axes77.legend(fontsize=14)
 axes77.tick_params(axis = "both", labelsize = 11)
 axes77.set_ylim([0,5.4])
+axes77.set_axisbelow(True)
 fig77.show()
 fig77.savefig("Compare_Models/Direct_Multi_Step_Probability_Results/Figures/Test_Set/DT_Stddev_of_Error_Test.pdf", bbox_inches='tight')
 
@@ -292,6 +301,7 @@ axes7.grid(b=True, which='minor',alpha = 0.2)
 axes7.legend(fontsize=14)
 axes7.tick_params(axis = "both", labelsize = 11)
 axes7.set_ylim([0,5.4])
+axes7.set_axisbelow(True)
 fig7.show()
 fig7.savefig("Compare_Models/Direct_Multi_Step_Probability_Results/Figures/Test_Set/RF_Stddev_of_Error_Test.pdf", bbox_inches='tight')
 
@@ -330,6 +340,7 @@ axes8.grid(b=True, which='minor',alpha = 0.2)
 axes8.legend(fontsize=14)
 axes8.tick_params(axis = "both", labelsize = 11)
 axes8.set_ylim([0,5.4])
+axes8.set_axisbelow(True)
 fig8.show()
 fig8.savefig("Compare_Models/Direct_Multi_Step_Probability_Results/Figures/Test_Set/SVR_Stddev_of_Error_Test.pdf", bbox_inches='tight')
 
@@ -368,5 +379,43 @@ axes10.grid(b=True, which='minor',alpha = 0.2)
 axes10.legend(fontsize=14)
 axes10.tick_params(axis = "both", labelsize = 11)
 axes10.set_ylim([0,5.4])
+axes10.set_axisbelow(True)
 fig10.show()
 fig10.savefig("Compare_Models/Direct_Multi_Step_Probability_Results/Figures/Test_Set/NN_Rd_Weights_Stddev_of_Error_Test.pdf", bbox_inches='tight')
+
+
+########################################################################################################################
+# Compare the mean and standard deviations of errors of the DT that OVERFITS between predictions and true values of the test set.
+########################################################################################################################
+
+fig11, axes11 = plt.subplots(1,1,figsize=(12,6))
+axes11.fill_between(x_axis,
+                   (+DT_mean_stddev_test_OVERFIT.iloc[:,-1]),
+                   (zeros),
+                   label= "S. dev. of the errors of the DT (overfitted) prediction on the test set",
+                   alpha = 0.2, color='orange')
+axes11.fill_between(x_axis,
+                  (+Mean_stddev_test.iloc[:,-1]),
+                   (zeros),
+                   label= "S. dev. in the test set", alpha=0.2, color = "black")
+#axes11.plot(x_axis,abs(DT_mean_stddev_training_OVERFIT.iloc[:,-2]),label= "Absolute error in the test set", color = "orange")
+axes11.set_ylabel('Standard deviation, electricity load, GW', size = 14)
+axes11.set_xticks(np.arange(1,385, 24))
+axes11.set_xticklabels(["00:00\nMonday","12:00",
+                       "00:00\nTuesday","12:00",
+                       "00:00\nWednesday", "12:00",
+                       "00:00\nThursday", "12:00",
+                       "00:00\nFriday","12:00",
+                       "00:00\nSaturday", "12:00",
+                       "00:00\nSunday","12:00",
+                       "00:00"])
+axes11.grid(True)
+axes11.minorticks_on()
+axes11.grid(b=True, which='major')
+axes11.grid(b=True, which='minor',alpha = 0.2)
+axes11.legend(fontsize=14)
+axes11.set_axisbelow(True)
+axes11.tick_params(axis = "both", labelsize = 11)
+axes11.set_ylim([0,5.4])
+fig11.show()
+fig11.savefig("Compare_Models/Direct_Multi_Step_Probability_Results/Figures/Training_Set/DT_Stddev_of_Error_Test_OVERFIT.pdf", bbox_inches='tight')
