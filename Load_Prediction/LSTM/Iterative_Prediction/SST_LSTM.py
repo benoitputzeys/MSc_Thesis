@@ -16,13 +16,15 @@ X = pd.read_csv('Data_Preprocessing/For_1_SP_Step_Prediction/X.csv', delimiter='
 X = X.set_index("Time")
 X = X.drop(columns = "Transmission_Past")
 dates = X.iloc[:,-1]
-X = X.iloc[:,:-5]
+X = X.iloc[:,:-6]
 
 y = pd.read_csv('Data_Preprocessing/For_1_SP_Step_Prediction/y.csv', delimiter=',')
 y = y.set_index("Time")
 
+# Partition the data into 80% training data and 20% test data.
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state = 0, shuffle = False)
 
+# Only take half the training set.
 X_train = X_train[int(len(X_train)*1/2):]
 X_test = X_test[:int(len(X_test)*1/2)]
 y_train = y_train[int(len(y_train)*1/2):]
@@ -41,9 +43,9 @@ y_train = y_scaler.fit_transform(y_train)
 ########################################################################################################################
 
 # Define the hyperparameters.
-learning_rate = 0.001
-number_of_epochs = 100
-batch_size = 24
+learning_rate = 0.005
+number_of_epochs = 40
+batch_size = 19
 
 # Create the model.
 my_model = create_model(X_train, learning_rate)
@@ -51,6 +53,7 @@ my_model = create_model(X_train, learning_rate)
 # Extract the loss per epoch to plot the learning progress.
 hist_list = pd.DataFrame()
 
+#Perform 5-fold cross validation
 tscv = TimeSeriesSplit()
 for train_index, test_index in tscv.split(X_train):
      X_train_split, X_test_split = X_train[train_index], X_train[test_index]
@@ -59,12 +62,13 @@ for train_index, test_index in tscv.split(X_train):
      hist_split = train_model(my_model, X_train_split, y_train_split, number_of_epochs, batch_size)
      hist_list = hist_list.append(hist_split)
 
-my_model.save("Load_Prediction/LSTM/Iterative_Prediction/SST_No_Trans_No_Date.h5")
+# Save the model.
+my_model.save("Load_Prediction/LSTM/Iterative_Prediction/SST_LSTM_no_SP.h5")
 
-#my_model = keras.models.load_model("SST_No_Trans_No_Date.h5")
+#my_model = keras.models.load_model("SST_LSTM_w_SP.h5")
 
 ########################################################################################################################
-# Predicting the generation.
+# Predicting the generation. Divide by 1000 to have the results in GW.
 ########################################################################################################################
 
 pred_train = y_scaler.inverse_transform(my_model.predict(np.reshape(X_train, (X_train.shape[0],X_train.shape[1],1))))/1000
@@ -79,7 +83,7 @@ y_test = y_test/1000
 # Data processing for plotting curves and printing the errors.
 ########################################################################################################################
 
-# Compute the error between the Actual Generation and the prediction from the NN
+# Compute the error between the Actual Generation and the prediction from the LSTM
 print("-"*200)
 error_train = (pred_train - y_train)
 print("The mean absolute error of the train set is %0.2f" % mean_absolute_error(y_train,pred_train))
@@ -97,9 +101,12 @@ print("-"*200)
 # Plotting curves.
 ########################################################################################################################
 
+# Create a vector that contains the error between the prediction and the test set values.
 error_test_plot = np.zeros((48*3+48*7,1))
 error_test_plot[-336:] = error_test[:48*7]
-# Plot the result with the truth in red and the predictions in blue.
+
+# Plot the result with the test set values in black and the predictions in orange.
+# The error is plotted in red and the training set is in blue.
 fig2, axs2=plt.subplots(2,1,figsize=(12,6))
 axs2[0].grid(True)
 axs2[0].plot(dates.iloc[-len(X_test)-48*3:-len(X_test)],
@@ -110,10 +117,9 @@ axs2[0].plot(dates.iloc[-len(X_test):-len(X_test)+48*7],
 axs2[0].plot(dates.iloc[-len(X_test):-len(X_test)+48*7],
              y_test[:48*7],
              label = "Test Set", alpha = 1, color = "black")
-axs2[0].axvline(dates.iloc[-len(X_test)], linestyle="--", color = "black")
 axs2[0].set_ylabel('Load, GW',size = 14)
 axs2[0].plot(30,30, label = 'Error, GW')
-loc = plticker.MultipleLocator(base=47) # this locator puts ticks at regular intervals
+axs2[0].axvline(dates.iloc[-len(X_test)], linestyle="--", color = "black")
 
 axs2[1].grid(True)
 axs2[1].plot(dates.iloc[-len(X_test)-48*3:-len(X_test)+48*7],
@@ -123,6 +129,7 @@ axs2[1].axvline(dates.iloc[-len(X_test)], linestyle="--", color = "black")
 axs2[1].set_xlabel('Date',size = 14)
 axs2[1].set_ylabel('Error, GW',size = 14)
 
+# Include additional details such as tick intervals, rotation of xaxis labels, legend positioning and grid on.
 loc = plticker.MultipleLocator(base=47) # this locator puts ticks at regular intervals
 axs2[1].xaxis.set_major_locator(loc)
 axs2[0].xaxis.set_major_locator(loc)
@@ -130,6 +137,3 @@ fig2.autofmt_xdate(rotation=10)
 axs2[1].legend(loc=(1.02,0.9))
 fig2.show()
 
-# ########################################################################################################################
-# # Save the results in a csv file.
-# ########################################################################################################################

@@ -17,19 +17,22 @@ X = pd.read_csv('Data_Preprocessing/For_1_SP_Step_Prediction/X.csv', delimiter='
 X = X.set_index("Time")
 X = X.drop(columns = "Transmission_Past")
 dates = X.iloc[:,-1]
-X = X.iloc[:,:-6]
+X = X.iloc[:,:-5]
 
 y = pd.read_csv('Data_Preprocessing/For_1_SP_Step_Prediction/y.csv', delimiter=',')
 y = y.set_index("Time")
 
+# Partition the data into 80% training data and 20% test data.
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state = 0, shuffle = False)
 
+# Only take half the training set.
 X_train = X_train[int(len(X_train)*1/2):]
 X_test = X_test[:int(len(X_test)*1/2)]
 y_train = y_train[int(len(y_train)*1/2):]
 y_test = y_test[:int(len(y_test)*1/2)]
 dates = dates[-len(X_train)-len(X_test)*2:-len(X_test)]
 
+# Save unscaled data for later use.
 X_test_unscaled = X_test
 X_train_unscaled = X_train
 
@@ -44,7 +47,7 @@ y_train = y_scaler.fit_transform(y_train)
 # Create the model.
 ########################################################################################################################
 
-# Fit the SVR to our data
+# Fit the SVR to the data
 regressor = SVR(kernel = 'rbf', C = 1.0, epsilon = 0.1, gamma = 'scale')
 regressor.fit(X_train, y_train)
 
@@ -52,15 +55,15 @@ regressor.fit(X_train, y_train)
 # Predicting the generation.
 ########################################################################################################################
 
-# Multi-Step prediction
-X_future_features = pd.DataFrame(data=X_train_unscaled.iloc[-335:,:].values,  columns=["0","1","2","3","4","5"])
+# Multi-Step prediction where for each 30 mins, the 7 input features have to be created
+X_future_features = pd.DataFrame(data=X_train_unscaled.iloc[-335:,:].values,  columns=["0","1","2","3","4","5","6"])
 result_future = y_scaler.inverse_transform(y_train[-1:])
 
 for i in range(0,48*7):
 
     prev_value = result_future[-1]
-    new_row = [[prev_value[0], 0, 0, 0, 0, 0]]
-    new_row = DataFrame(new_row, columns=["0","1","2","3","4","5"])
+    new_row = [[prev_value[0], 0, 0, 0, 0, 0, 0]]
+    new_row = DataFrame(new_row, columns=["0","1","2","3","4","5","6"])
 
     X_future_features = pd.concat([X_future_features,new_row])
     rolling_mean_10 = X_future_features["0"].rolling(window=10).mean().values[-1]
@@ -75,19 +78,20 @@ for i in range(0,48*7):
                    rolling_mean_336,
                    exp_10,
                    exp_48,
-                   #X_test_unscaled.iloc[i, -1]
+                   X_test_unscaled.iloc[i, -1]
                    ]]
 
-    update_row = DataFrame(update_row, columns=["0","1","2","3","4","5"])
+    update_row = DataFrame(update_row, columns=["0","1","2","3","4","5","6"])
     X_future_features.iloc[-1,:] = update_row.iloc[0,:]
 
-    result_future = np.append(result_future, y_scaler.inverse_transform(regressor.predict(x_scaler.transform(update_row).reshape(1,6))))
+    result_future = np.append(result_future, y_scaler.inverse_transform(regressor.predict(x_scaler.transform(update_row).reshape(1,7))))
     result_future = np.reshape(result_future,(-1,1))
 
+# The first element in the result vector is the last element from the training set. Remove it.
 result_future = result_future[1:]/1000
 
 ########################################################################################################################
-# Inverse the scaling.
+# Inverse the scaling. Divide by 1000 to express everything in GW.
 ########################################################################################################################
 
 X_train = x_scaler.inverse_transform(X_train)/1000
@@ -110,6 +114,7 @@ print("-"*200)
 # Visualising the results
 ########################################################################################################################
 
+# Create a vector that contains the error between the predictionn and the test set values.
 error_test_plot = np.zeros((48*3+48*7,1))
 error_test_plot[-336:] = error_test[:48*7]
 
@@ -120,7 +125,7 @@ axs2[0].plot(dates.iloc[-len(X_test)-48*3:-len(X_test)],
              label = "Training Set", alpha = 1, color = "blue")
 axs2[0].plot(dates.iloc[-len(X_test):-len(X_test)+48*7],
              result_future[:48*7,0],
-             label = "SVR Iterative\nPrediction w. SP", color = "orange")
+             label = "SVR Iterative\nPrediction w SP", color = "orange")
 axs2[0].plot(dates.iloc[-len(X_test):-len(X_test)+48*7],
              y_test[:48*7],
              label = "Test Set", alpha = 1, color = "black")
