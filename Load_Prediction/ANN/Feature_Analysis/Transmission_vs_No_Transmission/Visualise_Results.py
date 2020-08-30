@@ -30,6 +30,7 @@ axes3[2].bar(df.iloc[:,0], df.iloc[:,3]/1000, color='blue')
 axes3[2].set_ylabel('RMSE, GW', size = 14)
 axes3[2].grid(True)
 axes3[2].set_xticklabels(rotation=0, labels = string)
+axes3[0].set_axisbelow(True), axes3[1].set_axisbelow(True), axes3[2].set_axisbelow(True)
 fig3.show()
 fig3.savefig("Load_Prediction/ANN/Figures/Histograms_Transmission_vs_No_Transmission.pdf", bbox_inches='tight')
 

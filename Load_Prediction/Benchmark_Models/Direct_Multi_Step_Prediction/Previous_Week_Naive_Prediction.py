@@ -29,6 +29,7 @@ error = (X.iloc[:,0]- y.iloc[:,0])/1000
 axs1.hist(error, bins = 50, color = "blue")
 axs1.set_xlabel("Error between the prediction (X) and the actual values (y) in GW", size = 14)
 axs1.set_ylabel("Count", size = 14)
+axs1.set_axisbelow(True)
 fig1.show()
 fig1.savefig("Load_Prediction/Benchmark_Models/Figures/Previous_Week_Histogram_All.pdf", bbox_inches='tight')
 
@@ -43,12 +44,13 @@ fig3, axs3=plt.subplots(1,2,figsize=(12,6))
 axs3[0].grid(True)
 axs3[0].hist((X_train.iloc[:,0]- y_train.iloc[:,0])/1000, bins = 30, color = "blue")
 axs3[0].set_xlabel("Error between the prediction (X_train)\nand the actual values (y_train) in GW", size = 14)
-axs3[0].set_ylabel("Count", size = 14)
+axs3[0].set_ylabel("Number of settlement periods", size = 14)
 
 axs3[1].grid(True)
 axs3[1].hist((X_test.iloc[:,0]- y_test.iloc[:,0])/1000, bins = 30, color = "blue")
 axs3[1].set_xlabel("Error between the prediction (X_test)\nand the actual values (y_test) in GW", size = 14)
-axs3[1].set_ylabel("Count", size = 14)
+axs3[1].set_ylabel("Number of settlement periods", size = 14)
+axs3[0].set_axisbelow(True), axs3[1].set_axisbelow(True)
 fig3.show()
 fig3.savefig("Load_Prediction/Benchmark_Models/Figures/Previous_Week_Histograms_Train_and_Test.pdf", bbox_inches='tight')
 
@@ -123,7 +125,7 @@ loc = plticker.MultipleLocator(base=48) # Puts ticks at regular intervals
 axs2[0].xaxis.set_major_locator(loc), axs2[1].xaxis.set_major_locator(loc)
 fig2.autofmt_xdate(rotation=0)
 axs2[0].legend(loc=(1.02,0.49)),
-
+axs2[0].set_axisbelow(True),axs2[1].set_axisbelow(True)
 plt.xticks(np.arange(1,482, 48), ["14:00\n07/22","14:00\n07/23","14:00\n07/24",
                                   "14:00\n07/25","14:00\n07/26","14:00\n07/27",
                                   "14:00\n07/28","14:00\n07/29","14:00\n07/30",

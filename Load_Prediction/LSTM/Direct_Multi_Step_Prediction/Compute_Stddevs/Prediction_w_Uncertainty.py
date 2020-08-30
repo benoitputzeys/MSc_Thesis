@@ -99,6 +99,7 @@ axs4.grid(b=True, which='major'), axs4.grid(b=True, which='minor',alpha = 0.2)
 axs4.tick_params(axis = "both", labelsize = 12)
 axs4.minorticks_on()
 axs4.legend(fontsize=14)
+axs4.set_axisbelow(True)
 fig4.show()
 fig4.savefig("Load_Prediction/LSTM/Figures/DMST_Mean_and_Stddev_of_Error_Train_Set_Pred.pdf", bbox_inches='tight')
 
@@ -151,6 +152,7 @@ axs5[0].grid(True)
 loc = plticker.MultipleLocator(base=48)
 axs5[0].xaxis.set_major_locator(loc) # Put ticks at regular intervals
 axs5[1].xaxis.set_major_locator(loc)
+axs5[0].set_axisbelow(True), axs5[0].set_axisbelow(True)
 fig5.autofmt_xdate(rotation=0)
 axs5[0].legend(loc=(1.02,0.48))
 plt.xticks(np.arange(1,482, 48), ["14:00\n07/22","14:00\n07/23","14:00\n07/24",
@@ -214,6 +216,7 @@ axs7.set_xticklabels(["00:00\nMonday","12:00",
 axs7.grid(b=True, which='major'), axs7.grid(b=True, which='minor',alpha = 0.2)
 axs7.tick_params(axis = "both", labelsize = 12)
 axs7.minorticks_on()
+axs7.set_axisbelow(True)
 axs7.legend(fontsize=14)
 fig7.show()
 fig7.savefig("Load_Prediction/LSTM/Figures/DMST_Mean_and_Stddev_of_Error_Test_Set_Pred.pdf", bbox_inches='tight')
@@ -230,7 +233,7 @@ test_stats.to_csv("Compare_Models/Direct_Multi_Step_Probability_Results/Probabil
 ########################################################################################################################
 
 # Prediction on training set.
-fig8, axs8=plt.subplots(3,1,figsize=(12,10))
+fig8, axs8=plt.subplots(2,1,figsize=(12,6))
 # First plot contains the prediction, the true values from the test and training set and the standard deviation.
 axs8[0].plot(dates_train[154:48*7*3+154+1],
              y_train[154:48*7*3+154+1],
@@ -261,32 +264,22 @@ axs8[1].set_xticklabels(["2017/10/16",
                        "2017/11/06",
                        ])
 
-# Third plot contains the errors projected on a single week
-axs8[2].scatter(error_train["SP"],
-             error_train["Error_Train"],linewidth = 0.01,
-             alpha=0.05, color = "red")
-axs8[2].set_ylabel("Projected Error\nduring training, GW", size = 14)
+# # Third plot contains the errors projected on a single week
+# # Only plot 3000 errors otherwise the file is too large.
+# axs8[2].scatter(error_train["SP"].iloc[:3000],
+#              error_train["Error_Train"].iloc[:3000],linewidth = 0.01,
+#              alpha=0.2, color = "red")
+# axs8[2].set_ylabel("Projected Error\nduring training, GW", size = 14)
 
 # Include additional details such as tick intervals, rotation, legend positioning and grid on.
-axs8[2].grid(True), axs8[1].grid(True), axs8[0].grid(True)
+axs8[1].grid(True), axs8[0].grid(True)
 loc2 = plticker.MultipleLocator(base=24) # this locator puts ticks at regular intervals
-axs8[2].xaxis.set_major_locator(loc2)
-axs8[2].set_xticks(np.arange(1,385, 24))
-axs8[2].set_xticklabels(["00:00\nMonday","12:00",
-                       "00:00\nTuesday","12:00",
-                       "00:00\nWednesday", "12:00",
-                       "00:00\nThursday", "12:00",
-                       "00:00\nFriday","12:00",
-                       "00:00\nSaturday", "12:00",
-                       "00:00\nSunday","12:00",
-                       "00:00"])
-axs8[2].grid(b=True, which='major'), axs8[2].grid(b=True, which='minor',alpha = 0.2)
-axs8[2].tick_params(axis = "both")
+
+axs8[0].set_axisbelow(True), axs8[1].set_axisbelow(True)
+
 axs8[1].tick_params(axis = "both",labelsize = 12)
 axs8[0].tick_params(axis = "both",labelsize = 12)
 axs8[0].legend(loc=(1.02,0.75))
-axs8[2].minorticks_on()
-axs8[2].grid(True)
 
 fig8.show()
 fig8.savefig("Load_Prediction/LSTM/Figures/DMST_Projection_Explained.pdf", bbox_inches='tight')

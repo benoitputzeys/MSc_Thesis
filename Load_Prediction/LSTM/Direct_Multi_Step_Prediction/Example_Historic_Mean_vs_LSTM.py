@@ -102,7 +102,7 @@ axs1[1].tick_params(axis = "both",labelsize = 12)
 plt.xticks(np.arange(1,338, 48), ["14:00\n07/25","14:00\n07/26","14:00\n07/27",
                                   "14:00\n07/28","14:00\n07/29","14:00\n07/30",
                                   "14:00\n07/31","14:00\n08/01"])
-
+axs1[0].set_axisbelow(True), axs1[1].set_axisbelow(True)
 fig1.show()
 fig1.savefig("Load_Prediction/LSTM/Figures/DMST_Prediction_Compared_to_Historic_Variability.pdf", bbox_inches='tight')
 
@@ -133,6 +133,7 @@ plt.xticks(np.arange(1,338, 48), ["14:00\n07/25","14:00\n07/26","14:00\n07/27",
                                   "14:00\n07/28","14:00\n07/29","14:00\n07/30",
                                   "14:00\n07/31","14:00\n08/01"])
 axs2.tick_params(axis = "both",labelsize = 12)
+axs2.set_axisbelow(True)
 fig2.show()
 
 fig2.savefig("Load_Prediction/LSTM/Figures/Actual_Values_Compared_to_Historic_Variability.pdf", bbox_inches='tight')

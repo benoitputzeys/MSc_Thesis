@@ -85,8 +85,8 @@ loc = plticker.MultipleLocator(base=48) # Puts ticks at regular intervals
 axs2[0].xaxis.set_major_locator(loc), axs2[1].xaxis.set_major_locator(loc)
 fig2.autofmt_xdate(rotation=0)
 axs2[0].legend(loc=(1.02,0.55))
-axs2[0].tick_params(axis = "both",labelsize = 12)
-axs2[1].tick_params(axis = "both",labelsize = 12)
+axs2[0].tick_params(axis = "both",labelsize = 12), axs2[1].tick_params(axis = "both",labelsize = 12)
+axs2[0].set_axisbelow(True), axs2[1].set_axisbelow(True)
 plt.xticks(np.arange(1,482, 48), ["14:00\n07/22","14:00\n07/23","14:00\n07/24",
                                   "14:00\n07/25","14:00\n07/26","14:00\n07/27",
                                   "14:00\n07/28","14:00\n07/29","14:00\n07/30",
@@ -147,7 +147,7 @@ plt.xticks(np.arange(1,482, 48), ["14:00\n07/22","14:00\n07/23","14:00\n07/24",
                                   "14:00\n07/25","14:00\n07/26","14:00\n07/27",
                                   "14:00\n07/28","14:00\n07/29","14:00\n07/30",
                                   "14:00\n07/31","14:00\n08/01"])
-
+axs3[0].set_axisbelow(True), axs3[1].set_axisbelow(True)
 fig3.show()
 fig3.savefig("Load_Prediction/LSTM/Figures/DMST_Pred_w_Historic_Variability.pdf", bbox_inches='tight')
 

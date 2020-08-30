@@ -34,6 +34,7 @@ axes[2].bar(df.iloc[:,0], df.iloc[:,3]/1000, color='blue')
 axes[2].set_ylabel('RMSE, GW', size = 14)
 axes[2].grid(True)
 axes[2].set_xticklabels(rotation=90, labels = string)
+axes[0].set_axisbelow(True), axes[1].set_axisbelow(True), axes[2].set_axisbelow(True)
 fig.show()
 fig.savefig("Load_Prediction/ANN/Figures/Histograms_Impact_of_Date_Features.pdf", bbox_inches='tight')
 
