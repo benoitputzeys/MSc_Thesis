@@ -3,21 +3,22 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 
+# Use the key provided by entsoe to access the data
 client = EntsoePandasClient(api_key="b7a8a6e4-3d85-427a-8790-30ab56538691")
+
+# Define the time interval from where the data should be loaded.
 start = pd.Timestamp('20160101', tz="Europe/London")
 end = pd.Timestamp('20200615', tz="Europe/London")
 cc = "GB"
 
+# Load the data into a variable.
 load_GB_raw = client.query_load(cc, start = start ,end = end)
 load_GB_raw.to_csv("Data_Preprocessing/Load_GB_Raw_Data")
 
-# # Unavailabilities needed?
-# unavailability_GB = client.query_unavailability_of_generation_units(cc, start = start ,end = end)
-
-# Plot raw data.
+# Plot the raw data. Divide by 1000 to express everything in GW.
 fig1, axs1=plt.subplots(1,1,figsize=(12,6))
 axs1.plot(load_GB_raw/1000, color = "blue", linewidth = 0.5)
-axs1.set_ylabel("Load in GB (Raw Data), GW",size = 16)
+axs1.set_ylabel("Load in the UK (Raw Data), GW",size = 16)
 axs1.set_xlabel("Date", size = 16)
 axs1.axes.tick_params(labelsize = 14)
 axs1.grid(True)
@@ -27,14 +28,13 @@ fig1.savefig("Data_Preprocessing/Figures/Raw_Data.pdf", bbox_inches='tight')
 
 load_GB_processed = load_GB_raw.copy()
 
-not_shifted_raw = np.array(load_GB_raw)
-shifted_raw = load_GB_processed.shift(+1)
-not_shifted = not_shifted_raw[1:]
-shifted_raw = shifted_raw[1:]
+# Shift the data by 1 SP.
+not_shifted_raw = np.array(load_GB_raw)[1:]
+shifted_raw = load_GB_processed.shift(+1)[1:]
 
 # Plot the difference in electricity load from one SP to the next.
 fig21, axs21=plt.subplots(1,1,figsize=(12,6))
-axs21.plot((shifted_raw-not_shifted)/1000, color = "blue", linewidth = 0.5)
+axs21.plot((shifted_raw-not_shifted_raw)/1000, color = "blue", linewidth = 0.5)
 axs21.set_ylabel("Difference of Load, GW",size = 16)
 axs21.set_xlabel("Date", size = 16)
 axs21.axes.tick_params(labelsize = 14)
@@ -42,7 +42,7 @@ axs21.grid(True)
 fig21.show()
 
 counter = 0
-# Filter some erroneous data out.
+# Filter some erroneous data out and replace by the load from the previous SP.
 for i in range(1,len(load_GB_processed)-1):
     if (np.abs(load_GB_processed[i] - load_GB_processed[i - 1]) > 10000) & (np.abs(load_GB_processed[i] - load_GB_processed[i + 1])>10000):
         load_GB_processed[i] = load_GB_processed[i - 1]
@@ -51,7 +51,7 @@ for i in range(1,len(load_GB_processed)-1):
 # Create plot of processed data.
 fig2, axs2=plt.subplots(1,1,figsize=(12,6))
 axs2.plot(load_GB_processed/1000, color = "blue", linewidth = 0.5)
-axs2.set_ylabel("Load in GB (Processed Data), GW",size = 16)
+axs2.set_ylabel("Load in the UK (Processed Data), GW",size = 16)
 axs2.set_xlabel("Date", size = 16)
 axs2.axes.tick_params(labelsize = 14)
 axs2.grid(True)
@@ -187,7 +187,7 @@ fig9.show()
 # Create plot of all the processed load.
 fig10, axs10=plt.subplots(1,1,figsize=(12,6))
 axs10.plot(load_GB_processed/1000, color = "blue", linewidth = 0.5)
-axs10.set_ylabel("Load in GB (Processed Data), GW", size = 18)
+axs10.set_ylabel("Load in the UK (Processed Data), GW", size = 18)
 axs10.set_xlabel("Date", size = 18)
 axs10.axes.tick_params(labelsize = 12)
 #fig20.suptitle("Processed data", fontsize=18, x = 0.52, y = 0.975)
@@ -195,16 +195,15 @@ axs10.grid(True)
 fig10.show()
 fig10.savefig("Data_Preprocessing/Figures/Processed_Data.pdf", bbox_inches='tight')
 
+# Save the data into a csv file which will be used by other models as input values.
 #load_GB_processed.to_csv("Data_Preprocessing/Load_GB_Processed_Data")
 
-not_shifted_processed = np.array(load_GB_processed)
-shifted_processed = load_GB_processed.shift(+1)
-not_shifted_processed = not_shifted_processed[1:]
-shifted_processed = shifted_processed[1:]
+not_shifted_processed = np.array(load_GB_processed)[1:]
+shifted_processed = load_GB_processed.shift(+1)[1:]
 
 # Make 2 subplots to show the differences in the SP again.
 fig21, axs21=plt.subplots(2,1,figsize=(12,6))
-axs21[0].plot((shifted_raw-not_shifted)/1000, color = "blue", linewidth = 0.5)
+axs21[0].plot((shifted_raw-not_shifted_raw)/1000, color = "blue", linewidth = 0.5)
 axs21[0].set_ylabel("Difference\n(Raw Data), GW", size = 16)
 axs21[1].plot((shifted_processed-not_shifted_processed)/1000, color = "blue", linewidth = 0.5)
 axs21[1].set_ylabel("Difference\n(Processed Data), GW", size = 16)

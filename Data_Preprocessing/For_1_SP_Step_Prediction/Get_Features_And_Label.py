@@ -4,13 +4,16 @@ from sklearn.impute import SimpleImputer
 import matplotlib.pyplot as plt
 import datetime as dt
 
+# Load the data into a dataframe called df.
 df = pd.read_csv("Data_Preprocessing/Load_and_Transmission_Data.csv")
 df = df.rename(columns={"Unnamed: 0": "Timestamp"}, errors="raise")
 
+# Get rid of the seconds in the timestamp, only display up until minutes.
 df["Timestamp"] = [dt.datetime.strptime(df.iloc[i,0][0:16], '%Y-%m-%d %H:%M') for i in range(len(df))]
 df["Time"] = df["Timestamp"]
 df = df.set_index(["Time"])
 
+# Plot the data
 fig1, axs1=plt.subplots(1,1,figsize=(12,6))
 axs1.plot(df.iloc[:,1], color = "blue", linewidth = 0.5)
 axs1.set_ylabel("Load in UK, MW", size = 14)
@@ -24,7 +27,8 @@ df_features = pd.DataFrame()
 df_features["Load_Past"] = df["Load"].shift(+1)
 df_features["Transmission_Past"] = df["Transmission"].shift(+1)
 
-# Create artificial features.
+# Create artificial features: 3 simple moving averages and 2 exponential moving averages.
+# Determine the windows for these metrics.
 rolling_mean_10 = df_features["Load_Past"].rolling(window=10).mean()
 rolling_mean_48 = df_features["Load_Past"].rolling(window=48).mean()
 rolling_mean_336 = df_features["Load_Past"].rolling(window=336).mean()
@@ -37,7 +41,7 @@ df_features["Simple_Moving_Average_336_SP"] = rolling_mean_336
 df_features["Exp_Moving_Average_10_SP"] = exp_10
 df_features["Exp_Moving_Average_48_SP"] = exp_48
 
-# Create date relevant features.
+# Create date relevant features. This is not used in the end but it was analysed and is left for info only.
 df_features["Settlement Period"] = df['Timestamp'].dt.hour*2+1+df['Timestamp'].dt.minute/30
 df_features["Day of Week"] = df['Timestamp'].dt.weekday
 df_features['Day'] = df['Timestamp'].dt.day
@@ -47,26 +51,16 @@ df_features['Year'] = df['Timestamp'].dt.year
 df["Timestamp"]  = [pd.to_datetime(df.iloc[i,0]).strftime("%Y:%m:%d %H:%M") for i in range(len(df))]
 df_features["Time_At_Delivery"] = df["Timestamp"]
 
+# Create the final X (input) values and replace nan values with the mean from the respective column.
 X = df_features
 # After having shifted the data, the nan values have to be replaced in order to have good predictions.
 replace_nan = SimpleImputer(missing_values=np.nan, strategy='mean')
 replace_nan.fit(X.iloc[:,:-1])
 X.iloc[:,:-1] = replace_nan.transform(X.iloc[:,:-1])
 
+# Create the final y (output) values which is the "load".
 y = pd.DataFrame({"Load": df.iloc[:,1]})
 
+# Save the data so that other models can use them as input.
 X.to_csv("Data_Preprocessing/For_1_SP_Step_Prediction/X.csv")
 y.to_csv("Data_Preprocessing/For_1_SP_Step_Prediction/y.csv")
-
-#
-# plt.plot(X[:,0], label='Electricity Generation 2 SP ago', linewidth=0.5 )
-# plt.xlabel("Actual Settlement Period")
-# plt.ylabel("Electricity Generation [MW]")
-# #plt.plot(y[-48*3:,0], label='Total Generation Actual', linewidth=0.5 )
-# plt.plot(X[:,1], label='10 Day MA', color='black' , linewidth=0.5 )
-# #plt.plot(X[-48*3:,2], label='48 SP SMA', color='black',  linewidth=0.5 )
-# #plt.plot(X[-48*3:,3], label='10 SP Exp MA', color='red',  linewidth=0.5 )
-# #plt.plot(X[-48*3:,4], label='48 SP Exp MA', color='red',  linewidth=0.5 )
-# #axs1.grid(True)
-# plt.legend()
-# plt.show()
