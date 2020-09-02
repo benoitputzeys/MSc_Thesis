@@ -110,7 +110,7 @@ axs4.tick_params(axis = "both", labelsize = 12)
 axs4.minorticks_on()
 axs4.legend(fontsize=14)
 fig4.show()
-fig4.savefig("Load_Prediction/SVR/Figures/DMST_Mean_and_Stddev_of_Error_Train_Set_Pred.pdf", bbox_inches='tight')
+fig4.savefig("Load_Prediction/SVR/Figures/DMSP_Mean_and_Stddev_of_Error_Train_Set_Pred.pdf", bbox_inches='tight')
 
 ########################################################################################################################
 # Make the prediction with the orange band, the confidence interval.
@@ -174,7 +174,7 @@ plt.xticks(np.arange(1,482, 48), ["14:00\n07/22","14:00\n07/23","14:00\n07/24",
                                   "14:00\n07/28","14:00\n07/29","14:00\n07/30",
                                   "14:00\n07/31","14:00\n08/01"])
 fig5.show()
-fig5.savefig("Load_Prediction/SVR/Figures/DMST_Pred_w_Uncertainty.pdf", bbox_inches='tight')
+fig5.savefig("Load_Prediction/SVR/Figures/DMSP_Pred_w_Uncertainty.pdf", bbox_inches='tight')
 
 ########################################################################################################################
 # Compute the standard deviation of the errors from the test set.
@@ -235,7 +235,7 @@ axs7.minorticks_on()
 axs7.legend(fontsize=14)
 fig7.show()
 # Save the figure.
-fig7.savefig("Load_Prediction/SVR/Figures/DMST_Mean_and_Stddev_of_Error_Test_Set_Pred.pdf", bbox_inches='tight')
+fig7.savefig("Load_Prediction/SVR/Figures/DMSP_Mean_and_Stddev_of_Error_Test_Set_Pred.pdf", bbox_inches='tight')
 
 ########################################################################################################################
 # Save the results in a csv file.

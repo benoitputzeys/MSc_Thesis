@@ -48,7 +48,7 @@ y_train = y_scaler.fit_transform(y_train)
 # Create/load the model.
 ########################################################################################################################
 
-my_model = keras.models.load_model("Load_Prediction/LSTM/Iterative_Prediction/SST_LSTM_w_SP.h5")
+my_model = keras.models.load_model("Load_Prediction/LSTM/Iterative_Prediction/SSP_LSTM_w_SP.h5")
 
 ########################################################################################################################
 # Predicting the generation.

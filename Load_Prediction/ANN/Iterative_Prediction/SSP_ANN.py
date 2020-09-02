@@ -61,7 +61,7 @@ for train_index, test_index in tscv.split(X_train):
      hist_list = hist_list.append(hist_split)
 
 # Save the model.
-my_model.save("Load_Prediction/ANN/Iterative_Prediction/SST_ANN_w_SP.h5")
+my_model.save("Load_Prediction/ANN/Iterative_Prediction/SSP_ANN_w_SP.h5")
 
 #my_model = keras.models.load_model("SST_No_Trans_No_Date.h5")
 

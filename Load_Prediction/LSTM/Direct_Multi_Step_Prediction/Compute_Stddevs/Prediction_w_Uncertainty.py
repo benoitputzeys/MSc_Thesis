@@ -111,7 +111,7 @@ axs4.legend(fontsize=14)
 axs4.set_axisbelow(True)
 fig4.show()
 # Save the figure
-fig4.savefig("Load_Prediction/LSTM/Figures/DMST_Mean_and_Stddev_of_Error_Train_Set_Pred.pdf", bbox_inches='tight')
+fig4.savefig("Load_Prediction/LSTM/Figures/DMSP_Mean_and_Stddev_of_Error_Train_Set_Pred.pdf", bbox_inches='tight')
 
 ########################################################################################################################
 # Make the prediction with the orange band, the confidence interval.
@@ -178,7 +178,7 @@ plt.xticks(np.arange(1,482, 48), ["14:00\n07/22","14:00\n07/23","14:00\n07/24",
                                   "14:00\n07/31","14:00\n08/01"])
 fig5.show()
 # Save the figure.
-fig5.savefig("Load_Prediction/LSTM/Figures/DMST_Pred_w_Uncertainty.pdf", bbox_inches='tight')
+fig5.savefig("Load_Prediction/LSTM/Figures/DMSP_Pred_w_Uncertainty.pdf", bbox_inches='tight')
 
 ########################################################################################################################
 # Compute the standard deviation of the errors from the test set.
@@ -240,7 +240,7 @@ axs7.set_axisbelow(True)
 axs7.legend(fontsize=14)
 fig7.show()
 # Save the figure.
-fig7.savefig("Load_Prediction/LSTM/Figures/DMST_Mean_and_Stddev_of_Error_Test_Set_Pred.pdf", bbox_inches='tight')
+fig7.savefig("Load_Prediction/LSTM/Figures/DMSP_Mean_and_Stddev_of_Error_Test_Set_Pred.pdf", bbox_inches='tight')
 
 ########################################################################################################################
 # Save the results in a csv file.
@@ -302,4 +302,4 @@ axs8[0].legend(loc=(1.02,0.75))
 
 fig8.show()
 # Save the figure.
-fig8.savefig("Load_Prediction/LSTM/Figures/DMST_Projection_Explained.pdf", bbox_inches='tight')
+fig8.savefig("Load_Prediction/LSTM/Figures/DMSP_Projection_Explained.pdf", bbox_inches='tight')

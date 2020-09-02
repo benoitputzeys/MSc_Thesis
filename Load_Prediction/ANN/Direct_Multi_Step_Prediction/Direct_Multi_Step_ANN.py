@@ -81,8 +81,8 @@ y_train = y_scaler.fit_transform(y_train)
 #fig.savefig("Load_Prediction/ANN/Figures/ANN_Loss.pdf", bbox_inches='tight')
 #
 ## Save the model.
-#my_model.save("Load_Prediction/ANN/Direct_Multi_Step_Prediction/DMST_ANN_Prediction.h5")
-my_model = keras.models.load_model("Load_Prediction/ANN/Direct_Multi_Step_Prediction/DMST_ANN_Prediction.h5")
+#my_model.save("Load_Prediction/ANN/Direct_Multi_Step_Prediction/DMSP_ANN_Model.h5")
+my_model = keras.models.load_model("Load_Prediction/ANN/Direct_Multi_Step_Prediction/DMSP_ANN_Model.h5")
 
 ########################################################################################################################
 # Predict the electricity load. Divide by 1000 to express everything in GW.
@@ -163,7 +163,7 @@ axs2[0].legend(loc=(1.02,0.6))
 fig2.show()
 
 #Save the figure
-fig2.savefig("Load_Prediction/ANN/Figures/DMST_Prediction.pdf", bbox_inches='tight')
+#fig2.savefig("Load_Prediction/ANN/Figures/DMSP_Prediction.pdf", bbox_inches='tight')
 
 ########################################################################################################################
 # Save the results in a csv file.

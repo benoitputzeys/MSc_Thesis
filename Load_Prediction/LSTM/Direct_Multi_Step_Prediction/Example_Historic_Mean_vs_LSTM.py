@@ -109,7 +109,7 @@ plt.xticks(np.arange(1,338, 48), ["14:00\n07/25","14:00\n07/26","14:00\n07/27",
 axs1[0].set_axisbelow(True), axs1[1].set_axisbelow(True)
 fig1.show()
 # Save the figure.
-fig1.savefig("Load_Prediction/LSTM/Figures/DMST_Prediction_Compared_to_Historic_Variability.pdf", bbox_inches='tight')
+fig1.savefig("Load_Prediction/LSTM/Figures/DMSP_Prediction_Compared_to_Historic_Variability.pdf", bbox_inches='tight')
 
 ########################################################################################################################
 # For more clarity, only show the first week in the test set with the historic mean and stdev.

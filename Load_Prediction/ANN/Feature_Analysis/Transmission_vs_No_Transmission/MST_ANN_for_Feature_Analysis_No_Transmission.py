@@ -78,10 +78,10 @@ axs.legend(['Training set'])
 axs.grid(True)
 fig.show()
 
-my_model.save("Load_Prediction/ANN/Feature_Analysis/Models/DMST_ANN_model_No_Transmission.h5")
+my_model.save("Load_Prediction/ANN/Feature_Analysis/Models/DMSP_ANN_model_No_Transmission.h5")
 
 ## The model is already trained and can be loaded with:
-#my_model = keras.models.load_model("Load_Prediction/ANN/Feature_Analysis/Models/DMST_ANN_model_No_Transmission.h5")
+#my_model = keras.models.load_model("Load_Prediction/ANN/Feature_Analysis/Models/DMSP_ANN_model_No_Transmission.h5")
 
 ########################################################################################################################
 # Predicting the generation.

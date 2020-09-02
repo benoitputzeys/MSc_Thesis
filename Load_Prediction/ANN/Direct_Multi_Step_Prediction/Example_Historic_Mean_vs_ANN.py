@@ -106,7 +106,7 @@ axs1[0].grid(True), axs1[1].grid(True)
 fig1.show()
 
 # Save the figure
-fig1.savefig("Load_Prediction/ANN/Figures/DMST_Prediction_Compared_to_Historic_Variability.pdf", bbox_inches='tight')
+#fig1.savefig("Load_Prediction/ANN/Figures/DMSP_Prediction_Compared_to_Historic_Variability.pdf", bbox_inches='tight')
 
 ########################################################################################################################
 # For more clarity, only show the first week in the test set with the historic mean and stdev.

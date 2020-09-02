@@ -63,9 +63,8 @@ for train_index, test_index in tscv.split(X_train):
      hist_list = hist_list.append(hist_split)
 
 # Save the model.
-my_model.save("Load_Prediction/LSTM/Iterative_Prediction/SST_LSTM_w_SP.h5")
-
-#my_model = keras.models.load_model("SST_LSTM_w_SP.h5")
+my_model.save("Load_Prediction/LSTM/Iterative_Prediction/SSP_LSTM_w_SP.h5")
+#my_model = keras.models.load_model("SSP_LSTM_w_SP.h5")
 
 ########################################################################################################################
 # Predicting the generation. Divide by 1000 to have the results in GW.

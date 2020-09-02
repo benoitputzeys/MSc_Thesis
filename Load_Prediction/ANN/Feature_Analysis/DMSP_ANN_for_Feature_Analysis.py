@@ -63,7 +63,7 @@ y_train = y_scaler.fit_transform(y_train)
 #    y_train_split, y_test_split = y_train[train_index], y_train[test_index]
 #    hist_split = train_model(my_model, X_train_split, y_train_split, number_of_epochs, batch_size)
 #    hist_list = hist_list.append(hist_split)
-#my_model.save("Load_Prediction/ANN/Feature_Analysis/Models/DMST_ANN_F7_SP.h5")
+#my_model.save("Load_Prediction/ANN/Feature_Analysis/Models/DMSP_ANN_F7_SP.h5")
 #
 ## Plot the loss per epoch.
 #metric = "mean_absolute_error"
@@ -79,15 +79,15 @@ y_train = y_scaler.fit_transform(y_train)
 
 #Different models have to be used to visualise the impact of the different features.
 #Here are all the trained models to analyse the impact of leaving Date-related features out.
-#DMST_ANN_F7 means all 7 features are used DMST_ANN_F7_SP means all 7 features are used PLUS the SP as well
-#DMST_ANN_F7_SP_DoW means all 7 features PLUS the SP PLUS the Day of the Week etc.
+#DMSP_ANN_F7 means all 7 features are used DMSP_ANN_F7_SP means all 7 features are used PLUS the SP as well
+#DMSP_ANN_F7_SP_DoW means all 7 features PLUS the SP PLUS the Day of the Week etc.
 
-my_model = keras.models.load_model("Load_Prediction/ANN/Feature_Analysis/Models/DMST_ANN_F7.h5")
-#my_model = keras.models.load_model("Load_Prediction/ANN/Feature_Analysis/Models/DMST_ANN_F7_SP.h5")
-#my_model = keras.models.load_model("Load_Prediction/ANN/Feature_Analysis/Models/DMST_ANN_F7_SP_DoW.h5")
-#my_model = keras.models.load_model("Load_Prediction/ANN/Feature_Analysis/Models/DMST_ANN_F7_SP_DoW_D.h5")
-#my_model = keras.models.load_model("Load_Prediction/ANN/Feature_Analysis/Models/DMST_ANN_F7_SP_DoW_D_M.h5")
-#my_model = keras.models.load_model("Load_Prediction/ANN/Feature_Analysis/Models/DMST_ANN_F7_SP_DoW_D_M_Y.h5")
+my_model = keras.models.load_model("Load_Prediction/ANN/Feature_Analysis/Models/DMSP_ANN_F7.h5")
+#my_model = keras.models.load_model("Load_Prediction/ANN/Feature_Analysis/Models/DMSP_ANN_F7_SP.h5")
+#my_model = keras.models.load_model("Load_Prediction/ANN/Feature_Analysis/Models/DMSP_ANN_F7_SP_DoW.h5")
+#my_model = keras.models.load_model("Load_Prediction/ANN/Feature_Analysis/Models/DMSP_ANN_F7_SP_DoW_D.h5")
+#my_model = keras.models.load_model("Load_Prediction/ANN/Feature_Analysis/Models/DMSP_ANN_F7_SP_DoW_D_M.h5")
+#my_model = keras.models.load_model("Load_Prediction/ANN/Feature_Analysis/Models/DMSP_ANN_F7_SP_DoW_D_M_Y.h5")
 
 ########################################################################################################################
 # Predicting the generation.

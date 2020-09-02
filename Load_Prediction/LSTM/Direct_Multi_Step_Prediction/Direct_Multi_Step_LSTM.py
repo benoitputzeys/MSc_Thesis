@@ -81,8 +81,8 @@ fig.show()
 fig.savefig("Load_Prediction/LSTM/Figures/LSTM_Loss.pdf", bbox_inches='tight')
 
 # Load or save the model.
-my_model.save("Load_Prediction/LSTM/Direct_Multi_Step_Prediction/DMST_LSTM_Prediction.h5")
-#my_model = keras.models.load_model("Load_Prediction/LSTM/Direct_Multi_Step_Prediction/DMST_LSTM_Prediction.h5")
+my_model.save("Load_Prediction/LSTM/Direct_Multi_Step_Prediction/DMSP_LSTM_Model.h5")
+#my_model = keras.models.load_model("Load_Prediction/LSTM/Direct_Multi_Step_Prediction/DMSP_LSTM_Model.h5")
 
 ########################################################################################################################
 # Predicting the generation. Divide by 1000 to express everything in GW.
@@ -159,7 +159,7 @@ plt.xticks(np.arange(1,482, 48), ["14:00\n07/22","14:00\n07/23","14:00\n07/24",
                                   "14:00\n07/31","14:00\n08/01"])
 fig2.show()
 # Save the figure.
-fig2.savefig("Load_Prediction/LSTM/Figures/DMST_Prediction.pdf", bbox_inches='tight')
+fig2.savefig("Load_Prediction/LSTM/Figures/DMSP_Prediction.pdf", bbox_inches='tight')
 
 ########################################################################################################################
 # Save the results in a csv file.

@@ -129,7 +129,7 @@ plt.xticks(np.arange(1,482, 48), ["14:00\n07/22","14:00\n07/23","14:00\n07/24",
 axs2[0].legend(loc=(1.02,0.62))
 fig2.show()
 # Save the figure.
-fig2.savefig("Load_Prediction/SVR/Figures/DMST_Prediction.pdf", bbox_inches='tight')
+fig2.savefig("Load_Prediction/SVR/Figures/DMSP_Prediction.pdf", bbox_inches='tight')
 
 ########################################################################################################################
 # Save the results in csv files.
