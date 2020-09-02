@@ -5,6 +5,7 @@ import keras
 from keras import layers
 import numpy as np
 
+# Define the posterior trainable distribution.
 def posterior_mean_field(kernel_size: int, bias_size: int, dtype: any) -> tf.keras.Model:
     """Specify the surrogate posterior over `keras.layers.Dense` `kernel` and `bias`."""
     n = kernel_size + bias_size
@@ -18,7 +19,7 @@ def posterior_mean_field(kernel_size: int, bias_size: int, dtype: any) -> tf.ker
             reinterpreted_batch_ndims=1)),
     ])
 
-
+# Define the prior trainable distribution.
 def prior_trainable(kernel_size: int, bias_size: int, dtype: any) -> tf.keras.Model:
     """Specify the prior over `keras.layers.Dense` `kernel` and `bias`."""
     n = kernel_size + bias_size
@@ -30,6 +31,7 @@ def prior_trainable(kernel_size: int, bias_size: int, dtype: any) -> tf.keras.Mo
             reinterpreted_batch_ndims=1)),
     ])
 
+# Build the model with the same hyperparameters as the "normal" NN but only the first layer is randomly distributed.
 def build_model(input_dim,learning_rate):
     model = keras.Sequential([
         tfp.layers.DenseVariational(300, activation='relu', input_dim=input_dim,

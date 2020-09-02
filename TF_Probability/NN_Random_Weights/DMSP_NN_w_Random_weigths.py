@@ -21,8 +21,10 @@ X = X.iloc[:,:-6]
 y = pd.read_csv('Data_Preprocessing/For_336_SP_Step_Prediction/y.csv', delimiter=',')
 y = y.set_index("Time")
 
+# Divide the dataset into 80% training and 20% test.
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state = 0, shuffle = False)
 
+# Only take half the training and test set. See thesis for justification.
 X_train = X_train[int(len(X_train)*1/2):]
 y_train = y_train[int(len(y_train)*1/2):]
 X_test = X_test[:int(len(X_test)*1/2)]
@@ -40,18 +42,21 @@ y_train = y_scaler.fit_transform(y_train)
 # Create the model.
 ########################################################################################################################
 
+# Define the hyperparameters.
 epochs = 800
 learning_rate = 0.001
 batches = 29
+
 # Build the model.
 model = build_model(X_train.shape[1],learning_rate)
 
-# Extract the loss per epoch to plot the learning progress.
+# Build a dataframe to extract the loss per epoch to plot the learning progress.
 hist_list = pd.DataFrame()
 
 # Measure the time to train the model.
 start_time = time.time()
 
+# Perform 5-fold cross validation
 tscv = TimeSeriesSplit()
 for train_index, test_index in tscv.split(X_train):
      X_train_split, X_test_split = X_train[train_index], X_train[test_index]
@@ -73,8 +78,8 @@ fig1.show()
 fig1.savefig("TF_Probability/NN_Random_Weights/Figures/Loss_Epochs.pdf", bbox_inches='tight')
 
 # Save or load the model, somehow does not work
-#model.save("TF_Probability/NN_Random_Weights/DMST_NN_w_Rd_Weights.h5")
-#model = keras.models.load_model("TF_Probability/NN_Random_Weights/DMST_NN_w_Rd_Weights.h5")
+#model.save("TF_Probability/NN_Random_Weights/DMSP_NN_w_Rd_Weights.h5")
+#model = keras.models.load_model("TF_Probability/NN_Random_Weights/DMSP_NN_w_Rd_Weights.h5")
 
 ########################################################################################################################
 # Predicting the generation.
@@ -83,15 +88,19 @@ fig1.savefig("TF_Probability/NN_Random_Weights/Figures/Loss_Epochs.pdf", bbox_in
 # Make 350 predictions on the test set and calculate the errors for each prediction.
 yhats_test = [model.predict(X_test) for _ in range(350)]
 predictions_test = np.array(yhats_test)
+# Create a long column vector with all the predictions.
 predictions_test = predictions_test.reshape(-1,len(predictions_test[1]))
 
+# Do the same for the training set.
 yhats_train = [model.predict(X_train) for _ in range(350)]
 predictions_train = np.array(yhats_train)
 predictions_train = predictions_train.reshape(-1,len(predictions_train[1]))
 
+# Divide by 1000 to express everything in GW.
 predictions_test = y_scaler.inverse_transform(predictions_test)/1000
 predictions_train = y_scaler.inverse_transform(predictions_train)/1000
 
+# Inverse the scaling for the other variables.
 X_train = x_scaler.inverse_transform(X_train)
 X_test = x_scaler.inverse_transform(X_test)
 y_train = (y_scaler.inverse_transform(y_train)/1000).reshape(-1,)
@@ -101,16 +110,19 @@ y_test = np.array(y_test.iloc[:,-1]/1000).reshape(-1,)
 # Data processing for plotting curves and printing the errors. TRAINING SET.
 ########################################################################################################################
 
-# Calculate the stddev from the 350 predictions.
+# Calculate the mean and stddev from the 350 predictions.
 mean_train = (sum(predictions_train)/350).reshape(-1,1)
 stddev_train = np.zeros((len(mean_train),1))
 for i in range(len(X_train)):
     stddev_train[i,0] = np.std(predictions_train[:,i])
 
+# Calculate the error between the mean prediciton and the training value.
 error_train = mean_train.reshape(-1,) - y_train
+# Extract only 1 week worth of the error to plot it.
 error_train_plot = error_train[-48*7*2:-48*7+1].reshape(-1,1)
 
-# Plot the result with the truth in blue and the predictions in orange.
+# Plot the result with the training set in blue and the predictions in orange.
+# Only plot a week from the training set.
 fig2, axs2=plt.subplots(2,1,figsize=(12,6))
 axs2[0].plot(dates.iloc[-len(X_test)-48*7*2:-len(X_test)-48*7+1],
           y_train[-48*7*2:-48*7+1],
@@ -146,22 +158,25 @@ plt.xticks(np.arange(1,339, 48), ["14:00\n07/11","14:00\n07/12","14:00\n07/13",
                                   "14:00\n07/14","14:00\n07/15","14:00\n07/16",
                                   "14:00\n07/17","14:00\n07/18"])
 fig2.show()
-fig2.savefig("TF_Probability/NN_Random_Weights/Figures/DMST_Train_Set_Pred.pdf", bbox_inches='tight')
+fig2.savefig("TF_Probability/NN_Random_Weights/Figures/DMSP_Train_Set_Pred.pdf", bbox_inches='tight')
 
 ########################################################################################################################
 # Calculate the stddev from the 350 predictions. TESTING SET
 ########################################################################################################################
 
+# Calculate the mean and stddev from the 350 predictions.
 mean_test = (sum(predictions_test)/350).reshape(-1,1)
 stddev_test = np.zeros((len(mean_test),1))
 for i in range (len(X_test)):
     stddev_test[i,0] = np.std(predictions_test[:,i])
 
+# Calculate the error between the mean prediciton and the training value.
 error_test = mean_test.reshape(-1,) - y_test
+# Extract only 1 week worth of the error to plot it.
 error_test_plot = np.zeros((48*3+48*7+1,1))
 error_test_plot[-336:] = error_test[:48*7].reshape(-1,1)
 
-# Plot the result with the truth in blue and the predictions in orange.
+# Plot only 10 predictions in orange and the test set in black.
 fig33, axs33=plt.subplots(1,1,figsize=(12,6))
 axs33.plot(dates.iloc[-len(X_test):-len(X_test)+48*7], predictions_test[:1,:336].T, label = "Prediction samples", alpha = 0.3, color = "orange")
 axs33.plot(dates.iloc[-len(X_test):-len(X_test)+48*7], predictions_test[1:10,:336].T, alpha = 0.3, color = "orange")
@@ -179,10 +194,10 @@ plt.xticks(np.arange(1,338, 48), ["14:00\n07/25","14:00\n07/26","14:00\n07/27",
                                   "14:00\n07/28","14:00\n07/29","14:00\n07/30",
                                   "14:00\n07/31","14:00\n08/01"])
 fig33.show()
-fig33.savefig("TF_Probability/NN_Random_Weights/Figures/DMST_Sample_Multiple_Predictions.pdf", bbox_inches='tight')
+fig33.savefig("TF_Probability/NN_Random_Weights/Figures/DMSP_Sample_Multiple_Predictions.pdf", bbox_inches='tight')
 
-
-# Plot the result with the truth in blue and the predictions in orange.
+# Plot the actual prediciton with uncertainty in orange.
+# Plot the training set in blue, the test set in black and the predictions in orange.
 fig3, axs3=plt.subplots(2,1,figsize=(12,6))
 axs3[0].plot(dates.iloc[-len(X_test)-48*3:-len(X_test)],
           y_train[-48*3:],
@@ -220,19 +235,21 @@ plt.xticks(np.arange(1,482, 48), ["14:00\n07/22","14:00\n07/23","14:00\n07/24",
                                   "14:00\n07/28","14:00\n07/29","14:00\n07/30",
                                   "14:00\n07/31","14:00\n08/01"])
 fig3.show()
-fig3.savefig("TF_Probability/NN_Random_Weights/Figures/DMST_Test_Set_Pred.pdf", bbox_inches='tight')
+fig3.savefig("TF_Probability/NN_Random_Weights/Figures/DMSP_Test_Set_Pred.pdf", bbox_inches='tight')
 
 ########################################################################################################################
 # Calculate the errors on the training and the test set.
 ########################################################################################################################
 
-# Make one large column vector containing all the predictions
+# Make large column vectors containing all the predictions
 pred_train_vector = predictions_train.reshape(-1, 1)
 pred_test_vector = predictions_test.reshape(-1, 1)
 
 # Create a np array with all the predictions of the test set in the first column and the corresponding error in the next column.
 predictions_and_errors_test = np.zeros((len(pred_test_vector),2))
 predictions_and_errors_test[:,:-1] = pred_test_vector
+
+# Make a for loop to calculate the error between the prediction and the test set.
 j=0
 for i in range (len(pred_test_vector)):
         predictions_and_errors_test[i,1] = pred_test_vector[i]-y_test[j]
@@ -243,6 +260,8 @@ for i in range (len(pred_test_vector)):
 # Create a np array with all the predictions of the trianing set in the first column and the corresponding error in the next column.
 predictions_and_errors_train = np.zeros((len(pred_train_vector),2))
 predictions_and_errors_train[:,:-1] = pred_train_vector
+
+# Make a for loop to calculate the error between the prediction and the test set.
 j=0
 for i in range (len(pred_train_vector)):
         predictions_and_errors_train[i,1] = pred_train_vector[i]-y_train[j]
@@ -250,11 +269,11 @@ for i in range (len(pred_train_vector)):
         if j == len(y_train):
             j=0
 
-# Plot the histogram of the errors.
+# Plot the histograms of the errors.
 error_column_test = predictions_and_errors_test[:,1]
 error_column_train = predictions_and_errors_train[:,1]
 
-# Plot the histograms of the 2 sets.
+# Plot the histograms of the 2 sets (training and test).
 fig4, axs4=plt.subplots(1,2,figsize=(12,6))
 axs4[0].grid(True)
 axs4[0].hist(error_column_train, bins = 50, color = "blue")
@@ -266,16 +285,21 @@ axs4[1].hist(error_column_test, bins = 50, color = "blue")
 axs4[1].set_xlabel("Prediction Error on Test Set, GW", size = 14)
 axs4[1].set_ylabel("Count", size = 14)
 fig4.show()
-fig4.savefig("TF_Probability/NN_Random_Weights/Figures/DMST_Histograms_Train_and_Test_Set_Error_Pred.pdf", bbox_inches='tight')
+fig4.savefig("TF_Probability/NN_Random_Weights/Figures/DMSP_Histograms_Train_and_Test_Set_Error_Pred.pdf", bbox_inches='tight')
 
 ########################################################################################################################
 # Plot the mean and standard deviation per week for the training and test set.
 ########################################################################################################################
 
+# For the TRAINING SET
+# Call the X values again because it still has the SP as input feature.
 X = pd.read_csv('Data_Preprocessing/For_336_SP_Step_Prediction/X.csv', delimiter=',')
+
+# Compute a SP for a week going from 1 to 336.
 sp_train = X["Settlement Period"][-len(X_test)*2-len(X_train):-len(X_test)*2].values+(48*DoW[-len(X_test)*2-len(X_train):-len(X_test)*2]).values
 sp_train_column = np.array([sp_train]*350).reshape(-1,)
-# Create a dataframe that contains the SPs (1-336) and the load values.
+
+# Create a dataframe that contains the SPs (1-336) and the errors of the prediction.
 error_train = pd.DataFrame({'SP':sp_train_column, 'Error_Train': error_column_train[:len(sp_train_column)]})
 
 # Compute the mean and variation for each x.
@@ -287,12 +311,15 @@ for i in range(1,337):
     training_stats.iloc[i-1,1]=np.mean(error_train[error_train["SP"]==i].iloc[:,-1])
     training_stats.iloc[i-1,2]=np.std(error_train[error_train["SP"]==i].iloc[:,-1])
 
+# For the TEST SET
+# Compute a SP for a week going from 1 to 336.
 settlement_period_test = X["Settlement Period"][-len(X_test)*2:-len(X_test)].values+(48*DoW[-len(X_test)*2:-len(X_test)]).values
 sp_test_column = np.array([settlement_period_test]*350).reshape(-1,)
-# Create a dataframe that contains the SPs (1-336) and the load values.
+
+# Create a dataframe that contains the SPs (1-336) and the errors of the prediction.
 error_test = pd.DataFrame({'SP':sp_test_column, 'Error_Test': error_column_test[:len(sp_test_column)]})
 
-# Plot the projected errors onto a single week to see the variation in the timeseries.
+# Compute the mean and variation for each x.
 test_stats = pd.DataFrame({'Index':np.linspace(1,336,336),
                                'Mean':np.linspace(1,336,336),
                                'Stddev':np.linspace(1,336,336)})
@@ -301,7 +328,7 @@ for i in range(1,337):
     test_stats.iloc[i-1,1]=np.mean(error_test[error_test["SP"]==i].iloc[:,-1])
     test_stats.iloc[i-1,2]=np.std(error_test[error_test["SP"]==i].iloc[:,-1])
 
-# Plot the projected errors onto a single week to see the variation in the timeseries.
+# Plot the projected errors onto a single week to see the variation in the errors.
 fig5, axs5=plt.subplots(2,1,figsize=(12,10))
 
 # Plot the mean and standard deviation of the errors that are made on the training set.
@@ -314,6 +341,7 @@ axs5[0].fill_between(training_stats.iloc[:,0],
                   alpha=0.2, color = "orange", label = "+- 1x Standard Deviation")
 axs5[0].set_ylabel("Error when training\nNN w. random weights, GW", size = 14)
 
+# Plot the mean and standard deviation of the errors that are made on the test set.
 axs5[1].plot(test_stats.iloc[:,0],
           test_stats.iloc[:,1],
           color = "orange", label = "Mean of all projected errors (Test Set)")
@@ -348,21 +376,23 @@ axs5[1].set_xticklabels(["00:00\nMonday","12:00",
 axs5[0].legend(fontsize=12), axs5[1].legend(fontsize=12)
 axs5[0].tick_params(axis = "both", labelsize = 12), axs5[1].tick_params(axis = "both", labelsize = 12)
 fig5.show()
-fig5.savefig("TF_Probability/NN_Random_Weights/Figures/DMST_Mean_and_Stddev_of_Error_Train_and_Test_Set_Pred.pdf", bbox_inches='tight')
+fig5.savefig("TF_Probability/NN_Random_Weights/Figures/DMSP_Mean_and_Stddev_of_Error_Train_and_Test_Set_Pred.pdf", bbox_inches='tight')
 
 ########################################################################################################################
-# Plot the standard deviation per week for the test and training set.
+# Plot the standard deviation per week for the test and training set. WITHOUT THE MEAN
 ########################################################################################################################
 
 zeros = np.zeros((336,))
 
 fig7, axs7=plt.subplots(2,1,figsize=(12,10))
+# Plot the standard deviation of the errors that are made on the training set.
 axs7[0].fill_between(training_stats.iloc[:,0],
                   zeros,
                   +training_stats.iloc[:,2],
                   alpha=0.2, color = "orange", label = "Error when training the NN w. random weigths")
 axs7[0].set_ylabel("Standard deviation, electricity load, GW", size = 14)
 
+# Plot the standard deviation of the errors that are made on the test set.
 axs7[1].fill_between(test_stats.iloc[:,0],
                   zeros,
                   test_stats.iloc[:,2],
