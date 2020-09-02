@@ -9,6 +9,7 @@ tf.enable_v2_behavior()
 from sklearn.model_selection import train_test_split, TimeSeriesSplit
 import pandas as pd
 import matplotlib.ticker as plticker
+from sklearn.metrics import mean_absolute_error, mean_squared_error
 
 def plot_components(dates,
                     component_means_dict,
@@ -46,14 +47,15 @@ X = pd.read_csv('Data_Preprocessing/For_336_SP_Step_Prediction/X.csv', delimiter
 DoW = X["Day of Week"]
 X = X.set_index("Time")
 dates = X.iloc[:,-1]
+# Get rid of unnecessary features.
 X = X.iloc[:,:-6]
-
 y = pd.read_csv('Data_Preprocessing/For_336_SP_Step_Prediction/y.csv', delimiter=',')
 y = y.set_index("Time")
 
-# Split data into train set and test set.
+# Split data into 80% train set and 20% test set.
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state = 0, shuffle = False)
 
+# Only use half the training and tests sets. See thesis for justificaiton.
 X_train = X_train[int(len(X_train)*1/2):]
 y_train = y_train[int(len(y_train)*1/2):]
 X_test = X_test[:int(len(X_test)*1/2)]
@@ -63,7 +65,7 @@ dates_train = dates[:len(X_train)]
 dates_test = dates[-len(X_test):]
 
 ########################################################################################################################
-# Build the model.
+# Build the model using only 2 weeks for training because it takes very long!
 ########################################################################################################################
 
 #Decompose the data into daily and seasonal components
@@ -89,7 +91,9 @@ variational_posteriors = tfp.sts.build_factored_surrogate_posterior(model=load_m
 num_variational_steps = 200 # @param { isTemplate: true}
 num_variational_steps = int(num_variational_steps)
 
+# Define the optimizer and learning rate.
 optimizer = tf.optimizers.Adam(learning_rate=0.1)
+
 # Using fit_surrogate_posterior to build and optimize the variational loss function.
 @tf.function(experimental_compile=True)
 
@@ -120,7 +124,7 @@ fig1.savefig("TF_Probability/SARIMA/Figures/Loss_Curve.pdf", bbox_inches='tight'
 # Draw samples from the variational posterior.
 q_samples_load_ = variational_posteriors.sample(50)
 
-#Forecast the test set in advance.
+#Forecast the entire test set (set the length of the prediction to the length of the test set).
 num_forecast_steps = len(y_test)
 
 load_forecast_dist = tfp.sts.forecast(
@@ -129,9 +133,11 @@ load_forecast_dist = tfp.sts.forecast(
       parameter_samples=q_samples_load_,
       num_steps_forecast=num_forecast_steps)
 
+# Define the mean and stdev of the forecast
 load_forecast_mean = load_forecast_dist.mean().numpy().reshape(-1,)
 load_forecast_scale =  load_forecast_dist.stddev().numpy().reshape(-1,)
 
+# Prepare an error vector to contain the error between the forecast and the actual value.
 error_test_plot = np.zeros((len(X_test),1))
 error_test_plot = np.array((load_forecast_mean-y_test.iloc[:,0])/1000).reshape(-1,1)
 
@@ -167,15 +173,51 @@ fig2.autofmt_xdate(rotation = 12)
 fig2.show()
 fig2.savefig("TF_Probability/SARIMA/Figures/Pred_Test.pdf", bbox_inches='tight')
 
+
+# Same plot but zoomed in for the first week of the test set.
+fig22, axs22=plt.subplots(2,1,figsize=(12,6))
+
+axs22[0].plot(dates_test[:48*7],
+          y_test[:48*7]/1000,
+          color="black", label = "Test Set")
+axs22[0].plot(dates_test[:48*7],
+          load_forecast_mean[:48*7]/1000,
+          color="orange",label='SARIMA Forecast with \n+- 1 x Standard Deviation')
+axs22[0].fill_between(dates_test[:48*7],
+                  (load_forecast_mean-load_forecast_scale)[:48*7]/1000,
+                  (load_forecast_mean+load_forecast_scale)[:48*7]/1000, color="orange", alpha=0.2)
+axs22[0].set_xlabel("Dates",size = 14)
+axs22[0].set_ylabel("Load, GW",size = 14)
+
+axs22[1].plot(dates_test[:48*7],error_test_plot[:48*7], color="red", label='Error')
+axs22[1].set_xlabel("Dates",size = 14)
+axs22[1].set_ylabel("Error, GW",size = 14)
+
+# Include additional details such as grid on and rotation of ticks. Save the figure.
+axs22[0].legend(), axs22[1].legend()
+loc = plticker.MultipleLocator(base=48) # this locator puts ticks at regular intervals
+axs22[0].xaxis.set_major_locator(loc), axs22[1].xaxis.set_major_locator(loc)
+axs22[0].grid(True), axs22[1].grid(True)
+fig22.autofmt_xdate(rotation = 0)
+plt.xticks(np.arange(1,338, 48), ["14:00\n07/25","14:00\n07/26","14:00\n07/27",
+                                  "14:00\n07/28","14:00\n07/29","14:00\n07/30",
+                                  "14:00\n07/31","14:00\n08/01"])
+fig22.show()
+fig22.savefig("TF_Probability/SARIMA/Figures/Pred_Test_1st_Week.pdf", bbox_inches='tight')
+
 ########################################################################################################################
 # Plot the error per settlement period.
 ########################################################################################################################
 
+# Load the data with the SP still as input feature.
+X = pd.read_csv('Data_Preprocessing/For_336_SP_Step_Prediction/X.csv', delimiter=',')
+
+# Create a settlement period of a week going from 1 to 336.
 settlement_period_test = X["Settlement Period"][-len(X_test)*2:-len(X_test)].values+(48*DoW[-len(X_test)*2:-len(X_test)]).values
-long_column = np.array([settlement_period_test]).reshape(-1,)
-# Create a dataframe that contains the SPs (1-336) and the load values.
+
+# Create a dataframe that contains the SPs (1-336), the mean errors and the standard deviation.
 mean_errors = load_forecast_mean - y_test.values[:,0]
-error_test = pd.DataFrame({'SP':long_column, 'Means': mean_errors/1000,'Stddev': load_forecast_scale/1000 })
+error_test = pd.DataFrame({'SP':settlement_period_test, 'Means': mean_errors/1000,'Stddev': load_forecast_scale/1000 })
 
 # Compute the mean and variation for each x.
 test_stats = pd.DataFrame({'Index':np.linspace(1,336,336),
@@ -197,10 +239,21 @@ axs3.fill_between(test_stats.iloc[:,0],
                   (test_stats.iloc[:,1]+test_stats.iloc[:,2]),
                   alpha=0.2, color = "orange", label = "+- 1x Standard Deviation")
 axs3.set_ylabel("Error Test Set, GW", size = 14)
-axs3.set_xticks(np.arange(1,385, 48))
-axs3.set_xticklabels(["1 / Monday", "49 / Tuesday", "97 / Wednesday", "145 / Thursday", "193 / Friday","241 / Saturday", "289 / Sunday",""])
-axs3.legend()
-axs3.grid(True)
+
+# Include additional details such as tick intervals, legend positioning and grid on.
+axs3.set_xticks(np.arange(1,385, 24))
+axs3.set_xticklabels(["00:00\nMonday","12:00",
+                       "00:00\nTuesday","12:00",
+                       "00:00\nWednesday", "12:00",
+                       "00:00\nThursday", "12:00",
+                       "00:00\nFriday","12:00",
+                       "00:00\nSaturday", "12:00",
+                       "00:00\nSunday","12:00",
+                       "00:00"])
+axs3.grid(b=True, which='major'), axs3.grid(b=True, which='minor',alpha = 0.2)
+axs3.tick_params(axis = "both", labelsize = 12)
+axs3.minorticks_on()
+axs3.legend(fontsize=14)
 fig3.show()
 fig3.savefig("TF_Probability/SARIMA/Figures/Projected_Error_Test.pdf", bbox_inches='tight')
 
@@ -215,14 +268,9 @@ print("-"*200)
 ########################################################################################################################
 # Save the results in a csv file.
 ########################################################################################################################
-
-# import csv
-# with open('Compare_Models/Direct_Multi_Step_Probability_Results/Probability_Based_on_Model/SARIMA_error.csv', 'w', newline='', ) as file:
-#     writer = csv.writer(file)
-#     writer.writerow(["Method","MSE","MAE","RMSE"])
-#     writer.writerow(["SARIMA",
-#                      str(np.mean(errors**2)),
-#                      str(np.mean(errors)),
-#                      str(np.sqrt(np.mean(errors**2)))
-#                      ])
-# test_stats.to_csv("Compare_Models/Direct_Multi_Step_Probability_Results/Probability_Based_on_Model/SARIMA_mean_errors_stddevs.csv")
+#
+#df_errors = pd.DataFrame({"MSE_Test": [mean_squared_error(y_test, load_forecast_mean)],
+#                          "MAE_Test": [mean_absolute_error(y_test, load_forecast_mean)],
+#                          "RMSE_Test": [np.sqrt(mean_squared_error(y_test, load_forecast_mean))],
+#                          })
+#df_errors.to_csv("Compare_Models/Direct_Multi_Step_Probability_Results/Probability_Based_on_Training/DT_error.csv")
