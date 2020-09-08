@@ -6,3 +6,5 @@ Some abbreviations in this work include:
 
 DMSP: Direct Multi-Step Prediction
 IMSP: Iterative Multi-Step Prediction
+
+The "Load_Prediction/Hybrid_Folder" in this repository is under construction and not necessary for the thesis. 
